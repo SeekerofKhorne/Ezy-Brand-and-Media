@@ -1,0 +1,53 @@
+# How the code is organized
+
+The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joining the stylesheet, the markup and ten script files from `src/`, in the order below. Later files use names defined by earlier ones; there are no modules and no imports between them. Fonts and three libraries are copied beside the page and loaded only when needed.
+
+| File | What it holds |
+|---|---|
+| `data.js` | Sources (`SRC`), palettes, graphics list, platforms, formats and safe zones, layout list, text fields, the starter brand |
+| `concepts.js` | The 49 ideas a keyword can map to, their groups, synonyms and suggested keywords |
+| `types.js` | Type pairings and the design features the tagging rules read |
+| `engine.js` | Color math, the tagging rules, keyword parsing, ranking, color harmony and companion colors |
+| `draw.js` | The Canvas renderer: color scheme, text fitting, graphics, layouts, platform guides |
+| `store.js` | Storage. The only file that knows where data lives |
+| `ui.js` | The Designer: state, search results, color and pairing builders, Advanced options, export |
+| `free.js` | The Layer editor and PDF / image import |
+| `kit.js` | Brand kit export (guidelines PDF and ZIP) |
+| `lib.js` | Brands, posts, the Brands and posts tab, sharing, start-up |
+| `body.html`, `style.css` | Markup and styles |
+
+## The ideas that matter
+
+**One renderer.** `renderDraft(ctx, W, H, S, opts)` in `draw.js` draws a post from a plain description `S`. The live preview, every thumbnail and the exported file all call it, so they cannot disagree.
+
+**Tags come from rules.** At load, `engine.js` runs every palette, color, pairing and graphic through rules that read measurable features (hue, brightness, saturation; serif, weight, roundness; curvature, symmetry) and attach concept tags with a weight, a reason and a source. A keyword is parsed to the same concepts and results are ranked by overlap. Nothing is tagged by hand except the `conv` field, which is always shown as a convention.
+
+**State is a plain object.** `state` in `ui.js` is the open post plus a few display preferences. `sane()` fills in defaults and clamps values, so an old or partial object always opens. `snap()` turns state into the description the renderer takes.
+
+**Brands own things; posts point at a brand.** A brand record holds the name, colors, saved palettes, custom pairings, logo and sample text. A post is either a template post (a copy of `state`) or a layer layout (a document of layers). Records are JSON; images are stored separately and referenced by short strings.
+
+**Simple and Advanced are a view.** The mode sets a class on `<body>` and CSS hides elements marked `adv` or `simple-only`. Advanced settings live in the post itself and still apply when the post is viewed in Simple mode.
+
+**Edit as layers reuses the renderer.** `renderDraft` accepts `opts.rec`, an array. With it, the text helpers push layer descriptions to the array in place of painting, and what remains on the canvas becomes the background layer. This is why a new layout should draw text through the shared helpers.
+
+## Storage
+
+`store.js` has two modes behind one interface (`all`, `get`, `put`, `del`, `loadImage`, `pack`, `unpack` and a few more).
+
+- **Local** is the default and the only mode in a stand-alone copy. Records and image blobs go to IndexedDB (database `brand-media-lab`). Sharing and backup are files: `pack` gathers a brand, a post or everything, and embeds the images it refers to; `unpack` stores those images again on the receiving side and rewrites the references.
+- **Cloud** switches on only when the page is given a `window.claude` runtime, which is how the app runs when published as a Claude artifact. Then the signed-in viewer is the account, records go to that viewer's private part of the page database, images to the page's asset store, and a brand or post can also be shared by link. `tests/mock-host.js` simulates that runtime so the path stays tested.
+
+To put the app behind a different backend (your own accounts and database), replace the cloud branch in `store.js`. Nothing outside that file reads or writes storage directly.
+
+## Build settings
+
+`app.config.json` has two values, both overridable by environment variable at build time:
+
+| Key | Variable | Meaning |
+|---|---|---|
+| `name` | `APP_NAME` | The name shown in the header, the tab title and exported kits |
+| `shareBase` | `APP_SHARE_BASE` | Only for the hosted-with-accounts mode: the public address share links should start with, when it differs from the address the page sees itself at |
+
+## Why no framework
+
+The app is small enough to read in a sitting, loads as one file, and has no toolchain to keep alive. The cost is that the source is dense and files share one global scope. If the project grows, the first step worth taking is turning `src/` into ES modules; the load order above is already the dependency order.
