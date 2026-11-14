@@ -2,7 +2,7 @@
   <header class="top">
     <h1 id="appName">Ezy Brand and Media</h1>
     <div class="seg" id="nav" role="group" aria-label="Section">
-      <button type="button" data-v="design" aria-pressed="true">Designer</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
+      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
     </div>
     <span class="sp"></span>
     <div class="seg" id="modeSeg" role="group" aria-label="How much control to show">
@@ -13,6 +13,117 @@
     <button class="btn" id="btnHelp" type="button">Quick start</button>
     <button class="btn" id="btnSources" type="button">Sources and method</button>
   </header>
+  <div class="bview" id="viewBrand" hidden>
+    <div class="bbar">
+      <nav class="steps" aria-label="Brand steps">
+        <button type="button" id="bStep1" data-step="describe"><b>1</b>Describe the brand</button>
+        <span aria-hidden="true" class="stepsep"></span>
+        <button type="button" id="bStep2" data-step="build"><b>2</b>Build the kit</button>
+      </nav>
+      <span class="sp"></span>
+      <span class="savestate" id="bSaveState" aria-live="polite"></span>
+      <button class="btn small" id="btnDiscard" type="button" hidden>Discard changes</button>
+      <button class="btn primary" id="btnSaveBrand" type="button">Save brand</button>
+    </div>
+
+    <section class="bdesc" id="bDescribe" aria-labelledby="bDescH">
+      <div class="bdesc-main">
+        <div>
+          <h2 class="bh" id="bDescH">How should the brand feel?</h2>
+          <p class="lede">Type a few words. Each one is matched to personality traits, emotions and values, and the fingerprint updates as you go.</p>
+        </div>
+        <div class="search">
+          <label for="q">Keywords</label>
+          <div class="kwbox" id="kwbox">
+            <span class="chips" id="kwChips"></span>
+            <input id="q" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="acList" placeholder="calm, trustworthy, premium">
+          </div>
+          <div class="aclist" id="acList" role="listbox" aria-label="Keyword suggestions" hidden></div>
+          <p class="note" id="kwHint">Press Enter or type a comma to add a word. Use the arrow keys to pick a suggestion.</p>
+          <div class="sugg" id="sugg" aria-label="Words to start with"></div>
+          <details class="dir" id="dir"><summary>Browse all keywords by group</summary><div id="dirBody"></div></details>
+        </div>
+        <section class="card" aria-labelledby="termsH">
+          <h2 id="termsH">What your words map to</h2>
+          <div class="terms" id="terms"></div>
+          <div class="legend">
+            <span><i class="tier tier-R">R</i>Research</span><span><i class="tier tier-S">S</i>Standard</span><span><i class="tier tier-C">C</i>Convention</span>
+            <button type="button" id="btnSources2">What these mean</button>
+          </div>
+        </section>
+        <div class="rowbtns">
+          <button class="btn primary big" id="btnUseKw" type="button">Use these keywords &#8594;</button>
+          <span class="note" style="margin:0">You can change them later. Your picks are kept.</span>
+        </div>
+      </div>
+      <aside class="card fp" aria-labelledby="fpH">
+        <h2 id="fpH">Brand fingerprint</h2>
+        <div class="radar" id="radarBig"></div>
+        <p class="note">Personality runs from none at the centre to strong at the edge. Pleasure, arousal and dominance run from low to high; the dashed ring is neutral.</p>
+        <div class="fplist" id="fpList"></div>
+      </aside>
+    </section>
+
+    <section class="bbuild" id="bBuild" hidden>
+      <aside class="brail" aria-label="Fingerprint and keywords">
+        <section class="card">
+          <h2>Fingerprint</h2>
+          <div class="radar" id="radarSmall"></div>
+          <div class="fpkey">
+            <span><i class="kt"></i>What your keywords ask for</span>
+            <span><i class="kc"></i>What your current picks signal</span>
+          </div>
+          <p class="note" id="fpFit"></p>
+        </section>
+        <section class="card">
+          <div class="rowbtns" style="justify-content:space-between"><h2>Keywords</h2><button type="button" class="link" id="btnEditKw">Edit keywords</button></div>
+          <div class="terms" id="kwRead"></div>
+        </section>
+      </aside>
+      <div class="bmain card">
+        <div class="tabs" role="tablist" id="tabs">
+          <button role="tab" type="button" data-v="colors">Colors<span class="n" id="nColors"></span></button>
+          <button role="tab" type="button" data-v="type">Type<span class="n" id="nType"></span></button>
+          <button role="tab" type="button" data-v="graphic">Graphics<span class="n" id="nGraphic"></span></button>
+          <button role="tab" type="button" data-v="identity">Identity</button>
+        </div>
+        <div class="savedpals" id="savedPals"></div>
+        <div class="subbar" id="subbar"></div>
+        <div class="rhead" id="rhead"><span id="rSummary"></span><button type="button" id="btnAll"></button></div>
+        <div class="results" id="results"></div>
+        <div class="ident-form" id="bIdentity" hidden>
+          <div class="fields">
+            <div class="two">
+              <label for="bName">Brand name<input id="bName" type="text" maxlength="40"></label>
+              <label for="bHandle">Handle<input id="bHandle" type="text" maxlength="30"></label>
+            </div>
+            <label>Logo (replaces the text wordmark on posts)<span class="file"><input id="inLogo" type="file" accept="image/*"><button class="btn small" id="rmLogo" type="button">Remove</button></span></label>
+            <p class="note">The name, handle and logo appear on every post made with this brand. Save the brand to keep them.</p>
+          </div>
+        </div>
+        <details class="acc adv" id="accFine">
+        <summary>Fine-tune hex values and graphic</summary>
+        <div class="fields">
+          <div class="colors" id="colors"></div>
+          <p class="note" id="palNote"></p>
+          <div class="savepal"><input id="palName2" type="text" maxlength="40" placeholder="Name this palette" aria-label="Palette name"><button class="btn small" id="btnSavePal" type="button">Save as a named palette</button></div>
+          <label>Graphic strength<input id="gStrength" type="range" min="0" max="100" step="1"></label>
+          <div class="rowbtns"><button class="btn small" id="btnSeed" type="button">Rearrange the graphic</button><button class="btn small" id="btnResetPal" type="button">Reset palette colors</button></div>
+        </div>
+      </details>
+      </div>
+      <aside class="bprev" aria-labelledby="pvH">
+        <div class="rowbtns" style="justify-content:space-between">
+          <h2 id="pvH">Preview</h2>
+          <div class="seg" id="pvFmt" role="group" aria-label="Preview format">
+            <button type="button" data-v="square">Square post</button><button type="button" data-v="story">Story</button><button type="button" data-v="banner">Banner</button>
+          </div>
+        </div>
+        <div class="stage pvstage" id="pvStage"><canvas id="pcv" role="img" aria-label="Sample post in the brand's colors, type and graphic"></canvas></div>
+        <p class="note">A sample post for checking the kit. Make real posts under Media.</p>
+      </aside>
+    </section>
+  </div>
   <div class="main" id="viewDesign">
     <aside class="col left" aria-label="Templates">
       <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
@@ -58,7 +169,7 @@
         <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
       </div>
       <p class="advnote simple-only" id="advNote" hidden></p>
-      <p class="stepline simple-only"><b>4</b>Name it and save it to the brand, or export the image</p>
+      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
       <div class="status" id="status" aria-live="polite"></div>
 
       <section class="card" aria-labelledby="sigH">
@@ -82,50 +193,23 @@
       </section>
     </main>
 
-    <aside class="col right" aria-label="Keyword search">
-      <p class="stepline simple-only"><b>2</b>Describe the brand, then choose colors, type and a graphic</p>
-      <div class="search">
-        <label for="q">Describe the brand in a few words</label>
-        <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="authentic, calm, trustworthy">
-        <div class="sugg" id="sugg"></div>
-        <details class="dir" id="dir"><summary>Browse all keywords by group</summary><div id="dirBody"></div></details>
-        <div class="terms" id="terms"></div>
-        <div class="legend">
-          <span><i class="tier tier-R">R</i>Research</span><span><i class="tier tier-S">S</i>Standard</span><span><i class="tier tier-C">C</i>Convention</span>
-          <button type="button" id="btnSources2">What these mean</button>
-        </div>
-      </div>
-      <div class="tabs" role="tablist" id="tabs">
-        <button role="tab" type="button" data-v="colors">Colors<span class="n" id="nColors"></span></button>
-        <button role="tab" type="button" data-v="type">Type<span class="n" id="nType"></span></button>
-        <button role="tab" type="button" data-v="graphic">Graphics<span class="n" id="nGraphic"></span></button>
-      </div>
-      <div class="subbar" id="subbar"></div>
-      <div class="rhead" id="rhead"><span id="rSummary"></span><button type="button" id="btnAll"></button></div>
-      <div class="results" id="results"></div>
-
-      <p class="stepline simple-only"><b>3</b>Replace the sample words with your own</p>
+    <aside class="col right" aria-label="Post content">
+      <section class="look" id="mLook" aria-labelledby="mLookH">
+        <div class="rowbtns" style="justify-content:space-between"><h2 id="mLookH">Brand look</h2><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
+        <p class="note" id="mLookNote" style="margin-top:2px"></p>
+        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
+      </section>
+      <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
       <details class="acc" id="accText" open>
         <summary>Text on the post</summary>
         <div class="fields" id="fields"></div>
       </details>
       <details class="acc" id="accImg">
-        <summary>Photo and logo</summary>
+        <summary>Photo</summary>
         <div class="fields">
           <label>Photo (used by photo layouts)<span class="file"><input id="inPhoto" type="file" accept="image/*"><button class="btn small" id="rmPhoto" type="button">Remove</button></span></label>
-          <label>Logo (replaces the text wordmark)<span class="file"><input id="inLogo" type="file" accept="image/*"><button class="btn small" id="rmLogo" type="button">Remove</button></span></label>
           <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="tint" type="checkbox"> Tint the photo with the primary color</label>
-          <p class="note">The logo is saved with the brand and the photo with the post.</p>
-        </div>
-      </details>
-      <details class="acc adv" id="accFine">
-        <summary>Fine-tune hex values and graphic</summary>
-        <div class="fields">
-          <div class="colors" id="colors"></div>
-          <p class="note" id="palNote"></p>
-          <div class="savepal"><input id="palName2" type="text" maxlength="40" placeholder="Name this palette" aria-label="Palette name"><button class="btn small" id="btnSavePal" type="button">Save as a named palette</button></div>
-          <label>Graphic strength<input id="gStrength" type="range" min="0" max="100" step="1"></label>
-          <div class="rowbtns"><button class="btn small" id="btnSeed" type="button">Rearrange the graphic</button><button class="btn small" id="btnResetPal" type="button">Reset palette colors</button></div>
+          <p class="note">The photo is saved with the post. The logo belongs to the brand: change it on the Brand page, under Identity.</p>
         </div>
       </details>
       <details class="acc adv" id="accAdv">
@@ -215,13 +299,17 @@
   <header><h2 id="askH">Name</h2><button class="btn" type="button" data-close>Cancel</button></header>
   <div class="savepal"><input id="askIn" type="text" maxlength="40" aria-labelledby="askH"><button class="btn primary" id="askOk" type="button">Save</button></div>
 </div></div>
+<div class="overlay" id="ovUnsaved" hidden><div class="sheet" style="max-width:500px" role="dialog" aria-modal="true" aria-labelledby="unsH">
+  <header><h2 id="unsH">Save changes to the brand?</h2></header>
+  <p id="unsMsg"></p>
+  <div class="rowbtns" style="margin-top:14px"><button class="btn primary" id="unsSave" type="button">Save brand</button><button class="btn" id="unsDrop" type="button">Discard changes</button><button class="btn" id="unsCancel" type="button" data-close>Cancel</button></div>
+</div></div>
 <div class="overlay" id="ovWelcome" hidden><div class="sheet" style="max-width:680px" role="dialog" aria-modal="true" aria-labelledby="welH">
   <header><h2 id="welH">Quick start</h2><button class="btn primary" type="button" data-close>Start</button></header>
   <ol class="quick">
-    <li><b>Pick a template.</b> Choose the platform, the format and a layout on the left.</li>
-    <li><b>Describe the brand.</b> Type a few words such as “calm, trustworthy”. Colors, type pairings and graphics that fit those words rise to the top, each with the reason it matched.</li>
-    <li><b>Try options.</b> Select any result to see it on the post. Shuffle tries combinations for you.</li>
-    <li><b>Make it yours.</b> Replace the sample text, add a photo or logo, then save the post to the brand or export a PNG.</li>
+    <li><b>Describe the brand.</b> On the Brand page, type a few words such as “calm, trustworthy”. The fingerprint shows the personality and feeling those words ask for.</li>
+    <li><b>Build the kit.</b> Choose colors, a type pairing and a graphic. The ones that fit your words come first, each with the reason it matched. Save palettes to the brand, then choose Save brand.</li>
+    <li><b>Make posts.</b> On the Media page, pick a platform, a format and a layout, replace the sample text, and save the post to the brand or export it.</li>
   </ol>
   <div class="h" style="margin-top:14px">How much control do you want?</div>
   <div class="modepick" id="welMode">
@@ -230,5 +318,5 @@
   </div>
   <p class="note">You can switch at any time at the top of the page. Nothing is lost when you switch.</p>
   <p id="welBody"></p>
-  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts.</p>
+  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts. Brand changes are kept only when you choose Save brand.</p>
 </div></div>

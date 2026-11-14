@@ -36,7 +36,7 @@ Nothing goes live until you merge, and every merged change can be undone on GitH
 ## What it does
 
 - **Templates** for 33 formats across seven platforms, with safe-zone guides and ten layouts.
-- **Keyword search** over 49 ideas (brand personality, emotions, values, styles, topics), reached through about 2,900 keywords and each linked to colors, type and graphics by a rule with a named source.
+- **A Brand page** with keyword search over 49 ideas (brand personality, emotions, values, styles, topics), reached through about 2,900 keywords with autocomplete, and a fingerprint chart of what the words ask for. Each idea is linked to colors, type and graphics by a rule with a named source. Brand changes are kept when you choose Save brand.
 - **Color**: 28 ready-made palettes, or build one color at a time with partners that suit your primary and match your keywords. Contrast is checked against WCAG 2.2.
 - **Type**: 52 ready-made pairings from 56 bundled open-licensed typefaces.
 - **Brands and posts**: save named palettes, pairings, a logo and any number of posts under a brand. Keep several brands.
