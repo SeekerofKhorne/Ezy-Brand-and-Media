@@ -11,7 +11,7 @@
      in their private part of the page database, images in the page's asset
      store, and brands and posts can also be shared by link.
    ============================================================ */
-const APP_NAME=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.name)||'Brand Media Lab';
+const APP_NAME=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.name)||'Ezy Brand and Media';
 const SHARE_BASE=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.shareBase)||'';
 const uidGen=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const Store=(function(){

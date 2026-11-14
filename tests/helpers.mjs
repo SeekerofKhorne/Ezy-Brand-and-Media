@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const fixture = name => join(root, 'tests', 'fixtures', name);
 const site = join(root, 'docs');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.woff2': 'font/woff2', '.woff': 'font/woff' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 
 export function startServer() {
   return new Promise(done => {

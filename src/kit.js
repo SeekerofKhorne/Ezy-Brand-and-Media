@@ -37,7 +37,7 @@ const Kit=(function(){
         const w=c.width/2*.55,h=c.height/2*.55;if(x+w>W-M){x=M;y+=rowH+26;rowH=0;}if(y+h>740){pdf.addPage();y=64;x=M;rowH=0;}pdf.addImage(c.toDataURL('image/jpeg',.88),'JPEG',x,y,w,h);pdf.setFont('helvetica','normal');pdf.setFontSize(8.5);pdf.setTextColor(95,95,100);pdf.text(ascii(p.name).slice(0,34),x,y+h+11);x+=w+16;rowH=Math.max(rowH,h);}}
     return pdf.output('blob');}
   const README=(b,t,fonts)=>`${b.name} brand kit
-Exported from Brand Media Lab on ${new Date().toISOString().slice(0,10)}
+Exported from ${APP_NAME} on ${new Date().toISOString().slice(0,10)}
 
 WHAT IS IN THIS FOLDER
   Brand-guidelines.pdf    One document with the logo, colors, typefaces and brand keywords.

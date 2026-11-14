@@ -1,13 +1,47 @@
 # Contributing
 
-## Set up
+Most people never need this page: the app is live at https://seekerofkhorne.github.io/Ezy-Brand-and-Media/. This is for changing the code.
+
+## What is in this repository
+
+| Folder or file | What it is |
+|---|---|
+| `src/` | The app's source: page layout, styles, and the code. Edit here. |
+| `docs/` | The built app, made from `src/` by the build. GitHub Pages serves this folder as the live site. Never edit it by hand; rebuild instead. (GitHub only lets Pages serve a folder called `docs` or the top level, hence the name.) |
+| `handbook/` | Documentation: how the code fits together, the user guide, keyword search, the roadmap. |
+| `scripts/` | The build (`build.mjs`) and a small local web server (`serve.mjs`). |
+| `tests/` | Browser tests that open the built app and use it. |
+| `tools/` | Occasional jobs that are not part of the app: the keyword review list and the meaning-matching experiment. See `handbook/keyword-search.md`. |
+| `app.config.json` | The app's name and short name. |
+
+## Run it on your own computer
+
+You need [Node.js](https://nodejs.org) 20 or newer. In a terminal:
 
 ```
+git clone https://github.com/SeekerofKhorne/Ezy-Brand-and-Media.git
+cd Ezy-Brand-and-Media
 npm install
-npm run dev
+npm start
 ```
 
-Edit files in `src/`, reload the page. Before you commit, run `npm test` (it rebuilds `docs/` first) and commit the rebuilt `docs/` with your change.
+Then open http://localhost:5173/. Work saved there is separate from work saved on the live site, because the browser stores it per address.
+
+`docs/` can also be served as it is by any static file server (`python3 -m http.server --directory docs 5173`). Opening `docs/index.html` by double-click does not fully work: browsers block the PDF importer and the brand kit from loading their files off `file://`.
+
+## Make a change
+
+```
+npm run dev     # serve on localhost:5173 and rebuild when a file in src/ changes
+npm run build   # rebuild docs/ once
+npm test        # build, then run the browser tests
+```
+
+The tests drive a real browser with [Playwright](https://playwright.dev). The first time, either run `npx playwright install chromium`, or point the tests at a Chrome you already have: `CHROME_PATH=/path/to/chrome npm test`.
+
+Commit the rebuilt `docs/` with your change: it is what the live site serves. Changes go to `main` through a pull request, and GitHub runs the tests on every pull request.
+
+There is no framework and no bundler. `scripts/build.mjs` joins the files in `src/` into one page and copies the fonts, icons and three libraries next to it. Start with [handbook/architecture.md](handbook/architecture.md) for a map of the code.
 
 ## Ground rules
 

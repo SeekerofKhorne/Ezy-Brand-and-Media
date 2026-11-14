@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ezy Brand and Media</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-title" content="Ezy Brand and Media">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Ccircle cx='12' cy='13' r='6' fill='%23f2efe8'/%3E%3Ccircle cx='20' cy='19' r='6' fill='%238a7a5c'/%3E%3C/svg%3E">
 <style>
 @font-face{font-family:"Source Sans 3";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/source-sans-3-400.woff2") format("woff2")}
@@ -381,7 +385,7 @@ body.mode-advanced .simple-only{display:none!important}
 <body>
 <div class="app">
   <header class="top">
-    <h1 id="appName">Brand Media Lab</h1>
+    <h1 id="appName">Ezy Brand and Media</h1>
     <div class="seg" id="nav" role="group" aria-label="Section">
       <button type="button" data-v="design" aria-pressed="true">Designer</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
     </div>
@@ -1510,7 +1514,7 @@ function renderDraft(ctx,W,H,S,opts){opts=opts||{};const u=Math.sqrt(W*H)/100;S.
      in their private part of the page database, images in the page's asset
      store, and brands and posts can also be shared by link.
    ============================================================ */
-const APP_NAME=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.name)||'Brand Media Lab';
+const APP_NAME=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.name)||'Ezy Brand and Media';
 const SHARE_BASE=(typeof APP_CONFIG!=='undefined'&&APP_CONFIG.shareBase)||'';
 const uidGen=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const Store=(function(){
@@ -2130,7 +2134,7 @@ const Kit=(function(){
         const w=c.width/2*.55,h=c.height/2*.55;if(x+w>W-M){x=M;y+=rowH+26;rowH=0;}if(y+h>740){pdf.addPage();y=64;x=M;rowH=0;}pdf.addImage(c.toDataURL('image/jpeg',.88),'JPEG',x,y,w,h);pdf.setFont('helvetica','normal');pdf.setFontSize(8.5);pdf.setTextColor(95,95,100);pdf.text(ascii(p.name).slice(0,34),x,y+h+11);x+=w+16;rowH=Math.max(rowH,h);}}
     return pdf.output('blob');}
   const README=(b,t,fonts)=>`${b.name} brand kit
-Exported from Brand Media Lab on ${new Date().toISOString().slice(0,10)}
+Exported from ${APP_NAME} on ${new Date().toISOString().slice(0,10)}
 
 WHAT IS IN THIS FOLDER
   Brand-guidelines.pdf    One document with the logo, colors, typefaces and brand keywords.
