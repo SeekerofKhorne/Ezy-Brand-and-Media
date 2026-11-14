@@ -29,6 +29,16 @@ test('opens in Simple mode with a starter brand and no errors', async () => {
   await page.context().close();
 });
 
+test('can be installed as an app (Dock, Start menu, phone home screen)', async () => {
+  const page = await openApp(browser, url);
+  const cdp = await page.context().newCDPSession(page);
+  const { installabilityErrors } = await cdp.send('Page.getInstallabilityErrors');
+  // the test browser is a private profile, which Chrome reports on its own
+  assert.deepEqual(installabilityErrors.filter(e => e.errorId !== 'in-incognito'), []);
+  assert.equal(await page.textContent('#appName'), 'Ezy Brand and Media');
+  await page.context().close();
+});
+
 test('keywords rank the options, and choosing one changes the post', async () => {
   const page = await openApp(browser, url);
   const before = await page.evaluate('document.getElementById("cv").toDataURL()');

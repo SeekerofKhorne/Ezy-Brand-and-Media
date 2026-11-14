@@ -3,7 +3,7 @@
 ## The four steps
 
 1. **Pick a template.** On the left, choose a platform, then a format (the size), then a layout. Pink hatching on the preview marks areas the platform covers or crops; it is never exported.
-2. **Describe the brand.** On the right, type a few words or select suggested ones. Results that fit rise to the top of the Colors, Type and Graphics tabs. Each lists why it matched and carries a letter: **R** a published study measured the link, **S** a standard or platform requirement, **C** common practice nobody tested. A word the app has no link for is reported, not guessed.
+2. **Describe the brand.** On the right, type a few words or select suggested ones. Results that fit rise to the top of the Colors, Type and Graphics tabs. Each lists why it matched and carries a letter: **R** a published study measured the link, **S** a standard or platform requirement, **C** common practice nobody tested. Many everyday words and slang terms come from a reviewed list suggested by a language model; they carry no letter, and hovering the word says so. A word the app has no link for is reported, not guessed.
 3. **Try options.** Select any result to put it on the post. **Shuffle** tries combinations from the current matches. **Default / Brand fill / Reversed** changes which color fills the post.
 4. **Make it yours.** Replace the sample text, add a photo or logo, name the post and choose **Save post**, or **Export PNG**.
 
