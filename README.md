@@ -34,7 +34,7 @@ The switch at the top of the page changes how many controls are shown. It never 
 | Edit as layers: turn a template post into editable layers | | Yes |
 | Choose what Shuffle changes | | Yes |
 
-More detail is in the [user guide](handbook/user-guide.md).
+More detail is in the [user guide](handbook/user-guide.md). How keyword search works, and what was tried, is in [keyword search](handbook/keyword-search.md).
 
 ## Use it
 

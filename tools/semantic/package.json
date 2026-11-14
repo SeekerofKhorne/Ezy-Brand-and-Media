@@ -1,0 +1,14 @@
+{
+  "name": "ezy-semantic-table",
+  "private": true,
+  "description": "Builds data/semantic-table.json, which links everyday words to the app's concepts. Run rarely; the app itself does not need these packages.",
+  "type": "module",
+  "scripts": {
+    "build": "node build-table.mjs",
+    "evaluate": "node build-table.mjs --evaluate"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.7.0",
+    "wordlist-english": "^1.2.1"
+  }
+}

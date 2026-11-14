@@ -186,7 +186,9 @@ function tagGraphic(g){const T=newTags(),f=g.f,cautions=[];
 const CONCEPT_BY_ID={};CONCEPTS.forEach(c=>CONCEPT_BY_ID[c.id]=c);
 const LEX={};
 (function(){for(const c of CONCEPTS){const put=(w,kind)=>{const k=w.toLowerCase();const a=LEX[k]||(LEX[k]=[]);if(!a.some(x=>x.c===c.id))a.push({c:c.id,kind});};
-  put(c.label,'name');if(!c.bridge)put(c.id,'name');put(c.key,'name');(c.aaker||[]).forEach(w=>put(w,'aaker'));(c.syn||[]).forEach(w=>put(w,'syn'));}})();
+  put(c.label,'name');if(!c.bridge)put(c.id,'name');put(c.key,'name');(c.aaker||[]).forEach(w=>put(w,'aaker'));(c.syn||[]).forEach(w=>put(w,'syn'));}
+  /* model-suggested, reviewed words (concepts-suggested.js) come last, so a word also listed above keeps that label */
+  if(typeof SUGGESTED!=='undefined')for(const c of CONCEPTS)(SUGGESTED[c.id]||[]).forEach(w=>{const k=w.toLowerCase();const a=LEX[k]||(LEX[k]=[]);if(!a.some(x=>x.c===c.id))a.push({c:c.id,kind:'sugg'});});})();
 const LEX_KEYS=Object.keys(LEX);
 function stemTry(w){const out=[w];const add=x=>{if(x.length>2&&!out.includes(x))out.push(x);};
   add(w.replace(/-/g,' '));add(w.replace(/\s+/g,'-'));add(w.replace(/[\s-]+/g,''));

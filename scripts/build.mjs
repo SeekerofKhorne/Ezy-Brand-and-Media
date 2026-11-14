@@ -19,7 +19,7 @@ if (process.env.APP_NAME) config.name = process.env.APP_NAME;
 if (process.env.APP_SHARE_BASE) config.shareBase = process.env.APP_SHARE_BASE;
 
 /* Source files, in load order. Later files use what earlier files define. */
-const SCRIPTS = ['data.js', 'concepts.js', 'types.js', 'engine.js', 'draw.js', 'store.js', 'ui.js', 'free.js', 'kit.js', 'lib.js'];
+const SCRIPTS = ['data.js', 'concepts.js', 'concepts-suggested.js', 'types.js', 'engine.js', 'draw.js', 'store.js', 'ui.js', 'free.js', 'kit.js', 'lib.js'];
 
 const VENDOR = [
   ['pdfjs-dist/build/pdf.min.mjs', 'pdf.min.js'],
