@@ -46,6 +46,10 @@ test('keywords rank the options, and choosing one changes the post', async () =>
   await page.fill('#q', 'calm, zzzqqq');
   await page.waitForFunction('parsed.terms.some(t => !t.hits)');
   assert.match(await page.textContent('#terms'), /no link on file/);
+  // a reviewed, model-suggested word is understood, and its chip says where the link comes from
+  await page.fill('#q', 'opulent');
+  await page.waitForFunction('parsed.concepts.includes("sophistication")');
+  assert.match(await page.getAttribute('#terms .term', 'title'), /Suggested by a language model/);
   // the color builder accepts a typed hex code
   await page.fill('#q', 'calm');
   await page.click('#subbar button:has-text("Build color by color")');

@@ -2,3 +2,8 @@ node_modules/
 tests/output/
 .DS_Store
 *.log
+
+# Keyword tools: model files and packages are downloaded, never committed
+tools/semantic/model/
+tools/semantic/node_modules/
+data/semantic-table.json
