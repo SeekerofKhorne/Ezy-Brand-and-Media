@@ -380,6 +380,81 @@ body.mode-advanced .simple-only{display:none!important}
 
 [hidden]{display:none!important}
 
+/* ---------- Brand page ---------- */
+.navdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--t-c);margin-left:6px;vertical-align:middle}
+.bview{overflow:auto;min-height:0;display:flex;flex-direction:column}
+.bbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+.bbar .sp{flex:1 1 8px}
+.steps{display:flex;align-items:center;gap:6px}
+.steps button{display:inline-flex;align-items:center;gap:8px;border:0;background:none;padding:6px 8px;border-radius:8px;font-weight:600;color:var(--ink-2)}
+.steps button b{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.steps button[aria-current="true"]{color:var(--ink)}
+.steps button[aria-current="true"] b{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.steps button:hover{background:var(--chip)}
+.stepsep{width:22px;height:1px;background:var(--line)}
+.savestate{font-size:13px;color:var(--ink-2)}
+.savestate.on{color:var(--t-c);font-weight:600}
+.savestate.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--t-c);margin-right:6px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.big{padding:11px 18px;font-size:15px;border-radius:10px}
+.bh{font:600 26px/1.15 var(--font-display);letter-spacing:-.01em;margin-bottom:6px}
+.bdesc{display:flex;flex-wrap:wrap;gap:24px;padding:28px 24px 48px;max-width:1320px;width:100%;margin:0 auto;align-items:flex-start}
+.bdesc-main{flex:999 1 520px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.bdesc .lede{color:var(--ink-2);margin:0;max-width:62ch}
+.fp{flex:1 1 380px;min-width:0;max-width:520px;display:flex;flex-direction:column;gap:8px}
+.fplist{display:grid;gap:7px;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.fplist .sig{grid-template-columns:120px minmax(60px,1fr) auto}
+.search{position:relative}
+.kwbox{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:12px;background:var(--panel);padding:7px 8px;cursor:text}
+.kwbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.kwbox input{flex:1 1 160px;min-width:120px;border:0;background:transparent;padding:6px 4px;font-size:15px;outline:none;width:auto}
+.chips{display:contents}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--chip);border-radius:999px;padding:3px 3px 3px 11px;font-weight:500}
+.chip button{width:24px;height:24px;border-radius:50%;border:0;background:transparent;color:var(--ink-2);font-size:15px;line-height:1;padding:0}
+.chip button:hover{background:var(--line);color:var(--ink)}
+.chip.miss{background:transparent;border:1px dashed var(--ink-2);color:var(--ink-2)}
+.aclist{position:absolute;left:0;right:0;z-index:5;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.18);overflow:auto;max-height:340px}
+.acopt{display:grid;grid-template-columns:minmax(110px,auto) minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 14px;cursor:pointer}
+.acopt:hover,.acopt[aria-selected="true"]{background:var(--chip)}
+.acopt .w b{color:var(--accent)}
+.acopt .to{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acopt .ev{font-size:12px;color:var(--ink-2)}
+.acnone{padding:9px 14px;font-size:13px;color:var(--ink-2)}
+.bdesc .sugg{align-items:center}
+.radar{display:flex;justify-content:center}
+.radarsvg{width:100%;height:auto;max-width:460px;overflow:visible}
+.radarsvg .rg{fill:none;stroke:var(--line);stroke-width:1}
+.radarsvg .rn{fill:none;stroke:var(--ink-2);stroke-width:1.2;stroke-dasharray:4 4}
+.radarsvg .rl{font:12px var(--font-body);fill:var(--ink-2)}
+.radarsvg .rs{stroke-width:2;stroke-linejoin:round}
+.radarsvg .rs.rt{fill:color-mix(in srgb,var(--accent) 18%,transparent);stroke:var(--accent)}
+.radarsvg .rs.rc{fill:color-mix(in srgb,var(--t-c) 12%,transparent);stroke:var(--t-c);stroke-dasharray:6 4}
+.radarsvg .rd.rt{fill:var(--accent)}.radarsvg .rd.rc{fill:var(--t-c)}
+.fpkey{display:grid;gap:4px;font-size:12px;color:var(--ink-2)}
+.fpkey span{display:flex;align-items:center;gap:8px}
+.fpkey i{display:inline-block;width:22px;height:0;border-top:2px solid var(--accent)}
+.fpkey i.kc{border-top:2px dashed var(--t-c)}
+.bbuild{display:grid;grid-template-columns:280px minmax(0,1fr) 380px;gap:16px;padding:16px 20px 40px;align-items:start}
+@media (max-width:1320px){.bbuild{grid-template-columns:250px minmax(0,1fr) 330px}}
+@media (max-width:1060px){.bbuild{grid-template-columns:1fr}.bprev{order:-1}}
+.brail{display:flex;flex-direction:column;gap:12px;position:sticky;top:62px}
+.brail .card h2,.bprev h2,.look h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.bmain{min-width:0}
+.bmain .tabs{margin-top:0}
+.bmain .results{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.bmain details.acc{margin-top:18px}
+.savedpals{margin:4px 0 14px}
+.mpals{display:flex;flex-wrap:wrap;gap:8px}
+.palpick{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:5px 10px 5px 5px;font-size:13px;font-weight:500}
+.palpick .vis{width:70px;height:24px;border-radius:5px;overflow:hidden;display:flex;border:1px solid var(--line)}
+.palpick .vis i{display:block;height:100%}
+.palpick[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.bprev{display:flex;flex-direction:column;gap:10px;position:sticky;top:62px}
+.pvstage{height:440px;min-height:0}
+.bprev .seg button{padding:5px 9px;font-size:12.5px}
+.look{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px;background:var(--bg)}
+.look .mpals{margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -387,7 +462,7 @@ body.mode-advanced .simple-only{display:none!important}
   <header class="top">
     <h1 id="appName">Ezy Brand and Media</h1>
     <div class="seg" id="nav" role="group" aria-label="Section">
-      <button type="button" data-v="design" aria-pressed="true">Designer</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
+      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
     </div>
     <span class="sp"></span>
     <div class="seg" id="modeSeg" role="group" aria-label="How much control to show">
@@ -398,6 +473,117 @@ body.mode-advanced .simple-only{display:none!important}
     <button class="btn" id="btnHelp" type="button">Quick start</button>
     <button class="btn" id="btnSources" type="button">Sources and method</button>
   </header>
+  <div class="bview" id="viewBrand" hidden>
+    <div class="bbar">
+      <nav class="steps" aria-label="Brand steps">
+        <button type="button" id="bStep1" data-step="describe"><b>1</b>Describe the brand</button>
+        <span aria-hidden="true" class="stepsep"></span>
+        <button type="button" id="bStep2" data-step="build"><b>2</b>Build the kit</button>
+      </nav>
+      <span class="sp"></span>
+      <span class="savestate" id="bSaveState" aria-live="polite"></span>
+      <button class="btn small" id="btnDiscard" type="button" hidden>Discard changes</button>
+      <button class="btn primary" id="btnSaveBrand" type="button">Save brand</button>
+    </div>
+
+    <section class="bdesc" id="bDescribe" aria-labelledby="bDescH">
+      <div class="bdesc-main">
+        <div>
+          <h2 class="bh" id="bDescH">How should the brand feel?</h2>
+          <p class="lede">Type a few words. Each one is matched to personality traits, emotions and values, and the fingerprint updates as you go.</p>
+        </div>
+        <div class="search">
+          <label for="q">Keywords</label>
+          <div class="kwbox" id="kwbox">
+            <span class="chips" id="kwChips"></span>
+            <input id="q" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="acList" placeholder="calm, trustworthy, premium">
+          </div>
+          <div class="aclist" id="acList" role="listbox" aria-label="Keyword suggestions" hidden></div>
+          <p class="note" id="kwHint">Press Enter or type a comma to add a word. Use the arrow keys to pick a suggestion.</p>
+          <div class="sugg" id="sugg" aria-label="Words to start with"></div>
+          <details class="dir" id="dir"><summary>Browse all keywords by group</summary><div id="dirBody"></div></details>
+        </div>
+        <section class="card" aria-labelledby="termsH">
+          <h2 id="termsH">What your words map to</h2>
+          <div class="terms" id="terms"></div>
+          <div class="legend">
+            <span><i class="tier tier-R">R</i>Research</span><span><i class="tier tier-S">S</i>Standard</span><span><i class="tier tier-C">C</i>Convention</span>
+            <button type="button" id="btnSources2">What these mean</button>
+          </div>
+        </section>
+        <div class="rowbtns">
+          <button class="btn primary big" id="btnUseKw" type="button">Use these keywords &#8594;</button>
+          <span class="note" style="margin:0">You can change them later. Your picks are kept.</span>
+        </div>
+      </div>
+      <aside class="card fp" aria-labelledby="fpH">
+        <h2 id="fpH">Brand fingerprint</h2>
+        <div class="radar" id="radarBig"></div>
+        <p class="note">Personality runs from none at the centre to strong at the edge. Pleasure, arousal and dominance run from low to high; the dashed ring is neutral.</p>
+        <div class="fplist" id="fpList"></div>
+      </aside>
+    </section>
+
+    <section class="bbuild" id="bBuild" hidden>
+      <aside class="brail" aria-label="Fingerprint and keywords">
+        <section class="card">
+          <h2>Fingerprint</h2>
+          <div class="radar" id="radarSmall"></div>
+          <div class="fpkey">
+            <span><i class="kt"></i>What your keywords ask for</span>
+            <span><i class="kc"></i>What your current picks signal</span>
+          </div>
+          <p class="note" id="fpFit"></p>
+        </section>
+        <section class="card">
+          <div class="rowbtns" style="justify-content:space-between"><h2>Keywords</h2><button type="button" class="link" id="btnEditKw">Edit keywords</button></div>
+          <div class="terms" id="kwRead"></div>
+        </section>
+      </aside>
+      <div class="bmain card">
+        <div class="tabs" role="tablist" id="tabs">
+          <button role="tab" type="button" data-v="colors">Colors<span class="n" id="nColors"></span></button>
+          <button role="tab" type="button" data-v="type">Type<span class="n" id="nType"></span></button>
+          <button role="tab" type="button" data-v="graphic">Graphics<span class="n" id="nGraphic"></span></button>
+          <button role="tab" type="button" data-v="identity">Identity</button>
+        </div>
+        <div class="savedpals" id="savedPals"></div>
+        <div class="subbar" id="subbar"></div>
+        <div class="rhead" id="rhead"><span id="rSummary"></span><button type="button" id="btnAll"></button></div>
+        <div class="results" id="results"></div>
+        <div class="ident-form" id="bIdentity" hidden>
+          <div class="fields">
+            <div class="two">
+              <label for="bName">Brand name<input id="bName" type="text" maxlength="40"></label>
+              <label for="bHandle">Handle<input id="bHandle" type="text" maxlength="30"></label>
+            </div>
+            <label>Logo (replaces the text wordmark on posts)<span class="file"><input id="inLogo" type="file" accept="image/*"><button class="btn small" id="rmLogo" type="button">Remove</button></span></label>
+            <p class="note">The name, handle and logo appear on every post made with this brand. Save the brand to keep them.</p>
+          </div>
+        </div>
+        <details class="acc adv" id="accFine">
+        <summary>Fine-tune hex values and graphic</summary>
+        <div class="fields">
+          <div class="colors" id="colors"></div>
+          <p class="note" id="palNote"></p>
+          <div class="savepal"><input id="palName2" type="text" maxlength="40" placeholder="Name this palette" aria-label="Palette name"><button class="btn small" id="btnSavePal" type="button">Save as a named palette</button></div>
+          <label>Graphic strength<input id="gStrength" type="range" min="0" max="100" step="1"></label>
+          <div class="rowbtns"><button class="btn small" id="btnSeed" type="button">Rearrange the graphic</button><button class="btn small" id="btnResetPal" type="button">Reset palette colors</button></div>
+        </div>
+      </details>
+      </div>
+      <aside class="bprev" aria-labelledby="pvH">
+        <div class="rowbtns" style="justify-content:space-between">
+          <h2 id="pvH">Preview</h2>
+          <div class="seg" id="pvFmt" role="group" aria-label="Preview format">
+            <button type="button" data-v="square">Square post</button><button type="button" data-v="story">Story</button><button type="button" data-v="banner">Banner</button>
+          </div>
+        </div>
+        <div class="stage pvstage" id="pvStage"><canvas id="pcv" role="img" aria-label="Sample post in the brand's colors, type and graphic"></canvas></div>
+        <p class="note">A sample post for checking the kit. Make real posts under Media.</p>
+      </aside>
+    </section>
+  </div>
   <div class="main" id="viewDesign">
     <aside class="col left" aria-label="Templates">
       <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
@@ -443,7 +629,7 @@ body.mode-advanced .simple-only{display:none!important}
         <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
       </div>
       <p class="advnote simple-only" id="advNote" hidden></p>
-      <p class="stepline simple-only"><b>4</b>Name it and save it to the brand, or export the image</p>
+      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
       <div class="status" id="status" aria-live="polite"></div>
 
       <section class="card" aria-labelledby="sigH">
@@ -467,50 +653,23 @@ body.mode-advanced .simple-only{display:none!important}
       </section>
     </main>
 
-    <aside class="col right" aria-label="Keyword search">
-      <p class="stepline simple-only"><b>2</b>Describe the brand, then choose colors, type and a graphic</p>
-      <div class="search">
-        <label for="q">Describe the brand in a few words</label>
-        <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="authentic, calm, trustworthy">
-        <div class="sugg" id="sugg"></div>
-        <details class="dir" id="dir"><summary>Browse all keywords by group</summary><div id="dirBody"></div></details>
-        <div class="terms" id="terms"></div>
-        <div class="legend">
-          <span><i class="tier tier-R">R</i>Research</span><span><i class="tier tier-S">S</i>Standard</span><span><i class="tier tier-C">C</i>Convention</span>
-          <button type="button" id="btnSources2">What these mean</button>
-        </div>
-      </div>
-      <div class="tabs" role="tablist" id="tabs">
-        <button role="tab" type="button" data-v="colors">Colors<span class="n" id="nColors"></span></button>
-        <button role="tab" type="button" data-v="type">Type<span class="n" id="nType"></span></button>
-        <button role="tab" type="button" data-v="graphic">Graphics<span class="n" id="nGraphic"></span></button>
-      </div>
-      <div class="subbar" id="subbar"></div>
-      <div class="rhead" id="rhead"><span id="rSummary"></span><button type="button" id="btnAll"></button></div>
-      <div class="results" id="results"></div>
-
-      <p class="stepline simple-only"><b>3</b>Replace the sample words with your own</p>
+    <aside class="col right" aria-label="Post content">
+      <section class="look" id="mLook" aria-labelledby="mLookH">
+        <div class="rowbtns" style="justify-content:space-between"><h2 id="mLookH">Brand look</h2><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
+        <p class="note" id="mLookNote" style="margin-top:2px"></p>
+        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
+      </section>
+      <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
       <details class="acc" id="accText" open>
         <summary>Text on the post</summary>
         <div class="fields" id="fields"></div>
       </details>
       <details class="acc" id="accImg">
-        <summary>Photo and logo</summary>
+        <summary>Photo</summary>
         <div class="fields">
           <label>Photo (used by photo layouts)<span class="file"><input id="inPhoto" type="file" accept="image/*"><button class="btn small" id="rmPhoto" type="button">Remove</button></span></label>
-          <label>Logo (replaces the text wordmark)<span class="file"><input id="inLogo" type="file" accept="image/*"><button class="btn small" id="rmLogo" type="button">Remove</button></span></label>
           <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="tint" type="checkbox"> Tint the photo with the primary color</label>
-          <p class="note">The logo is saved with the brand and the photo with the post.</p>
-        </div>
-      </details>
-      <details class="acc adv" id="accFine">
-        <summary>Fine-tune hex values and graphic</summary>
-        <div class="fields">
-          <div class="colors" id="colors"></div>
-          <p class="note" id="palNote"></p>
-          <div class="savepal"><input id="palName2" type="text" maxlength="40" placeholder="Name this palette" aria-label="Palette name"><button class="btn small" id="btnSavePal" type="button">Save as a named palette</button></div>
-          <label>Graphic strength<input id="gStrength" type="range" min="0" max="100" step="1"></label>
-          <div class="rowbtns"><button class="btn small" id="btnSeed" type="button">Rearrange the graphic</button><button class="btn small" id="btnResetPal" type="button">Reset palette colors</button></div>
+          <p class="note">The photo is saved with the post. The logo belongs to the brand: change it on the Brand page, under Identity.</p>
         </div>
       </details>
       <details class="acc adv" id="accAdv">
@@ -600,13 +759,17 @@ body.mode-advanced .simple-only{display:none!important}
   <header><h2 id="askH">Name</h2><button class="btn" type="button" data-close>Cancel</button></header>
   <div class="savepal"><input id="askIn" type="text" maxlength="40" aria-labelledby="askH"><button class="btn primary" id="askOk" type="button">Save</button></div>
 </div></div>
+<div class="overlay" id="ovUnsaved" hidden><div class="sheet" style="max-width:500px" role="dialog" aria-modal="true" aria-labelledby="unsH">
+  <header><h2 id="unsH">Save changes to the brand?</h2></header>
+  <p id="unsMsg"></p>
+  <div class="rowbtns" style="margin-top:14px"><button class="btn primary" id="unsSave" type="button">Save brand</button><button class="btn" id="unsDrop" type="button">Discard changes</button><button class="btn" id="unsCancel" type="button" data-close>Cancel</button></div>
+</div></div>
 <div class="overlay" id="ovWelcome" hidden><div class="sheet" style="max-width:680px" role="dialog" aria-modal="true" aria-labelledby="welH">
   <header><h2 id="welH">Quick start</h2><button class="btn primary" type="button" data-close>Start</button></header>
   <ol class="quick">
-    <li><b>Pick a template.</b> Choose the platform, the format and a layout on the left.</li>
-    <li><b>Describe the brand.</b> Type a few words such as “calm, trustworthy”. Colors, type pairings and graphics that fit those words rise to the top, each with the reason it matched.</li>
-    <li><b>Try options.</b> Select any result to see it on the post. Shuffle tries combinations for you.</li>
-    <li><b>Make it yours.</b> Replace the sample text, add a photo or logo, then save the post to the brand or export a PNG.</li>
+    <li><b>Describe the brand.</b> On the Brand page, type a few words such as “calm, trustworthy”. The fingerprint shows the personality and feeling those words ask for.</li>
+    <li><b>Build the kit.</b> Choose colors, a type pairing and a graphic. The ones that fit your words come first, each with the reason it matched. Save palettes to the brand, then choose Save brand.</li>
+    <li><b>Make posts.</b> On the Media page, pick a platform, a format and a layout, replace the sample text, and save the post to the brand or export it.</li>
   </ol>
   <div class="h" style="margin-top:14px">How much control do you want?</div>
   <div class="modepick" id="welMode">
@@ -615,7 +778,7 @@ body.mode-advanced .simple-only{display:none!important}
   </div>
   <p class="note">You can switch at any time at the top of the page. Nothing is lost when you switch.</p>
   <p id="welBody"></p>
-  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts.</p>
+  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts. Brand changes are kept only when you choose Save brand.</p>
 </div></div>
 
 <script>
@@ -1631,13 +1794,13 @@ function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('b
   document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
 function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{colors:true,type:true,graphic:true,layout:false},
-  headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};}
+  headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
-  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';return o;}
+  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -1658,12 +1821,12 @@ function useType(id){ensureType(id).then(()=>{updateReadout.k='';requestPaint(tr
 let paintQ=false,thumbT=0,saveT=0;
 function requestPaint(thumbs){if(!paintQ){paintQ=true;requestAnimationFrame(()=>{paintQ=false;paint();});}
   if(thumbs){clearTimeout(thumbT);thumbT=setTimeout(()=>{paintLayoutThumbs();paintDrafts();if(state.tab==='graphic')paintGraphicThumbs();},140);}
-  clearTimeout(saveT);saveT=setTimeout(()=>{store.set('brandlab.state.v1',state);Lib.touchBrand();},400);}
+  Lib.touchBrand();clearTimeout(saveT);saveT=setTimeout(()=>{store.set('brandlab.state.v1',state);},400);}
 function sizeStage(){const st=$('#stage'),fmt=FMT[state.format];const narrow=window.matchMedia('(max-width:1060px)').matches;let h;
   if(narrow){const w=st.clientWidth-36;h=Math.min(w*fmt.h/fmt.w,Math.max(360,window.innerHeight*.6))+36;}
   else{const col=st.parentElement;h=clamp(col.clientHeight-250,320,1000);}
   st.style.height=Math.round(h)+'px';}
-function paint(){const fmt=FMT[state.format],st=$('#stage'),cv=$('#cv');sizeStage();const aw=st.clientWidth-36,ah=st.clientHeight-36;const sc=Math.min(aw/fmt.w,ah/fmt.h);
+function paint(){if(Lib.view==='brand'){paintBrand();return;}const fmt=FMT[state.format],st=$('#stage'),cv=$('#cv');sizeStage();const aw=st.clientWidth-36,ah=st.clientHeight-36;const sc=Math.min(aw/fmt.w,ah/fmt.h);
   const cw=Math.max(60,Math.floor(fmt.w*sc)),ch=Math.max(20,Math.floor(fmt.h*sc));const dpr=Math.min(2,window.devicePixelRatio||1);const pw=Math.min(fmt.w,Math.round(cw*dpr)),ph=Math.round(pw*fmt.h/fmt.w);
   if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph;}cv.style.width=cw+'px';cv.style.height=ch+'px';const ctx=cv.getContext('2d');ctx.setTransform(pw/fmt.w,0,0,pw/fmt.w,0,0);
   const c=renderDraft(ctx,fmt.w,fmt.h,snap(),{guides:state.guides,preview:true});updateReadout(c);}
@@ -1681,10 +1844,10 @@ function setFormat(id){state.format=id;state.platform=FMT[id].p;if(!FMT[id].layo
 let parsed={terms:[],cw:{},concepts:[]};
 const cLabel=id=>CONCEPT_BY_ID[id].label;
 function tierEl(src){const t=SRC[src].t;return el('i',{class:'tier tier-'+t,title:TIER[t].long+': '+SRC[src].short,text:t});}
-function addKeyword(w){const cur=state.query.trim();if(cur.toLowerCase().split(/[,;]+/).map(s=>s.trim()).includes(w.toLowerCase()))return;state.query=cur?cur.replace(/[,;\s]+$/,'')+', '+w:w;$('#q').value=state.query;runSearch();}
+function addKeyword(w){commitKeywords(w);}
 function buildTerms(){const box=$('#terms');box.textContent='';parsed.terms.forEach(t=>{if(t.hits){const parts=[...new Set(t.hits.map(h=>{const c=CONCEPT_BY_ID[h.c];return c.bridge?c.label+' (value) \u2192 '+Object.keys(c.bridge).map(cLabel).join(', '):c.label;}))].join('; ');const ak=t.hits.some(h=>h.kind==='aaker'),br=t.hits.some(h=>CONCEPT_BY_ID[h.c].bridge),sg=t.hits.every(h=>h.kind==='sugg');
     box.append(el('span',{class:'term',title:ak?'One of the 42 trait words in Aaker\u2019s brand-personality scale':br?'A basic value. No study links values to visuals, so it is bridged by meaning to the concepts shown.':sg?'Suggested by a language model and reviewed by hand. Mapped by meaning only: no study links this word to visuals.':'Mapped by meaning to this concept'},el('b',{text:t.text}),'\u2192 '+parts,ak?tierEl('AAKER'):br?tierEl('CONV'):null));}
-   else{const s=el('span',{class:'term miss'},`\u201C${t.text}\u201D has no link on file.`);if(t.near&&t.near.length){s.append(' Try ');t.near.forEach((w,i)=>{s.append(el('button',{type:'button',text:w,onclick:()=>{state.query=state.query.replace(new RegExp('\\b'+t.text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i'),w);$('#q').value=state.query;runSearch();}}));if(i<t.near.length-1)s.append(', ');});}box.append(s);}});}
+   else{const s=el('span',{class:'term miss'},`\u201C${t.text}\u201D has no link on file.`);if(t.near&&t.near.length){s.append(' Try ');t.near.forEach((w,i)=>{s.append(el('button',{type:'button',text:w,onclick:()=>replaceKeyword(t.text,w)}));if(i<t.near.length-1)s.append(', ');});}box.append(s);}});}
 function buildDirectory(){const box=$('#dirBody');box.textContent='';box.append(el('p',{class:'note',text:`${CONCEPTS.length} ideas, reachable through ${LEX_KEYS.length} keywords. Select one to add it to your search.`}));
   GROUPS.forEach(g=>{const cs=CONCEPTS.filter(c=>c.group===g.id);box.append(el('div',{class:'dirh'},el('b',{text:g.id}),el('span',{text:g.note}),tierEl(g.src)),el('div',{class:'sugg'},cs.map(c=>el('button',{type:'button',text:c.label,title:c.def+'. Also: '+(c.aaker||[]).concat(c.syn).slice(0,8).join(', '),onclick:()=>addKeyword(c.key)}))));});}
 function results(){const cw=parsed.cw;return{colors:rank('palette',PALETTES,cw),type:rank('type',listedTypes(),cw),graphic:rank('graphic',GRAPHICS,cw)};}
@@ -1693,13 +1856,14 @@ function kwLabels(){return parsed.concepts.map(cLabel).join(', ');}
 
 /* ---------- results ---------- */
 function buildSubbar(){const bar=$('#subbar');bar.textContent='';
-  if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Ready-made palettes'],['build','Build color by color']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
+  if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Premade palettes'],['build','Build your own']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
   else if(state.tab==='type'){const build=uiMode==='advanced'&&state.typeMode==='build',ts=listedTypes();
     if(uiMode==='advanced')bar.append(el('div',{class:'seg',role:'group','aria-label':'Type mode'},[['sets','Ready-made pairings'],['build','Build a pairing']].map(([v,t])=>el('button',{type:'button','aria-pressed':String((build?'build':'sets')===v),text:t,onclick:()=>{state.typeMode=v;buildResults();}}))));
     if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));}}
 function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>has?res[k].filter(r=>r.score>0).length:res[k].length;
   $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=count('graphic');
-  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));buildSubbar();
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
+  const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
   const kind=state.tab;if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;buildColorBuilder();return;}
   if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;buildTypeBuilder();return;}$('#rhead').hidden=false;
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
@@ -1716,8 +1880,8 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
   if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
 function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
-function runSearch(){parsed=parseQuery(state.query);buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
-function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palColors(PAL[id]);buildColors();}else if(kind==='type'){state.typeId=id;useType(id);}else state.graphicId=id;buildResults();requestPaint(true);}
+function runSearch(){parsed=parseQuery(liveQuery());buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
+function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palColors(PAL[id]);buildColors();renderLook();}else if(kind==='type'){state.typeId=id;useType(id);}else state.graphicId=id;buildResults();requestPaint(true);}
 
 /* ---------- build color by color ---------- */
 function setRole(role,hex){state.colors[role]=hex.toUpperCase();buildColors();buildResults();requestPaint(true);}
@@ -1771,8 +1935,10 @@ function buildTypeBuilder(){const box=$('#results');box.textContent='';const cur
   if(myTypes.length){box.append(el('div',{class:'bhead'},el('h3',{text:'Your pairings in this brand'})));box.append(el('div',{class:'mine'},myTypes.map(m=>el('span',{class:'term'},el('b',{text:m.name}),el('button',{type:'button',class:'link',text:m.id===state.typeId?'In use':'Use',onclick:()=>apply('type',m.id)}),el('button',{type:'button','aria-label':'Delete '+m.name,text:'\u00D7',onclick:()=>Lib.deleteType(m.id)})))));}}
 
 /* ---------- readout ---------- */
-function updateReadout(c){const parts=[['Color',curPaletteTags(),1],['Type',TAGS.type[state.typeId],.8],['Graphic',TAGS.graphic[state.graphicId],.6]];const agg={};
-  parts.forEach(([nm,tg,w])=>{for(const k in tg.tags){const t=tg.tags[k];const a=agg[k]||(agg[k]={w:0,from:[],srcs:{}});a.w+=Math.min(1,t.w)*w;a.from.push(nm);a.srcs[SRC[t.src].t]=t.src;}});
+/* What the current colors, type and graphic signal together: one weight per concept. */
+function draftParts(){return[['Color',curPaletteTags(),1],['Type',TAGS.type[state.typeId]||TAGS.type.clear,.8],['Graphic',TAGS.graphic[state.graphicId]||TAGS.graphic.none,.6]];}
+function draftAgg(parts){const agg={};(parts||draftParts()).forEach(([nm,tg,w])=>{for(const k in tg.tags){const t=tg.tags[k];const a=agg[k]||(agg[k]={w:0,from:[],srcs:{}});a.w+=Math.min(1,t.w)*w;a.from.push(nm);a.srcs[SRC[t.src].t]=t.src;}});return agg;}
+function updateReadout(c){const parts=draftParts(),agg=draftAgg(parts);
   const ids=Object.keys(agg).sort((a,b)=>agg[b].w-agg[a].w).slice(0,6),mx=ids.length?agg[ids[0]].w:1;const key=JSON.stringify([ids.map(i=>[i,agg[i].w.toFixed(2)]),c.bg,c.fg,c.head,c.accent,c.onAccent,state.typeId,state.graphicId,parsed.concepts]);if(key===updateReadout.k)return;updateReadout.k=key;
   const box=$('#signals');box.textContent='';ids.forEach(id=>{const a=agg[id];const hit=parsed.concepts.includes(id);box.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)+(hit?' \u2713':'')}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(a.w/mx*100)}%`})),el('span',{class:'from'},['R','S','C'].filter(t=>a.srcs[t]).map(t=>tierEl(a.srcs[t])),' from '+a.from.join(', ').toLowerCase())));});
   const miss=parsed.concepts.filter(cid=>!agg[cid]||agg[cid].w<.25);if(miss.length)box.append(el('div',{class:'empty',text:'Asked for but weak or missing in this draft: '+miss.map(cLabel).join(', ')+'.'}));
@@ -1784,7 +1950,6 @@ function updateReadout(c){const parts=[['Color',curPaletteTags(),1],['Type',TAGS
 /* ---------- right column forms ---------- */
 function buildFields(){const box=$('#fields');box.textContent='';const mk=(id,label,val,max,area,on)=>{const inp=area?el('textarea',{id:'f_'+id,maxlength:max,rows:2}):el('input',{id:'f_'+id,type:'text',maxlength:max});inp.value=val||'';inp.addEventListener('input',()=>{on(inp.value);requestPaint(true);});return el('label',{for:'f_'+id},label,inp);};
   LAYOUTS[state.layout].fields.forEach(f=>box.append(mk(f,FIELDS[f].label,state.content[f],FIELDS[f].max,FIELDS[f].area,v=>state.content[f]=v)));
-  box.append(el('div',{class:'two'},mk('brandName','Brand name',state.brandName,40,false,v=>state.brandName=v),mk('handle','Handle',state.handle,30,false,v=>state.handle=v)));
   box.append(el('p',{class:'note',text:'Fields change with the layout. Placeholder copy avoids result claims; replace it with wording you can stand behind.'}));}
 function buildColors(){const box=$('#colors');box.textContent='';ROLES.forEach(([role,label])=>{const pick=el('input',{type:'color',id:'c_'+role,'aria-label':label+' color'}),hex=el('input',{type:'text',id:'h_'+role,maxlength:7,'aria-label':label+' hex value'});pick.value=state.colors[role];hex.value=state.colors[role].toUpperCase();
     const set=v=>{state.colors[role]=v.toUpperCase();pick.value=v;hex.value=v.toUpperCase();palNote();buildResults();requestPaint(true);};pick.addEventListener('change',()=>set(pick.value));hex.addEventListener('change',()=>{let v=hex.value.trim();if(validHex(v))set(v[0]==='#'?v:'#'+v);else hex.value=state.colors[role];});
@@ -1863,11 +2028,10 @@ function closeOverlays(){document.querySelectorAll('.overlay').forEach(o=>o.hidd
 
 /* ---------- wiring ---------- */
 function loadImage(file,cb){if(!file)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>cb(im);im.onerror=()=>say('That file could not be read as an image.');im.src=fr.result;};fr.readAsDataURL(file);}
-function initAll(){$('#q').value=state.query;syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
+function initAll(){$('#q').value='';renderChips();syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
 function boot(){
   $('#appName').textContent=APP_NAME;setMode(uiMode,true);bootAdv();
-  const sg=$('#sugg');SUGGEST.forEach(w=>sg.append(el('button',{type:'button',text:w,onclick:()=>addKeyword(w)})));buildDirectory();
-  let qt=0;$('#q').addEventListener('input',e=>{state.query=e.target.value;clearTimeout(qt);qt=setTimeout(runSearch,120);});
+  bootBrand();
   document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.v;buildResults();}));
   $('#btnAll').addEventListener('click',()=>{state.showAll=!state.showAll;buildResults();});
   document.querySelectorAll('#arr button').forEach(b=>b.addEventListener('click',()=>{state.arrangement=b.dataset.v;syncSeg();requestPaint(true);}));
@@ -1890,6 +2054,135 @@ function boot(){
   buildSources();initAll();
   if(document.fonts&&document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',()=>{clearTimeout(boot.t);boot.t=setTimeout(()=>{updateReadout.k='';requestPaint(true);},120);});}
 
+
+/* ============================================================
+   BRAND PAGE: keyword chips with autocomplete, the brand fingerprint (radar),
+   the two steps (describe, build), the sample-post preview, saved palettes,
+   and the brand-look card on the Media page.
+   Uses state, parsed and the builders from ui.js; Lib (lib.js) owns saving.
+   ============================================================ */
+
+/* ---------- fingerprint ----------
+   Eight fixed axes so every brand's shape means the same thing:
+   Aaker's five personality dimensions, then pleasure, arousal and dominance.
+   Personality axes run from 0 (not asked for) to 1 (the strongest concept).
+   The three feeling axes are bipolar: 0.5 is neutral. Only concepts that carry
+   a pleasure-arousal-dominance position in concepts.js move them, so an emotion
+   with no position (amusement, love, admiration, compassion) moves no axis.
+   No mapping is invented to make the chart look fuller. */
+const FP_AXES=[{id:'sincerity',label:'Sincerity'},{id:'excitement',label:'Excitement'},{id:'competence',label:'Competence'},{id:'sophistication',label:'Sophistication'},{id:'ruggedness',label:'Ruggedness'},
+  {pad:0,label:'Pleasure'},{pad:1,label:'Arousal'},{pad:2,label:'Dominance'}];
+const onChart=id=>{const c=CONCEPT_BY_ID[id];return !!c&&(FP_AXES.some(a=>a.id===id)||!!(c.pad&&c.pad.some(Boolean)));};
+/* Both shapes are scaled to their own strongest on-chart concept, so they compare by shape, not by raw totals. */
+function fingerprint(w){const ids=Object.keys(w||{}).filter(k=>w[k]>0&&onChart(k));if(!ids.length)return null;const mx=Math.max(...ids.map(k=>w[k]));
+  return FP_AXES.map(a=>{if(a.pad==null){const v=w[a.id]||0;return{v:Math.min(1,v/mx),set:v>0};}
+    let num=0,den=0;for(const k of ids){const c=CONCEPT_BY_ID[k];if(c.pad&&c.pad[a.pad]){num+=w[k]*c.pad[a.pad];den+=w[k];}}
+    return{v:den?.5+.5*clamp(num/Math.max(den,mx),-1,1):.5,set:den>0};});}
+/* What the current colors, type and graphic signal, as concept weights. */
+function picksWeights(){const a=draftAgg(),w={};for(const k in a)w[k]=a[k].w;return w;}
+
+const SVGNS='http://www.w3.org/2000/svg';
+function svgEl(tag,attrs){const n=document.createElementNS(SVGNS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);return n;}
+/* series: [{fp, cls}] drawn in order. */
+function radarSVG(series,size,label){const W=size+150,H=size+44,cx=W/2,cy=H/2,r=size/2-4,n=FP_AXES.length;
+  const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+r*v*Math.cos(a),cy+r*v*Math.sin(a)];};const pts=vals=>vals.map((v,i)=>pt(i,v).map(x=>x.toFixed(1)).join(',')).join(' ');
+  const svg=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':label,class:'radarsvg'});
+  [.25,.5,.75,1].forEach(k=>svg.append(svgEl('polygon',{points:pts(Array(n).fill(k)),class:'rg'})));
+  for(let i=0;i<n;i++){const[x,y]=pt(i,1);svg.append(svgEl('line',{x1:cx,y1:cy,x2:x.toFixed(1),y2:y.toFixed(1),class:'rg'}));}
+  /* the neutral line on the three bipolar axes */
+  const pad=FP_AXES.map((a,i)=>a.pad!=null?i:-1).filter(i=>i>=0);svg.append(svgEl('polyline',{points:pad.map(i=>pt(i,.5).map(x=>x.toFixed(1)).join(',')).join(' '),class:'rn'}));
+  series.forEach(s=>{if(!s.fp)return;svg.append(svgEl('polygon',{points:pts(s.fp.map(a=>a.v)),class:'rs '+s.cls}));
+    s.fp.forEach((a,i)=>{if(!a.set)return;const[x,y]=pt(i,a.v);svg.append(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:3,class:'rd '+s.cls}));});});
+  FP_AXES.forEach((a,i)=>{const[x,y]=pt(i,1.1);const deg=i*360/n;const t=svgEl('text',{x:x.toFixed(1),y:(y+(deg===0?-2:deg===180?10:4)).toFixed(1),'text-anchor':deg===0||deg===180?'middle':deg<180?'start':'end',class:'rl'});t.textContent=a.label;svg.append(t);});
+  const title=svgEl('title',{});title.textContent=label;svg.prepend(title);return svg;}
+function fpText(fp){return FP_AXES.map((a,i)=>a.label+' '+(a.pad==null?Math.round(fp[i].v*100)+'%':fp[i].v>.6?'high':fp[i].v<.4?'low':'neutral')).join(', ');}
+
+function updateFingerprint(){const tgt=fingerprint(parsed.cw),cur=fingerprint(picksWeights());
+  const big=$('#radarBig');big.textContent='';big.append(radarSVG([{fp:tgt,cls:'rt'}],300,tgt?'Brand fingerprint from your keywords: '+fpText(tgt):'Brand fingerprint: no keywords yet'));
+  const sm=$('#radarSmall');sm.textContent='';sm.append(radarSVG([{fp:cur,cls:'rc'},{fp:tgt,cls:'rt'}],190,'Keywords compared with current picks'+(tgt?'. Keywords: '+fpText(tgt):'')+(cur?'. Picks: '+fpText(cur):'')));
+  const list=$('#fpList');list.textContent='';const cw=parsed.cw,ids=Object.keys(cw).sort((a,b)=>cw[b]-cw[a]).slice(0,6);
+  if(!ids.length)list.append(el('p',{class:'empty',text:'Add a keyword to see what it asks for.'}));
+  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the chart'}))));
+  $('#fpFit').textContent=fitSentence(tgt,cur);}
+function fitSentence(t,c){if(!t)return'Add keywords to compare them with your picks.';if(!c)return'';const d=FP_AXES.map((a,i)=>({a,d:c[i].v-t[i].v})).filter(x=>Math.abs(x.d)>=.2).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
+  if(!d.length)return'Close fit: your picks signal what your keywords ask for.';const hi=d.filter(x=>x.d>0).slice(0,2).map(x=>x.a.label),lo=d.filter(x=>x.d<0).slice(0,2).map(x=>x.a.label);
+  return'Your picks run '+[hi.length?'higher on '+hi.join(' and '):'',lo.length?'lower on '+lo.join(' and '):''].filter(Boolean).join(' and ')+' than your keywords ask for.';}
+
+/* ---------- keywords: committed words are chips; the box holds the word being typed ---------- */
+const kwList=()=>String(state.query||'').split(/[,;\n]+/).map(s=>s.trim()).filter(Boolean);
+function setKw(list){state.query=list.join(', ');renderChips();runSearch();}
+function commitKeywords(text){const cur=kwList(),low=cur.map(w=>w.toLowerCase());String(text).split(/[,;\n]+/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean).forEach(w=>{if(!low.includes(w.toLowerCase())){cur.push(w);low.push(w.toLowerCase());}});setKw(cur);}
+function removeKeyword(i){const cur=kwList();cur.splice(i,1);setKw(cur);}
+function replaceKeyword(from,to){const cur=kwList().map(w=>w.toLowerCase()===from.toLowerCase()?to:w);setKw(cur);}
+/* The word being typed counts toward the results and the fingerprint as soon as it is a known keyword. */
+function liveQuery(){const q=$('#q'),f=q?q.value.trim():'';return f&&lookup(f.toLowerCase())?(state.query?state.query+', ':'')+f:state.query||'';}
+function renderChips(){const box=$('#kwChips');box.textContent='';kwList().forEach((w,i)=>{const miss=!lookup(w.toLowerCase())&&parseQuery(w).concepts.length===0;
+  box.append(el('span',{class:'chip'+(miss?' miss':''),title:miss?'No link on file for this word':''},el('span',{text:w}),el('button',{type:'button','aria-label':'Remove '+w,text:'×',onclick:()=>{removeKeyword(i);$('#q').focus();}})));});
+  const ws=kwList();$('#q').placeholder=ws.length?'Add another word':'calm, trustworthy, premium';
+  const rd=$('#kwRead');rd.textContent='';if(!ws.length)rd.append(el('p',{class:'empty',text:'No keywords. Everything is listed unranked.'}));ws.forEach(w=>rd.append(el('span',{class:'term',text:w})));}
+
+/* Autocomplete over every word the index knows: concept names, Aaker's trait words,
+   synonyms and the reviewed suggested words. Prefix match; known kinds rank first. */
+const KIND_RANK={name:0,aaker:1,syn:2,sugg:3};
+let acItems=[],acIdx=-1;
+function acCandidates(f){const taken=new Set(kwList().map(w=>w.toLowerCase()));const rows=[];
+  for(const k of LEX_KEYS){if(!k.startsWith(f)||taken.has(k))continue;const hits=LEX[k];rows.push({w:k,hits,rank:k===f?-1:Math.min(...hits.map(h=>KIND_RANK[h.kind]))});}
+  rows.sort((a,b)=>a.rank-b.rank||a.w.length-b.w.length||a.w.localeCompare(b.w));return rows.slice(0,8);}
+function acRender(){const q=$('#q'),list=$('#acList'),f=q.value.trim().toLowerCase();list.textContent='';acItems=[];acIdx=-1;q.removeAttribute('aria-activedescendant');
+  if(f.length<2){list.hidden=true;q.setAttribute('aria-expanded','false');return;}
+  acItems=acCandidates(f);let near=false;if(!acItems.length&&f.length>=4){acItems=nearest(f).filter(w=>LEX[w]).map(w=>({w,hits:LEX[w]}));near=acItems.length>0;}
+  if(!acItems.length){list.append(el('div',{class:'acnone',text:'No keyword starts with “'+f+'”. Press Enter to add it anyway; it will be reported, not guessed.'}));}
+  else if(near)list.append(el('div',{class:'acnone',text:'No exact match. Did you mean:'}));
+  acItems.forEach((it,i)=>{const cs=[...new Set(it.hits.map(h=>h.c))].slice(0,2),sg=it.hits.every(h=>h.kind==='sugg'),c0=CONCEPT_BY_ID[cs[0]],g=GROUPS.find(x=>x.id===c0.group);
+    const word=near?el('span',{class:'w',text:it.w}):el('span',{class:'w'},el('b',{text:it.w.slice(0,f.length)}),it.w.slice(f.length));
+    const opt=el('div',{role:'option',id:'ac-'+i,class:'acopt','aria-selected':'false'},word,el('span',{class:'to',text:'→ '+cs.map(id=>cLabel(id)+(CONCEPT_BY_ID[id].bridge?' (value)':'')).join(', ')}),sg?el('span',{class:'ev',text:'suggested word',title:'Suggested by a language model and reviewed by hand. Mapped by meaning only.'}):tierEl(g.src));
+    opt.addEventListener('mousedown',e=>{e.preventDefault();acPick(i);});list.append(opt);});
+  list.hidden=false;q.setAttribute('aria-expanded','true');}
+function acMove(d){if(!acItems.length)return;acIdx=(acIdx+d+acItems.length)%acItems.length;document.querySelectorAll('#acList .acopt').forEach((o,i)=>o.setAttribute('aria-selected',String(i===acIdx)));
+  const q=$('#q');q.setAttribute('aria-activedescendant','ac-'+acIdx);const o=$('#ac-'+acIdx);if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest'});}
+function acPick(i){const it=acItems[i];if(!it)return;$('#q').value='';commitKeywords(it.w);acClose();$('#q').focus();}
+function acClose(){$('#acList').hidden=true;acItems=[];acIdx=-1;const q=$('#q');q.setAttribute('aria-expanded','false');q.removeAttribute('aria-activedescendant');}
+
+/* ---------- steps and the build panel ---------- */
+function setStep(s){state.bstep=s==='build'?'build':'describe';const b=state.bstep==='build';$('#bDescribe').hidden=b;$('#bBuild').hidden=!b;
+  $('#bStep1').setAttribute('aria-current',String(!b));$('#bStep2').setAttribute('aria-current',String(b));if(b){buildResults();}requestPaint(false);}
+const PV_FMT={square:'ig-square',story:'ig-story',banner:'fb-link'};
+function paintBrand(){updateFingerprint();if(state.bstep!=='build')return;const fid=PV_FMT[state.pvFmt]||PV_FMT.square,f=FMT[fid];
+  const layout=f.layouts.includes(state.layout)?state.layout:f.layouts.includes('announce')?'announce':f.layouts[0];
+  const st=$('#pvStage'),aw=Math.max(120,st.clientWidth-36),ah=Math.max(160,st.clientHeight-36);renderTo($('#pcv'),Object.assign({},state,{format:fid,layout}),aw,ah,{});}
+function syncPvFmt(){document.querySelectorAll('#pvFmt button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===state.pvFmt)));}
+function syncIdentity(){const n=$('#bName'),h=$('#bHandle');if(document.activeElement!==n)n.value=state.brandName||'';if(document.activeElement!==h)h.value=state.handle||'';}
+/* Saved palettes lead the Colors tab: the brand's own set, switched with one click. */
+function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidden=state.tab!=='colors';if(box.hidden)return;
+  box.append(el('div',{class:'h',style:'margin:0 0 6px',text:'Saved to this brand'}));const row=el('div',{class:'mpals'});
+  myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
+  row.append(el('button',{type:'button',class:'btn small',text:myPalettes.length?'+ Save current colors':'+ Save current colors as a palette',onclick:()=>Lib.askPalette()}));box.append(row);
+  if(!myPalettes.length)box.append(el('p',{class:'note',text:'Pick a premade palette or build your own, then save it here. Saved palettes can be switched on any post.'}));}
+function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+cols[r]}))),el('span',{text:name}));}
+const sameColors=(a,b)=>ROLES.every(([r])=>String(a[r]).toUpperCase()===String(b[r]).toUpperCase());
+
+/* ---------- Media page: the brand's look, and switching between its palettes ---------- */
+function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=TYP[state.typeId]||TYP.clear,g=GRA[state.graphicId];box.textContent='';
+  $('#mLookNote').textContent=(state.brandName||'This brand')+': '+t.name+' type, '+(g?g.name.toLowerCase():'no')+' graphic. Choose which saved palette this post uses.';
+  if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
+  myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));}
+
+function bootBrand(){const q=$('#q');let qt=0;const live=()=>{clearTimeout(qt);qt=setTimeout(runSearch,120);};
+  q.addEventListener('input',()=>{const v=q.value;if(/[,;\n]/.test(v)){const parts=v.split(/[,;\n]/),last=parts.pop();if(parts.join('').trim())commitKeywords(parts.join(','));q.value=last.replace(/^\s+/,'');}acRender();live();});
+  q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if($('#acList').hidden)acRender();acMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();acMove(-1);}
+    /* Enter keeps a known word as typed; a partial word takes the top prefix match. A near spelling is only offered, never taken. */
+    else if(e.key==='Enter'){e.preventDefault();const f=q.value.trim();if(acIdx>=0)acPick(acIdx);else if(f&&!lookup(f.toLowerCase())&&acItems.length&&acItems[0].w.startsWith(f.toLowerCase()))acPick(0);else if(f){commitKeywords(f);q.value='';acClose();}}
+    else if(e.key==='Escape'){if(!$('#acList').hidden){e.stopPropagation();acClose();}}
+    else if(e.key==='Backspace'&&!q.value&&kwList().length){removeKeyword(kwList().length-1);}});
+  q.addEventListener('blur',()=>setTimeout(acClose,120));
+  $('#kwbox').addEventListener('click',e=>{if(e.target===e.currentTarget||e.target.id==='kwChips')q.focus();});
+  const sg=$('#sugg');sg.append(el('span',{class:'note',style:'margin:0 4px 0 0',text:'Try:'}));SUGGEST.forEach(w=>sg.append(el('button',{type:'button',text:w,onclick:()=>addKeyword(w)})));buildDirectory();
+  $('#btnUseKw').addEventListener('click',()=>{if(q.value.trim()){commitKeywords(q.value);q.value='';}setStep('build');window.scrollTo(0,0);});
+  $('#btnEditKw').addEventListener('click',()=>{setStep('describe');q.focus();});
+  $('#bStep1').addEventListener('click',()=>setStep('describe'));$('#bStep2').addEventListener('click',()=>setStep('build'));
+  document.querySelectorAll('#pvFmt button').forEach(b=>b.addEventListener('click',()=>{state.pvFmt=b.dataset.v;syncPvFmt();requestPaint(false);}));
+  $('#bName').addEventListener('input',e=>{state.brandName=e.target.value;requestPaint(true);});$('#bHandle').addEventListener('input',e=>{state.handle=e.target.value;requestPaint(true);});
+  $('#btnEditBrand').addEventListener('click',()=>Lib.setView('brand'));}
 
 /* ============================================================
    FREE: the layer editor, and PDF / image import into layers
@@ -2182,29 +2475,43 @@ FONT LICENSE
    ============================================================ */
 let logoRef=null,photoRef=null;
 const Lib=(function(){
-  let view='design',libBrand=null,sig='',saveT=0,incoming=null;
+  let view='design',libBrand=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
   const clone=o=>JSON.parse(JSON.stringify(o));
   const brandPosts=bid=>Store.all('post').filter(p=>p.bid===bid);
   const postMeta=p=>p.type==='free'?`Layer layout · ${p.doc.w} × ${p.doc.h}`:(()=>{const f=FMT[p.s.format]||FMT['fb-feed'];return PLATFORMS.find(x=>x.id===f.p).name+' · '+f.name;})();
   const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':new Date(t).toLocaleDateString();};
 
   /* ---------- brand <-> designer state ---------- */
-  function brandFields(){return{name:(state.brandName||'').trim()||'Untitled brand',handle:state.handle||'',query:state.query||'',typeId:state.typeId,graphicId:state.graphicId,gStrength:state.gStrength,paletteId:state.paletteId,colors:Object.assign({},state.colors),palettes:myPalettes.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text})),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
-  function touchBrand(){if(!Store.S.ready||!state.bid)return;clearTimeout(saveT);saveT=setTimeout(saveBrandNow,1200);}
+  /* The brand being edited is a draft. On the Brand page it lives in `state`; elsewhere it is held in `draft`,
+     so the post open on the Media page can keep its own look. Nothing is written until Save brand. */
+  const LOOK=['paletteId','colors','typeId','graphicId','gStrength'];
+  function pick(s){return{brandName:s.brandName,handle:s.handle,query:s.query,typeId:s.typeId,graphicId:s.graphicId,gStrength:s.gStrength,paletteId:s.paletteId,colors:Object.assign({},s.colors)};}
+  function live(){return view==='brand'||!draft?pick(state):draft;}
+  function brandFields(){const L=live(),old=Store.get('brand',state.bid)||{};return{name:(L.brandName||'').trim()||'Untitled brand',handle:L.handle||'',query:L.query||'',typeId:L.typeId,graphicId:L.graphicId,gStrength:L.gStrength,paletteId:L.paletteId,colors:ROLES.reduce((o,[r])=>(o[r]=L.colors[r],o),{}),palettes:myPalettes.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text})),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},old.content||state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
+  const fieldsSig=()=>{const f=brandFields();delete f.content;return state.bid+JSON.stringify(f);};
+  function isDirty(){return !!(Store.S.ready&&state.bid&&sig&&((logoRef&&logoRef.startsWith('mem:'))||fieldsSig()!==sig));}
+  function syncDirty(){const d=isDirty();$('#navDirty').hidden=!d;const st=$('#bSaveState');st.textContent=d?'Unsaved changes':'All changes saved';st.classList.toggle('on',d);$('#btnDiscard').hidden=!d;$('#btnSaveBrand').disabled=!d;}
+  function touchBrand(){clearTimeout(saveT);saveT=setTimeout(syncDirty,150);}
   async function saveBrandNow(){if(!Store.S.ready||!state.bid)return;if(logoRef&&logoRef.startsWith('mem:')){const r=await Store.persistRef(logoRef);if(r)logoRef=r;}
-    const f=brandFields(),s=state.bid+JSON.stringify(f);if(s===sig)return;sig=s;const old=Store.get('brand',state.bid)||{};try{await Store.put('brand',Object.assign({},old,f,{id:state.bid}));}catch(e){}fillBrandSelect();acct();if(view==='lib')buildLib();}
-  function fillBrandSelect(){const bs=$('#brandSel');bs.textContent='';Store.all('brand').slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(b=>bs.append(el('option',{value:b.id,text:b.name})));bs.append(el('option',{value:'__lib',text:'Manage brands…'}));bs.value=state.bid;}
-  function activate(id,quiet){const b=Store.get('brand',id);if(!b)return;const keep={platform:state.platform,format:state.format,layout:state.layout,tab:state.tab,guides:state.guides,shuffle:state.shuffle,colorMode:state.colorMode,typeClass:state.typeClass,typeMode:state.typeMode,arrangement:state.arrangement,seed:state.seed};
+    const f=brandFields(),old=Store.get('brand',state.bid)||{};try{await Store.put('brand',Object.assign({},old,f,{id:state.bid}));}catch(e){syncDirty();return false;}sig=fieldsSig();if(view!=='brand')draft=live();fillBrandSelect();acct();syncDirty();renderLook();if(view==='lib')buildLib();return true;}
+  /* Unsaved brand changes are never dropped silently: switching brands asks first. */
+  function guard(fn){if(!isDirty()){fn();return;}const L=live();$('#unsMsg').textContent='\u201C'+((L.brandName||'').trim()||'This brand')+'\u201D has changes that are not saved. Save them before you continue?';$('#ovUnsaved').hidden=false;
+    $('#unsSave').onclick=async()=>{$('#ovUnsaved').hidden=true;if(await saveBrandNow())fn();};$('#unsDrop').onclick=()=>{$('#ovUnsaved').hidden=true;discard();fn();};}
+  function discard(){if(state.bid&&Store.get('brand',state.bid))activate(state.bid,true);}
+  function askPalette(){askName('Name this palette','',n=>savePalette(n));}
+  function fillBrandSelect(){const bs=$('#brandSel');bs.textContent='';Store.all('brand').slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(b=>bs.append(el('option',{value:b.id,text:b.name})));bs.append(el('option',{value:'__new',text:'New brand…'}),el('option',{value:'__lib',text:'Manage brands…'}));bs.value=state.bid;}
+  function makeBrand(){askName('Name the new brand','',async n=>{const b=await newBrand(n||'New brand');activate(b.id,true);setView('brand');setStep('describe');say('Created '+b.name+'.');});}
+  function activate(id,quiet){const b=Store.get('brand',id);if(!b)return;const keep={platform:state.platform,format:state.format,layout:state.layout,tab:state.tab,guides:state.guides,shuffle:state.shuffle,colorMode:state.colorMode,typeClass:state.typeClass,typeMode:state.typeMode,arrangement:state.arrangement,seed:state.seed,pvFmt:state.pvFmt,bstep:b.query?'build':'describe'};
     myPalettes=(b.palettes||[]).filter(p=>p&&p.id&&ROLES.every(([r])=>validHex(String(p[r]||'')))).map(clone);registerPalettes();
     myTypes=(b.types||[]).filter(validType).map(clone);state.bid=b.id;registerTypes();
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
     logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
-    sig=state.bid+JSON.stringify(brandFields());fillBrandSelect();initAll();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
+    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
   /* ---------- named palettes ---------- */
-  async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the ready-made palettes.');await saveBrandNow();}
+  async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the premade palettes.');await saveBrandNow();}
   function renamePalette(id,name){const p=myPalettes.find(x=>x.id===id);if(!p)return;p.name=(name||'').trim().slice(0,40)||p.name;registerPalettes();buildResults();touchBrand();}
   function deletePalette(id){myPalettes=myPalettes.filter(x=>x.id!==id);if(state.paletteId===id)state.paletteId=DEFAULT_PAL;registerPalettes();buildColors();buildResults();touchBrand();}
 
@@ -2221,10 +2528,11 @@ const Lib=(function(){
   async function saveFree(asNew){const d=Free.doc;if(!d){Free.say('Nothing to save yet.');return;}Free.say('Saving…');const r=await Free.persistable();const id=(!asNew&&d.id&&Store.get('post',d.id))?d.id:uidGen();d.id=id;r.doc.id=id;
     try{await Store.put('post',{id,bid:state.bid,name:(d.name||'').trim()||'Untitled layout',type:'free',doc:r.doc});}catch(e){Free.say(e&&e.code==='too_large'?'This layout holds too much text to save as one post. Remove some layers and try again.':'The layout could not be saved.');return;}
     Free.clean();buildDrafts();acct();Free.say('Saved to '+state.brandName+'.'+(r.lost?' '+r.lost+' image '+(r.lost===1?'layer':'layers')+' could not be stored and will be missing next time.':''));}
-  function openPost(id){const p=Store.get('post',id);if(!p)return;if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
+  function openPost(id){const p=Store.get('post',id);if(!p)return;if(p.bid!==state.bid&&Store.get('brand',p.bid))guard(()=>openPostNow(id));else openPostNow(id);}
+  function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
@@ -2241,8 +2549,13 @@ const Lib=(function(){
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(blob)await saveFile(`${slug(p.name)}-${fmt.w}x${fmt.h}.png`,blob,true);}
 
   /* ---------- views ---------- */
-  function setView(v){view=v;$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
-    if(v==='design')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
+  /* Entering the Brand page puts the draft into `state`; leaving takes it back out. A saved post that is
+     open on the Media page keeps its own colors, type and graphic; a new post takes the brand's. */
+  function enterBrand(){postLook=state.postId?LOOK.reduce((o,k)=>(o[k]=clone(state[k]),o),{}):null;if(draft)Object.assign(state,clone(draft));
+    $('#q').value='';renderChips();syncIdentity();buildColors();runSearch();setStep(state.bstep);useType(state.typeId);}
+  function leaveBrand(){draft=pick(state);if(postLook){Object.assign(state,postLook);postLook=null;}buildColors();buildFields();useType(state.typeId);renderLook();}
+  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
+    if(v==='design'){renderLook();requestPaint(true);}else if(v==='brand')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
   function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Brands and posts are saved to your Claude account on this page.':S.reason;}
 
   /* ---------- library ---------- */
@@ -2252,21 +2565,22 @@ const Lib=(function(){
     const a=$('#libAcct');a.textContent='';a.append(el('div',{class:'who'},S.me.avatarUrl?el('img',{src:S.me.avatarUrl,alt:'',width:44,height:44}):null,el('div',null,el('h2',{text:S.me.name||'Your workspace'}),el('p',{class:'lede',style:'margin:0',text:S.mode==='cloud'?'Signed in with your Claude account. Your brands and posts are private to you and follow you to any device.':S.reason}))),
       el('div',{class:'rowbtns'},el('span',{class:'meta',text:`${brands.length} ${brands.length===1?'brand':'brands'} · ${posts.length} ${posts.length===1?'post':'posts'}`}),el('button',{type:'button',class:'btn small',title:'One file with every brand, post and image in this workspace',text:'Back up everything',onclick:async()=>{libSay('Building the backup…');await saveFile('brand-media-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(await Store.exportAll()),false);libSay('Backup saved. Keep the file somewhere safe; open it here to restore.');}}),el('label',{class:'btn small',style:'cursor:pointer',title:'Open a backup, or a brand or post file someone shared with you'},'Open a backup or shared file',el('input',{type:'file',id:'libOpen',accept:'application/json,.json',hidden:true,onchange:openFile}))));
     const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open in the designer':''}`}))));});
-    bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>askName('Name the new brand','',async n=>{const b=await newBrand(n||'New brand');libBrand=b.id;fillBrandSelect();buildLib();})}));
+    bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>guard(makeBrand)}));
     const b=Store.get('brand',libBrand),pn=$('#libPanel');pn.textContent='';if(!b)return;const ps=brandPosts(b.id),t=TYP[b.typeId]||TYP.clear;
-    const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;if(b.id===state.bid){state.brandName=v;buildFields();requestPaint(true);await saveBrandNow();}else{await Store.put('brand',Object.assign({},b,{name:v}));fillBrandSelect();}buildLib();});
+    const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;await Store.put('brand',Object.assign({},b,{name:v}));if(b.id===state.bid){state.brandName=v;if(draft)draft.brandName=v;const f=JSON.parse(sig.slice(state.bid.length));f.name=v;sig=state.bid+JSON.stringify(f);syncIdentity();renderLook();requestPaint(true);}fillBrandSelect();buildLib();});
     const del=el('button',{type:'button',class:'btn small',text:'Delete brand'});del.addEventListener('click',()=>sure(del,async()=>{for(const p of ps)await Store.del('post',p.id);await Store.del('brand',b.id);if(b.id===state.bid){let nx=Store.all('brand')[0];if(!nx)nx=await newBrand('New brand');activate(nx.id,true);}libBrand=null;fillBrandSelect();buildLib();}));
-    pn.append(el('div',{class:'phead'},nm,el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn primary',text:'Open in designer',onclick:()=>{if(b.id!==state.bid)activate(b.id);setView('design');}}),
+    pn.append(el('div',{class:'phead'},nm,el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn primary',text:'Edit brand',onclick:()=>{if(b.id!==state.bid)guard(()=>{activate(b.id);setView('brand');});else setView('brand');}}),el('button',{type:'button',class:'btn',text:'Make a post',onclick:()=>{if(b.id!==state.bid)guard(()=>{activate(b.id);setView('design');});else setView('design');}}),
       el('button',{type:'button',class:'btn',title:S.canShare?'Create a link other accounts can open':'Save the brand, its posts and images as one file to send to someone',text:S.canShare?'Share brand':'Share brand as a file',onclick:()=>shareBrand(b.id)}),el('button',{type:'button',class:'btn',text:'Export brand kit',onclick:()=>exportKit(b.id,'zip')}),el('button',{type:'button',class:'btn',text:'Guidelines PDF',onclick:()=>exportKit(b.id,'pdf')}),
       el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:async()=>{const c=clone(b);c.id=uidGen();c.name=(b.name+' copy').slice(0,40);await Store.put('brand',c);libBrand=c.id;fillBrandSelect();buildLib();}}),del)));
     pn.append(el('p',{class:'note',id:'libMsg','aria-live':'polite',text:'Brand kit: a ZIP with a guidelines PDF, logo, palette files and fonts. In Canva, give the PDF to Brand Kit Builder, or add the pieces by hand.'}));
     const pals=[{name:'Current colors',cols:b.colors}].concat((b.palettes||[]).map(p=>({name:p.name,cols:p})));
     pn.append(el('div',{class:'h',text:'Identity'}),el('div',{class:'ident'},el('div',null,el('small',{text:'Typefaces'}),el('b',{text:t.display.family+(t.body.family!==t.display.family?' with '+t.body.family:'')})),el('div',null,el('small',{text:'Keywords'}),el('b',{text:b.query||'None yet'})),el('div',null,el('small',{text:'Logo'}),el('b',{text:b.logo?'Uploaded':'Text wordmark'}))),
       el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+p.cols[r]}))),el('span',{text:p.name})))));
-    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');}}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>{if(b.id!==state.bid)activate(b.id);setView('free');}}))));
+    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');})}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
     const grid=el('div',{class:'pgrid'});if(!ps.length)grid.append(el('p',{class:'empty',text:'No posts in this brand yet.'}));
     ps.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
       grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d)));thumb(cv,p,220,200);});pn.append(grid);}
+  function guardIf(bid,fn){if(bid!==state.bid)guard(fn);else fn();}
   function libSay(t){const m=$('#libMsg');if(m)m.textContent=t;}
   async function exportKit(id,kind){const b=Store.get('brand',id);if(!b)return;libSay('Building the '+(kind==='zip'?'brand kit':'guidelines PDF')+'…');try{const ps=brandPosts(id);const blob=kind==='zip'?await Kit.zip(b,ps):await Kit.guidelines(b,ps);await saveFile(slug(b.name)+(kind==='zip'?'-brand-kit.zip':'-brand-guidelines.pdf'),blob,false);libSay(kind==='zip'?'Brand kit ready. Unzip it first: Canva takes the PDF, logo and font files one at a time, not the ZIP.':'Guidelines PDF ready. In Canva, open an empty Brand Kit and upload it to Brand Kit Builder.');}catch(e){console.error(e);libSay('The export could not be built. Try again.');}}
   /* One reader for the three kinds of file: a full backup, a shared brand, a shared post. */
@@ -2293,7 +2607,7 @@ const Lib=(function(){
     box.append(el('p',{text:(r.mine?'You shared this.':r.by?'Shared by '+r.by+'.':r.file?'From a shared file.':'Shared by another account.')+' '+(isB?`It includes the brand, ${(b.palettes||[]).length} saved ${(b.palettes||[]).length===1?'palette':'palettes'} and ${r.data.posts.length} ${r.data.posts.length===1?'post':'posts'}.`:`It belongs to the brand “${b.name||'Untitled'}”, which is copied with it.`)}));
     if(b.colors)box.append(el('div',{class:'pals'},el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([x])=>el('i',{style:'width:20%;background:'+b.colors[x]}))),el('span',{text:b.name||'Brand colors'}))));
     const prev=el('div',{class:'cmp'});(isB?r.data.posts.slice(0,4):[p]).forEach(q=>{const cv=el('canvas');prev.append(el('figure',null,cv,el('figcaption',{text:q.name})));thumb(cv,q,220,240);});box.append(prev);$('#inAdd').hidden=false;$('#inAdd').textContent=isB?'Add to my brands':'Add to my posts';}
-  async function acceptIncoming(){const r=incoming;if(!r)return;const src=r.data.brand||{};let b=r.kind==='post'&&src.id?Store.all('brand').find(x=>x.from===src.id):null;
+  async function acceptIncoming(){const r=incoming;if(!r)return;if(isDirty()){guard(acceptIncoming);return;}const src=r.data.brand||{};let b=r.kind==='post'&&src.id?Store.all('brand').find(x=>x.from===src.id):null;
     if(!b){const d=defaults('sample');b=src.colors?clone(src):{handle:'',query:'',typeId:d.typeId,graphicId:d.graphicId,gStrength:.55,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:d.content,logo:null};delete b.kind;b.id=uidGen();b.from=src.id||null;b.name=(src.name||'Shared brand').slice(0,40);await Store.put('brand',b);}
     const list=r.kind==='brand'?r.data.posts:[r.data.post];let last=null;for(const p of list){const c=clone(p);c.id=uidGen();c.bid=b.id;if(c.doc)c.doc.id=c.id;await Store.put('post',c);last=c;}
     incoming=null;$('#ovIncoming').hidden=true;fillBrandSelect();activate(b.id,true);acct();if(r.kind==='post'&&last)openPost(last.id);else{libBrand=b.id;setView('lib');}say(Store.S.mode==='cloud'?'Added to your account.':'Added to your brands.');}
@@ -2301,7 +2615,9 @@ const Lib=(function(){
   /* ---------- start ---------- */
   async function start(){boot();Free.boot();acct();
     document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));$('#acct').addEventListener('click',()=>setView('lib'));
-    $('#brandSel').addEventListener('change',e=>{if(e.target.value==='__lib'){e.target.value=state.bid;setView('lib');}else activate(e.target.value);});
+    $('#brandSel').addEventListener('change',e=>{const v=e.target.value;e.target.value=state.bid;if(v==='__lib')setView('lib');else if(v==='__new')guard(makeBrand);else if(v!==state.bid)guard(()=>activate(v));});
+    $('#btnSaveBrand').addEventListener('click',()=>saveBrandNow());$('#btnDiscard').addEventListener('click',discard);
+    window.addEventListener('beforeunload',e=>{if(isDirty()){e.preventDefault();e.returnValue='';}});
     $('#btnSave').addEventListener('click',()=>savePost(false));$('#btnSaveNew').addEventListener('click',()=>savePost(true));$('#btnCompare').addEventListener('click',compare);$('#btnLib').addEventListener('click',()=>setView('lib'));
     $('#fSave').addEventListener('click',()=>saveFree(false));$('#fSaveNew').addEventListener('click',()=>saveFree(true));
     $('#shareCopy').addEventListener('click',()=>{const v=$('#shareUrl').value;if(!v)return;const done=()=>{$('#shareCopied').textContent='Link copied.';};try{navigator.clipboard.writeText(v).then(done,()=>{$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';});}catch(e){$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';}});
@@ -2311,11 +2627,11 @@ const Lib=(function(){
     if(!Store.all('brand').length){const legacyP=(store.get('brandlab.mypalettes.v1')||[]).filter(p=>p&&p.id&&ROLES.every(([r])=>validHex(String(p[r]||''))));const legacyD=(store.get('brandlab.drafts.v1')||[]).filter(d=>d&&d.s);
       const id=uidGen();myPalettes=legacyP.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text}));registerPalettes();state.bid=id;await Store.put('brand',Object.assign(brandFields(),{id}));
       let n=0;for(const d of legacyD.slice(0,40)){await Store.put('post',{id:uidGen(),bid:id,name:'Draft '+(++n),type:'template',s:sane(d.s),photo:null});}}
-    const want=Store.get('brand',state.bid)?state.bid:Store.all('brand')[0].id;activate(want,true);acct();buildDrafts();
+    const want=Store.get('brand',state.bid)?state.bid:Store.all('brand')[0].id;activate(want,true);acct();buildDrafts();{const v=store.get('brandlab.view.v1');setView(['brand','design','free','lib'].includes(v)?v:'brand');}
     {const S=Store.S;$('#welBody').textContent=S.mode==='cloud'?'Your account here is your Claude sign-in'+(S.me.name?' ('+S.me.name+')':'')+'. There is nothing to register. Brands, palettes and posts you save are private to your account and open on any device where you are signed in.':S.reason;}
     if(!store.get('brandlab.welcomed.v3')){store.set('brandlab.welcomed.v3',1);$('#ovWelcome').hidden=false;}
     checkHash();}
-  return{start,setView,savePalette,renamePalette,deletePalette,saveType,updateType,deleteType,touchBrand,buildDraftsImpl,openPost,get view(){return view;}};
+  return{start,setView,askPalette,look:()=>draft?live():pick(state),isDirty,savePalette,renamePalette,deletePalette,saveType,updateType,deleteType,touchBrand,buildDraftsImpl,openPost,get view(){return view;}};
 })();
 function buildDrafts(){Lib.buildDraftsImpl();}
 function paintDrafts(){}

@@ -1,18 +1,23 @@
 # User guide
 
-## The four steps
+## The two pages
 
-1. **Pick a template.** On the left, choose a platform, then a format (the size), then a layout. Pink hatching on the preview marks areas the platform covers or crops; it is never exported.
-2. **Describe the brand.** On the right, type a few words or select suggested ones. Results that fit rise to the top of the Colors, Type and Graphics tabs. Each lists why it matched and carries a letter: **R** a published study measured the link, **S** a standard or platform requirement, **C** common practice nobody tested. Many everyday words and slang terms come from a reviewed list suggested by a language model; they carry no letter, and hovering the word says so. A word the app has no link for is reported, not guessed.
-3. **Try options.** Select any result to put it on the post. **Shuffle** tries combinations from the current matches. **Default / Brand fill / Reversed** changes which color fills the post.
-4. **Make it yours.** Replace the sample text, add a photo or logo, name the post and choose **Save post**, or **Export PNG**.
+**Brand** builds the brand kit, in two steps:
 
-**What this draft signals**, under the preview, adds up the associations of your current colors, type and graphic, checks text contrast against WCAG 2.2, and lists cautions.
+1. **Describe the brand.** Type a few words. Suggestions appear as you type (arrow keys to move, Enter to add); a half-typed word takes the top suggestion, and a word the app does not know is added and reported, not guessed. The **fingerprint** shows what the words ask for on eight axes: sincerity, excitement, competence, sophistication and ruggedness (none to strong), and pleasure, arousal and dominance (low to high, with the dashed line as neutral). Words that map to a style or topic are listed beside it as "not on the chart". **Browse all keywords by group** opens the full index. Choose **Use these keywords** when done.
+2. **Build the kit.** Pick colors, a type pairing and a graphic; the ones that fit your words come first. Each lists why it matched and carries a letter: **R** a published study measured the link, **S** a standard or platform requirement, **C** common practice nobody tested. Many everyday words and slang terms come from a reviewed list suggested by a language model; they carry no letter, and hovering the word says so. The small fingerprint compares your keywords (solid) with what your current picks signal (dashed). The preview shows a sample post as a square post, a story or a banner. **Identity** holds the brand name, handle and logo.
+
+Brand changes are kept only when you choose **Save brand**. The Brand tab shows a dot while there are unsaved changes, and switching brands asks first.
+
+**Media** makes posts. Pick a platform, a format and a layout on the left; pink hatching on the preview marks areas the platform covers or crops and is never exported. **Brand look** switches the post between the brand's colors and its saved palettes. Replace the sample text, add a photo, name the post and choose **Save post**, or **Export PNG**. A saved post keeps its own look when you later change the brand; a new post takes the brand's.
+
+**What this draft signals**, under the Media preview, adds up the associations of your current colors, type and graphic, checks text contrast against WCAG 2.2, and lists cautions.
 
 ## Colors
 
-- **Ready-made palettes** are five colors with roles: ground, panel, primary, accent, text.
-- **Build color by color** lets you pick a role and choose its color: from single colors linked to your keywords, from partners that suit your primary and match a keyword, by typing a hex code, or with the color picker. Save the result as a named palette; it is kept with the brand and listed first.
+- **Premade palettes** are five colors with roles: ground, panel, primary, accent, text.
+- **Saved to this brand**, at the top of the Colors tab, lists the brand's own palettes; select one to switch to it, or save the current colors as a new one.
+- **Build your own** lets you pick a role and choose its color: from single colors linked to your keywords, from partners that suit your primary and match a keyword, by typing a hex code, or with the color picker. Save the result as a named palette; it is kept with the brand and listed first.
 
 ## Brands and posts
 
@@ -37,8 +42,8 @@ Use it when a template is not enough.
 
 Switch at the top of the page. Advanced adds:
 
-- **Build a pairing** (Type tab): start from any ready-made pairing, then choose the headline and supporting typefaces and weights yourself. Associations follow the headline face.
-- **Fine-tune hex values and graphic**: all five hex values at once, graphic strength, rearrange the graphic.
+- **Build a pairing** (Brand page, Type tab): start from any ready-made pairing, then choose the headline and supporting typefaces and weights yourself. Associations follow the headline face.
+- **Fine-tune hex values and graphic** (Brand page): all five hex values at once, graphic strength, rearrange the graphic.
 - **Text size, photo and brand mark**: headline and supporting text size, headline capitals, which part of a photo stays in view, tint strength, the shade behind text on photo layouts, and whether the brand mark and handle show. These are saved with the post.
 - **Edit as layers**: opens a copy of the template post in the Layer editor. Text, buttons, bars and the logo become separate layers; the ground, photo and graphic become one locked background layer. The original post is unchanged.
 - **Export JPG** and **Export all sizes (ZIP)**: one PNG for every format of the current platform. A format keeps the current layout where it offers it, otherwise it uses its first layout, so check each image.
