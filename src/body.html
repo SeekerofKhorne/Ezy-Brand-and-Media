@@ -2,16 +2,17 @@
   <header class="top">
     <h1 id="appName">Ezy Brand and Media</h1>
     <div class="seg" id="nav" role="group" aria-label="Section">
-      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
+      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="lib" aria-pressed="false">Library</button>
+    </div>
+    <div class="seg" id="mediaMode" role="group" aria-label="Media mode">
+      <button type="button" data-v="design" aria-pressed="true">Templates</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button>
     </div>
     <span class="sp"></span>
-    <div class="seg" id="modeSeg" role="group" aria-label="How much control to show">
-      <button type="button" data-v="simple" aria-pressed="true" title="A guided set of controls. Best for getting a good draft quickly.">Simple</button><button type="button" data-v="advanced" aria-pressed="false" title="Every control: custom type pairings, exact hex values, photo and text adjustments, more export options, and conversion to layers.">Advanced</button>
-    </div>
     <label for="brandSel">Brand <select id="brandSel" style="width:auto;max-width:190px"></select></label>
     <button class="acct" id="acct" type="button"></button>
-    <button class="btn" id="btnHelp" type="button">Quick start</button>
-    <button class="btn" id="btnSources" type="button">Sources and method</button>
+    <button class="iconbtn" id="btnSettings" type="button" aria-label="Settings" title="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9"></path></svg>
+    </button>
   </header>
   <div class="bview" id="viewBrand" hidden>
     <div class="bbar">
@@ -126,96 +127,47 @@
       </aside>
     </section>
   </div>
-  <div class="main" id="viewDesign">
-    <aside class="col left" aria-label="Templates">
-      <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
-      <div class="h">Platform</div>
-      <div class="plats" id="plats"></div>
-      <div class="h">Format</div>
-      <div class="formats" id="formats"></div>
-      <div class="h">Layout</div>
-      <div class="layouts" id="layouts"></div>
-      <p class="note">Sizes come from 2026 platform guides and change often. Re-check a size before you produce final files.</p>
-    </aside>
+  <div class="main media" id="viewDesign">
+    <nav class="rail" id="rail" aria-label="Media tools">
+      <button type="button" data-p="layouts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg><span>Layouts</span></button>
+      <button type="button" data-p="text"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6V4.5h14V6"></path><path d="M12 4.5v15"></path><path d="M9 19.5h6"></path></svg><span>Text</span></button>
+      <button type="button" data-p="photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"></rect><circle cx="9" cy="10" r="1.8"></circle><path d="M20.5 16l-5-5-8.5 8"></path></svg><span>Photo</span></button>
+      <button type="button" data-p="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 3.5a8.5 8.5 0 0 0 0 17z" fill="currentColor"></path></svg><span>Brand</span></button>
+      <button type="button" data-p="adjust" class="adv"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span>Adjust</span></button>
+      <button type="button" data-p="posts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg><span>Posts</span></button>
+    </nav>
 
-    <main class="col center">
-      <div class="toolbar">
-        <span class="title" id="fmtTitle"></span><span class="dim" id="fmtDim"></span>
-        <span class="sp"></span>
-        <div class="seg" id="arr" role="group" aria-label="Color arrangement">
-          <button type="button" data-v="base" title="Background color fills the post">Default</button>
-          <button type="button" data-v="brand" title="Primary color fills the post">Brand fill</button>
-          <button type="button" data-v="contrast" title="Text color fills the post">Reversed</button>
-        </div>
-        <button class="btn" id="btnGuides" type="button" aria-pressed="true" title="Show the areas each app covers or crops. Guides are never exported.">Platform guides</button>
-      </div>
-      <div class="stage" id="stage"><canvas id="cv" role="img" aria-label="Live preview of the post"></canvas></div>
-      <div class="toolbar">
-        <button class="btn" id="btnPrev" type="button" title="Previous layout">&#8592; Layout</button>
-        <button class="btn" id="btnNext" type="button" title="Next layout">Layout &#8594;</button>
-        <button class="btn" id="btnShuffle" type="button" title="Try another combination from the current matches">Shuffle</button>
-        <span class="sp"></span>
-        <input id="postName" type="text" maxlength="60" placeholder="Name this post" aria-label="Post name" style="width:160px">
-        <button class="btn" id="btnSaveNew" type="button" title="Keep the open post as it is and save this version as another post">Save as new</button>
-        <button class="btn" id="btnSave" type="button">Save post</button>
-        <button class="btn primary" id="btnExport" type="button">Export PNG</button>
-      </div>
-      <div class="toolbar adv" id="advBar" aria-label="More ways to export and edit">
-        <span class="dim">Shuffle changes</span>
-        <div class="seg" id="shuf" role="group" aria-label="What Shuffle changes">
-          <button type="button" data-v="colors">Colors</button><button type="button" data-v="type">Type</button><button type="button" data-v="graphic">Graphic</button><button type="button" data-v="layout">Layout</button>
-        </div>
-        <span class="sp"></span>
-        <button class="btn small" id="btnLayers" type="button" title="Open a copy of this post in the Layer editor, with each piece of text, button and logo on its own layer">Edit as layers</button>
-        <button class="btn small" id="btnJpg" type="button" title="A smaller file than PNG. Good for photo posts.">Export JPG</button>
-        <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
-      </div>
-      <p class="advnote simple-only" id="advNote" hidden></p>
-      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
-      <div class="status" id="status" aria-live="polite"></div>
-
-      <section class="card" aria-labelledby="sigH">
-        <h2 id="sigH">What this draft signals</h2>
-        <p class="lede">The strongest associations of the current colors, type and graphic, with the kind of evidence behind each.</p>
-        <div class="signals" id="signals"></div>
-        <div class="checks" id="checks"></div>
-        <ul class="cautions" id="cautions"></ul>
+    <aside class="col panel" id="mPanel" aria-label="Tool panel">
+      <section class="mp" data-p="layouts" aria-label="Layouts">
+        <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
+        <div class="h">Platform</div>
+        <div class="plats" id="plats"></div>
+        <div class="h">Format</div>
+        <div class="formats" id="formats"></div>
+        <div class="h">Layout</div>
+        <div class="layouts" id="layouts"></div>
+        <p class="note">Sizes come from 2026 platform guides and change often. Re-check a size before you produce final files.</p>
       </section>
-
-      <section class="card" aria-labelledby="drH">
-        <div class="rowbtns" style="justify-content:space-between">
-          <h2 id="drH">Posts in this brand</h2>
-          <div class="rowbtns">
-            <button class="btn small" id="btnCompare" type="button">Compare side by side</button>
-            <button class="btn small" id="btnLib" type="button">Open the library</button>
-          </div>
-        </div>
-        <div class="drafts" id="drafts"></div>
-        <p class="note">Posts save to the brand shown at the top of the page. Select one to reopen it. Share, rename and export them under Brands and posts.</p>
-      </section>
-    </main>
-
-    <aside class="col right" aria-label="Post content">
-      <section class="look" id="mLook" aria-labelledby="mLookH">
-        <div class="rowbtns" style="justify-content:space-between"><h2 id="mLookH">Brand look</h2><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
-        <p class="note" id="mLookNote" style="margin-top:2px"></p>
-        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
-      </section>
-      <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
-      <details class="acc" id="accText" open>
-        <summary>Text on the post</summary>
+      <section class="mp" data-p="text" aria-label="Text on the post" hidden>
+        <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
+        <div class="h">Text on the post</div>
         <div class="fields" id="fields"></div>
-      </details>
-      <details class="acc" id="accImg">
-        <summary>Photo</summary>
+      </section>
+      <section class="mp" data-p="photo" aria-label="Photo" hidden>
+        <div class="h">Photo</div>
         <div class="fields">
           <label>Photo (used by photo layouts)<span class="file"><input id="inPhoto" type="file" accept="image/*"><button class="btn small" id="rmPhoto" type="button">Remove</button></span></label>
           <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="tint" type="checkbox"> Tint the photo with the primary color</label>
           <p class="note">The photo is saved with the post. The logo belongs to the brand: change it on the Brand page, under Identity.</p>
         </div>
-      </details>
-      <details class="acc adv" id="accAdv">
-        <summary>Text size, photo and brand mark</summary>
+      </section>
+      <section class="mp look" data-p="brand" id="mLook" aria-labelledby="mLookH" hidden>
+        <div class="rowbtns" style="justify-content:space-between"><div class="h" id="mLookH" style="margin:0">Brand look</div><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
+        <p class="note" id="mLookNote" style="margin-top:2px"></p>
+        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
+      </section>
+      <section class="mp adv" data-p="adjust" id="accAdv" aria-label="Text size, photo and brand mark" hidden>
+        <div class="h">Text size, photo and brand mark</div>
         <div class="fields">
           <label>Headline size <output id="oHead"></output><input id="aHead" type="range" min="60" max="150" step="5"></label>
           <label>Supporting text size <output id="oBody"></output><input id="aBody" type="range" min="80" max="130" step="5"></label>
@@ -231,8 +183,60 @@
           <div class="rowbtns"><button class="btn small" id="aReset" type="button">Reset these settings</button></div>
           <p class="note">These settings are saved with the post, not the brand.</p>
         </div>
-      </details>
+      </section>
+      <section class="mp" data-p="posts" aria-labelledby="drH" hidden>
+        <div class="h" id="drH">Posts in this brand</div>
+        <div class="drafts" id="drafts"></div>
+        <div class="rowbtns" style="margin-top:10px"><button class="btn small" id="btnCompare" type="button">Compare side by side</button><button class="btn small" id="btnLib" type="button">Open the library</button></div>
+        <p class="note">Select a post to reopen it. Folders, sharing and copying to another brand are in the Library.</p>
+      </section>
     </aside>
+
+    <main class="col center">
+      <div class="toolbar">
+        <span class="title" id="fmtTitle"></span><span class="dim" id="fmtDim"></span>
+        <span class="sp"></span>
+        <div class="seg" id="arr" role="group" aria-label="Color arrangement">
+          <button type="button" data-v="base" title="Background color fills the post">Default</button>
+          <button type="button" data-v="brand" title="Primary color fills the post">Brand fill</button>
+          <button type="button" data-v="contrast" title="Text color fills the post">Reversed</button>
+        </div>
+        <button class="btn" id="btnShuffle" type="button" title="Try another layout, color arrangement or brand palette">Shuffle</button>
+        <button class="btn" id="btnGuides" type="button" aria-pressed="true" title="Show the areas each app covers or crops. Guides are never exported.">Platform guides</button>
+      </div>
+      <div class="stage" id="stage"><canvas id="cv" role="img" aria-label="Live preview of the post"></canvas></div>
+      <div class="toolbar">
+        <button class="btn" id="btnPrev" type="button" title="Previous layout">&#8592; Layout</button>
+        <button class="btn" id="btnNext" type="button" title="Next layout">Layout &#8594;</button>
+        <span class="sp"></span>
+        <input id="postName" type="text" maxlength="60" placeholder="Name this post" aria-label="Post name" style="width:170px">
+        <label class="inl" for="postFolder">Folder <select id="postFolder"></select></label>
+        <button class="btn" id="btnSaveNew" type="button" title="Keep the open post as it is and save this version as another post">Save as new</button>
+        <button class="btn" id="btnSave" type="button">Save post</button>
+        <button class="btn primary" id="btnExport" type="button">Export PNG</button>
+      </div>
+      <div class="toolbar adv" id="advBar" aria-label="More ways to export and edit">
+        <span class="dim">Shuffle changes</span>
+        <div class="seg" id="shuf" role="group" aria-label="What Shuffle changes">
+          <button type="button" data-v="layout">Layout</button><button type="button" data-v="arrangement">Arrangement</button><button type="button" data-v="colors">Brand palette</button>
+        </div>
+        <span class="sp"></span>
+        <button class="btn small" id="btnLayers" type="button" title="Open a copy of this post in the Layer editor, with each piece of text, button and logo on its own layer">Edit as layers</button>
+        <button class="btn small" id="btnJpg" type="button" title="A smaller file than PNG. Good for photo posts.">Export JPG</button>
+        <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
+      </div>
+      <p class="advnote simple-only" id="advNote" hidden></p>
+      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
+      <div class="status" id="status" aria-live="polite"></div>
+
+      <details class="card dcheck" id="draftCheck">
+        <summary><b id="sigH">Draft check</b><span class="dsum" id="dSum"></span></summary>
+        <p class="lede">The strongest associations of the current colors, type and graphic, with the kind of evidence behind each.</p>
+        <div class="signals" id="signals"></div>
+        <div class="checks" id="checks"></div>
+        <ul class="cautions" id="cautions"></ul>
+      </details>
+    </main>
   </div>
   <div class="main" id="viewFree" hidden>
     <aside class="col left" aria-label="Layers">
@@ -301,6 +305,33 @@
   <header><h2 id="askH">Name</h2><button class="btn" type="button" data-close>Cancel</button></header>
   <div class="savepal"><input id="askIn" type="text" maxlength="40" aria-labelledby="askH"><button class="btn primary" id="askOk" type="button">Save</button></div>
 </div></div>
+<div class="overlay" id="ovSettings" hidden><div class="sheet" style="max-width:860px" role="dialog" aria-modal="true" aria-labelledby="setH">
+  <header><h2 id="setH">Settings</h2><button class="btn small" type="button" data-close>Close</button></header>
+  <section class="setsec" aria-labelledby="thH">
+    <h3 id="thH">Theme</h3>
+    <p class="note">Changes the app around your work. The preview area stays neutral gray in every theme, so the app's colors never shift how you judge a brand's colors.</p>
+    <div class="cards4" id="themeSeg" role="group" aria-label="Theme">
+      <button type="button" data-v="noir" class="tcard"><span class="tsw" style="--a:#0D0B10;--b:#16131C;--c:#EEE8F4;--d:#FF4FA3"></span><b>Neon Noir</b><small>Gothic, cyberpunk. The default.</small></button>
+      <button type="button" data-v="light" class="tcard"><span class="tsw" style="--a:#F2F2F3;--b:#FFFFFF;--c:#1B1B20;--d:#3443B8"></span><b>Clean Light</b><small>Bright, quiet, neutral.</small></button>
+      <button type="button" data-v="dark" class="tcard"><span class="tsw" style="--a:#151517;--b:#1E1E22;--c:#EDEDF0;--d:#97A2F7"></span><b>Clean Dark</b><small>Low glare, no color cast.</small></button>
+      <button type="button" data-v="graphite" class="tcard"><span class="tsw" style="--a:#111416;--b:#1A1E21;--c:#E8EEF0;--d:#3BE3E3"></span><b>Graphite</b><small>Cool steel with a cyan edge.</small></button>
+    </div>
+  </section>
+  <section class="setsec" aria-labelledby="clH">
+    <h3 id="clH">How much control to show</h3>
+    <p class="note">Advanced settings are saved with each post and still apply if you switch back to Simple.</p>
+    <div class="cards2" id="modeSeg" role="group" aria-label="How much control to show">
+      <button type="button" data-v="simple" class="tcard"><b>Simple</b><small>A guided set of controls for getting a good draft quickly.</small>
+        <span class="tlist">You get keyword search and the fingerprint, premade palettes and build-your-own, ready-made type pairings, graphics, every platform template, your text, photo and logo, the three color arrangements, saving to folders, and PNG export. Numbered steps show the order to work in.</span></button>
+      <button type="button" data-v="advanced" class="tcard"><b>Advanced</b><small>Everything in Simple, plus:</small>
+        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all five hex values at once; graphic strength; rearrange the graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
+    </div>
+  </section>
+  <section class="setsec" aria-labelledby="hpH">
+    <h3 id="hpH">Help</h3>
+    <div class="rowbtns"><button class="btn" id="btnHelp" type="button">Quick start</button><button class="btn" id="btnSources" type="button">Sources and method</button></div>
+  </section>
+</div></div>
 <div class="overlay" id="ovUnsaved" hidden><div class="sheet" style="max-width:500px" role="dialog" aria-modal="true" aria-labelledby="unsH">
   <header><h2 id="unsH">Save changes to the brand?</h2></header>
   <p id="unsMsg"></p>
@@ -320,5 +351,5 @@
   </div>
   <p class="note">You can switch at any time at the top of the page. Nothing is lost when you switch.</p>
   <p id="welBody"></p>
-  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts. Brand changes are kept only when you choose Save brand.</p>
+  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Library. Brand changes are kept only when you choose Save brand.</p>
 </div></div>

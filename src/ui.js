@@ -35,16 +35,16 @@ let uiMode=store.get('brandlab.mode.v1')==='advanced'?'advanced':'simple';
 const ADV_DEFAULTS={headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};
 const advActive=s=>Object.keys(ADV_DEFAULTS).some(k=>s[k]!==ADV_DEFAULTS[k]);
 function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('brandlab.mode.v1',uiMode);document.body.classList.toggle('mode-simple',uiMode==='simple');document.body.classList.toggle('mode-advanced',uiMode==='advanced');
-  document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));if(quiet)return;buildResults();syncAdv();requestPaint(false);}
+  document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));setPanel(state.mpanel);if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
-function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{colors:true,type:true,graphic:true,layout:false},
+function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true},mpanel:'layouts',
   headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
-  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';return o;}
+  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false};if(!['layouts','text','photo','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -189,7 +189,9 @@ function updateReadout(c){const parts=draftParts(),agg=draftAgg(parts);
   const ck=$('#checks');ck.textContent='';[['Headline',c.head,c.bg,3],['Body text',c.fg,c.bg,4.5],['Button text',c.onAccent,c.accent,4.5]].forEach(([nm,fg,bg,min])=>{const r=contrast(fg,bg),ok=r>=min;
     ck.append(el('span',{class:'check',title:`WCAG 2.2 asks for at least ${min}:1 here`},el('span',{class:'sw',style:`background:${bg};color:${fg}`,text:'Aa'}),nm+' ',el('b',{text:r.toFixed(1)+':1'}),el('span',{class:ok?'pass':'fail',text:ok?'Passes':'Below '+min+':1'}),tierEl('WCAG')));});
   const hm=harmonyOf(state.colors.primary,state.colors.accent);ck.append(el('span',{class:'check',title:hm.why},el('span',{class:'sw',style:`background:linear-gradient(90deg,${state.colors.primary} 50%,${state.colors.accent} 50%)`}),'Primary with accent ',el('b',{text:hm.level+' harmony'}),el('span',{text:hm.rel.toLowerCase()}),tierEl(hm.src)));
-  const cu=$('#cautions');cu.textContent='';const cs=[].concat(parts[0][1].cautions,parts[1][1].cautions,parts[2][1].cautions);cs.slice(0,4).forEach(x=>cu.append(el('li',null,el('span',{class:'mk',text:'Note'}),el('span',null,x.text+' ('+SRC[x.src].short+')'))));}
+  const cu=$('#cautions');cu.textContent='';const cs=[].concat(parts[0][1].cautions,parts[1][1].cautions,parts[2][1].cautions);
+  {const pass=ck.querySelectorAll('.pass').length,fail=ck.querySelectorAll('.fail').length,n=Math.min(4,cs.length);const d=$('#dSum');d.textContent='';d.append(el('span',{class:fail?'fail':'pass',text:fail?fail+' contrast '+(fail===1?'check is':'checks are')+' below the minimum':'Text contrast passes ('+pass+' of '+pass+')'}),n?el('span',{class:'cau',text:n+' '+(n===1?'note':'notes')}):null);}
+  cs.slice(0,4).forEach(x=>cu.append(el('li',null,el('span',{class:'mk',text:'Note'}),el('span',null,x.text+' ('+SRC[x.src].short+')'))));}
 
 /* ---------- right column forms ---------- */
 function buildFields(){const box=$('#fields');box.textContent='';const mk=(id,label,val,max,area,on)=>{const inp=area?el('textarea',{id:'f_'+id,maxlength:max,rows:2}):el('input',{id:'f_'+id,type:'text',maxlength:max});inp.value=val||'';inp.addEventListener('input',()=>{on(inp.value);requestPaint(true);});return el('label',{for:'f_'+id},label,inp);};
@@ -227,6 +229,9 @@ async function toLayers(){await ensureType(state.typeId);const fmt=FMT[state.for
   Lib.setView('free');Free.say('Opened as '+layers.length+' layers. Save it to keep it with the brand.');}
 
 /* ---------- advanced options panel ---------- */
+/* Media page tool rail: one panel open at a time, like Canva's side panel. */
+function setPanel(p){if(p==='adjust'&&uiMode!=='advanced')p='layouts';state.mpanel=p;document.querySelectorAll('#rail button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===p)));
+  document.querySelectorAll('#mPanel .mp').forEach(x=>x.hidden=x.dataset.p!==p);if(p==='brand')renderLook();}
 function syncAdv(){const pc=v=>Math.round(v*100);$('#aHead').value=pc(state.headScale);$('#aBody').value=pc(state.bodyScale);$('#oHead').textContent=pc(state.headScale)+'%';$('#oBody').textContent=pc(state.bodyScale)+'%';$('#aCaps').value=state.caps;
   $('#aFx').value=pc(state.fx);$('#aFy').value=pc(state.fy);$('#aTint').value=pc(state.tintAmt);$('#aDim').value=pc(state.dim);$('#aMark').checked=state.showMark;$('#aHandle').checked=state.showHandle;
   const n=$('#advNote'),on=advActive(state);n.hidden=!on;if(on){n.textContent='This post uses Advanced settings for text size, photo or brand mark. ';n.append(el('button',{type:'button',class:'link',text:'Reset them',onclick:()=>{Object.assign(state,ADV_DEFAULTS);syncAdv();requestPaint(true);}}),' or switch to Advanced to change them.');}}
@@ -238,13 +243,14 @@ function bootAdv(){const rng=(id,key)=>$(id).addEventListener('input',e=>{state[
   $('#btnHelp').addEventListener('click',()=>{$('#ovWelcome').hidden=false;});}
 
 /* ---------- shuffle ---------- */
-function shuffle(){const res=results(),has=parsed.concepts.length>0;const pool=k=>{const m=res[k].filter(r=>r.score>0);const src=has&&m.length>=2?m.slice(0,Math.max(3,Math.ceil(m.length*.6))):res[k];return src[Math.floor(Math.random()*src.length)].it;};
-  if(state.shuffle.colors){const p=pool('colors');state.paletteId=p.id;state.colors=palColors(p);const r=Math.random();state.arrangement=r<.55?'base':r<.82?'brand':'contrast';}
-  if(state.shuffle.type){state.typeId=pool('type').id;useType(state.typeId);}
-  if(state.shuffle.graphic){let g=pool('graphic');if(g.id==='none')g=pool('graphic');state.graphicId=g.id;state.seed=1+Math.floor(Math.random()*9999);}
-  if(state.shuffle.layout){const ls=FMT[state.format].layouts;state.layout=ls[Math.floor(Math.random()*ls.length)];buildLayouts();buildFields();}
-  syncSeg();buildColors();buildResults();requestPaint(true);}
-function stepLayout(d){const ls=FMT[state.format].layouts;state.layout=ls[(ls.indexOf(state.layout)+d+ls.length)%ls.length];buildLayouts();buildFields();requestPaint(true);}
+/* Shuffle stays inside the brand: another layout, another color arrangement, or another of the
+   brand's saved palettes. Type and graphic belong to the brand and are changed on the Brand page. */
+function shuffle(){const pick=a=>a[Math.floor(Math.random()*a.length)];let changed=false;
+  if(state.shuffle.layout){const ls=FMT[state.format].layouts.filter(l=>l!==state.layout);if(ls.length){state.layout=pick(ls);buildLayouts();buildFields();changed=true;}}
+  if(state.shuffle.arrangement){state.arrangement=pick(['base','brand','contrast'].filter(a=>a!==state.arrangement));syncSeg();changed=true;}
+  if(state.shuffle.colors){const L=Lib.look(),opts=[L?{id:L.paletteId,cols:L.colors}:null].concat(myPalettes.map(p=>({id:p.id,cols:palColors(p)}))).filter(Boolean).filter(o=>!sameColors(o.cols,state.colors));
+    if(opts.length){const o=pick(opts);state.paletteId=o.id;state.colors=Object.assign({},o.cols);buildColors();renderLook();changed=true;}}
+  if(changed)requestPaint(true);else say('Nothing to shuffle: choose what Shuffle changes, or save more palettes to the brand.');}
 function syncSeg(){document.querySelectorAll('#arr button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===state.arrangement)));document.querySelectorAll('#shuf button').forEach(b=>b.setAttribute('aria-pressed',String(!!state.shuffle[b.dataset.v])));$('#btnGuides').setAttribute('aria-pressed',String(state.guides));}
 
 /* ---------- sources ---------- */
@@ -272,7 +278,7 @@ function closeOverlays(){document.querySelectorAll('.overlay').forEach(o=>o.hidd
 
 /* ---------- wiring ---------- */
 function loadImage(file,cb){if(!file)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>cb(im);im.onerror=()=>say('That file could not be read as an image.');im.src=fr.result;};fr.readAsDataURL(file);}
-function initAll(){$('#q').value='';renderChips();syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
+function initAll(){$('#q').value='';renderChips();setPanel(state.mpanel);syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
 function boot(){
   $('#appName').textContent=APP_NAME;setMode(uiMode,true);bootAdv();
   bootBrand();
@@ -281,6 +287,7 @@ function boot(){
   document.querySelectorAll('#arr button').forEach(b=>b.addEventListener('click',()=>{state.arrangement=b.dataset.v;syncSeg();requestPaint(true);}));
   document.querySelectorAll('#shuf button').forEach(b=>b.addEventListener('click',()=>{state.shuffle[b.dataset.v]=!state.shuffle[b.dataset.v];syncSeg();}));
   $('#btnGuides').addEventListener('click',()=>{state.guides=!state.guides;syncSeg();requestPaint(false);});
+  document.querySelectorAll('#rail button').forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.p);store.set('brandlab.state.v1',state);}));
   $('#btnPrev').addEventListener('click',()=>stepLayout(-1));$('#btnNext').addEventListener('click',()=>stepLayout(1));$('#btnShuffle').addEventListener('click',shuffle);
   $('#btnExport').addEventListener('click',()=>exportPNG());
   $('#inPhoto').addEventListener('change',e=>loadImage(e.target.files[0],im=>{photoImg=im;photoRef=Store.memRef(e.target.files[0]);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);}));

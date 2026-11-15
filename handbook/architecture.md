@@ -15,7 +15,7 @@ The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joinin
 | `brand.js` | The Brand page: keyword chips and autocomplete, the brand fingerprint (radar), the describe and build steps, the sample-post preview, saved-palette pickers |
 | `free.js` | The Layer editor and PDF / image import |
 | `kit.js` | Brand kit export (guidelines PDF and ZIP) |
-| `lib.js` | Brands, posts, the Brands and posts tab, sharing, start-up |
+| `lib.js` | Brands, posts, the Library tab, sharing, start-up |
 | `body.html`, `style.css` | Markup and styles |
 
 ## The ideas that matter
@@ -29,6 +29,10 @@ The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joinin
 **The brand is edited as a draft.** On the Brand page the draft lives in `state`, so the existing builders work on it unchanged. Leaving the page copies it to `draft` in `lib.js`; a saved post open on the Media page then gets its own colors, type and graphic back, while a new post takes the brand's. Nothing about the brand is written until **Save brand** (saving a named palette or starting a type pairing also saves, because those are explicit saves). Switching brands, opening another brand's post, accepting a shared brand or leaving the page with unsaved changes asks first.
 
 **The fingerprint has eight fixed axes**: Aaker's five personality dimensions, then pleasure, arousal and dominance. Personality axes run from none to strong; the three feeling axes are bipolar, with 0.5 neutral. Only concepts with a `pad` position in `concepts.js` move the feeling axes, so an emotion without one moves nothing; no mapping is invented to fill the chart. Compassion (`warmth`), Love, Amusement and Admiration have no position yet, and the page names them under the chart rather than dropping them silently. A position is not display-only: `engine.js` also uses it to score colors, so adding one changes rankings. The existing positions follow Mehrabian's emotional-state model; word-affect norms such as Warriner et al. (2013) agree with them on pleasure but often not on arousal or dominance (23 of 42 axis signs matched), so they are not a drop-in source. Each shape is scaled to its own strongest on-chart concept, so the keyword shape and the picks shape compare by shape, not by raw totals.
+
+**Themes** are CSS variable sets on `<html data-theme>`: `noir` (default), `light`, `dark`, `graphite`. A tiny script in the page head applies the stored choice before first paint. `--sel` colors selected controls; `--stage` (the preview area) is kept neutral gray in every theme.
+
+**Folders** are a list of names on the brand record (`folders`) and a `folder` name on each post. They are written at once, not through the brand draft, because they organize posts rather than define the brand.
 
 **Brands own things; posts point at a brand.** A brand record holds the name, colors, saved palettes, custom pairings, logo and sample text. A post is either a template post (a copy of `state`) or a layer layout (a document of layers). Records are JSON; images are stored separately and referenced by short strings.
 

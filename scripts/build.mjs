@@ -69,6 +69,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* the theme is set before first paint, so the page never flashes the wrong colors */try{var t=localStorage.getItem('brandlab.theme.v1');document.documentElement.dataset.theme=['noir','light','dark','graphite'].indexOf(t)>=0?t:'noir';}catch(e){document.documentElement.dataset.theme='noir';}</script>
 <title>${esc(config.name)}</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">

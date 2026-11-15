@@ -20,7 +20,7 @@ Nothing to install, no sign-up, no tracking. It runs in your browser and keeps y
 
 In the browser you made it in, on that device. Some things to know:
 
-- **Back it up.** Clearing the browser's site data deletes it. Use **Brands and posts → Back up everything** now and then, and keep the file.
+- **Back it up.** Clearing the browser's site data deletes it. Use **Library → Back up everything** now and then, and keep the file.
 - **Each browser keeps its own copy.** Work made in Chrome does not appear in Safari. On a Mac, the Safari Dock icon also keeps its own copy, separate from Safari tabs. Pick one place to work, and move work between places with a backup file.
 - **Sharing:** save a brand or a post as a file and send it. The other person opens it in their own copy.
 
@@ -39,14 +39,15 @@ Nothing goes live until you merge, and every merged change can be undone on GitH
 - **A Brand page** with keyword search over 49 ideas (brand personality, emotions, values, styles, topics), reached through about 2,900 keywords with autocomplete, and a fingerprint chart of what the words ask for. Each idea is linked to colors, type and graphics by a rule with a named source. Brand changes are kept when you choose Save brand.
 - **Color**: 28 ready-made palettes, or build one color at a time with partners that suit your primary and match your keywords. Contrast is checked against WCAG 2.2.
 - **Type**: 52 ready-made pairings from 56 bundled open-licensed typefaces.
-- **Brands and posts**: save named palettes, pairings, a logo and any number of posts under a brand. Keep several brands.
-- **Layer editor**: import a PDF (for example, one downloaded from Canva) or an image and edit it as layers, or start from a blank canvas.
+- **Library**: save named palettes, pairings, a logo and any number of posts under a brand, sorted into folders. Keep several brands, and copy a post from one brand to another in the new brand's look.
+- **Themes**: Neon Noir (default), Clean Light, Clean Dark and Graphite, in Settings. The preview area stays neutral gray in all of them.
+- **Layer editor** (a mode of the Media page): import a PDF (for example, one downloaded from Canva) or an image and edit it as layers, or start from a blank canvas.
 - **Export**: PNG at the exact platform size; a brand kit ZIP (guidelines PDF, palette files, wordmark, fonts) that tools such as Canva's Brand Kit can take in.
 - **Sharing without accounts**: save a brand or a post as one file, images included, and send it to someone. They open it in their own copy.
 
 ### Simple and Advanced
 
-The switch at the top of the page changes how many controls are shown. It never changes what a post contains.
+The switch in **Settings** (the gear at the top right) changes how many controls are shown. It never changes what a post contains.
 
 | | Simple | Advanced |
 |---|---|---|

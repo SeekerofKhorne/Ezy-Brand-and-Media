@@ -1,11 +1,11 @@
 /* ============================================================
-   LIB: brands and posts, the Brands and posts tab, named palettes and type
+   LIB: brands and posts, the Library tab, named palettes and type
    pairings, sharing (files everywhere, links when hosted with accounts),
    and the glue between the three views.
    ============================================================ */
 let logoRef=null,photoRef=null;
 const Lib=(function(){
-  let view='design',libBrand=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
+  let view='design',libBrand=null,libFolder=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
   const clone=o=>JSON.parse(JSON.stringify(o));
   const brandPosts=bid=>Store.all('post').filter(p=>p.bid===bid);
   const postMeta=p=>p.type==='free'?`Layer layout · ${p.doc.w} × ${p.doc.h}`:(()=>{const f=FMT[p.s.format]||FMT['fb-feed'];return PLATFORMS.find(x=>x.id===f.p).name+' · '+f.name;})();
@@ -37,7 +37,7 @@ const Lib=(function(){
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
     logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
-    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
+    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();fillFolderSel('');if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
   /* ---------- named palettes ---------- */
@@ -53,8 +53,8 @@ const Lib=(function(){
   /* ---------- posts ---------- */
   async function savePost(asNew){const name=($('#postName').value||'').trim().slice(0,60)||('Post '+(brandPosts(state.bid).length+1));if(photoRef&&photoRef.startsWith('mem:')){const r=await Store.persistRef(photoRef);if(r)photoRef=r;}
     const id=(!asNew&&state.postId&&Store.get('post',state.postId))?state.postId:uidGen();const s=clone(state);delete s.postId;const keepPhoto=LAYOUTS[state.layout].photo&&photoRef&&!photoRef.startsWith('mem:');
-    try{await Store.put('post',{id,bid:state.bid,name,type:'template',s,photo:keepPhoto?photoRef:null});}catch(e){say('The post could not be saved.');return;}state.postId=id;$('#postName').value=name;buildDrafts();acct();
-    say('Saved “'+name+'” to '+state.brandName+'.'+(photoImg&&LAYOUTS[state.layout].photo&&!keepPhoto?' The photo could not be stored with it.':''));}
+    const fv=$('#postFolder').value;try{await Store.put('post',{id,bid:state.bid,name,type:'template',s,photo:keepPhoto?photoRef:null,folder:fv==='__new'?'':fv});}catch(e){say('The post could not be saved.');return;}state.postId=id;$('#postName').value=name;buildDrafts();acct();
+    say('Saved “'+name+'” to '+state.brandName+(/[.!?]$/.test(state.brandName||'')?'':'.')+(photoImg&&LAYOUTS[state.layout].photo&&!keepPhoto?' The photo could not be stored with it.':''));}
   async function saveFree(asNew){const d=Free.doc;if(!d){Free.say('Nothing to save yet.');return;}Free.say('Saving…');const r=await Free.persistable();const id=(!asNew&&d.id&&Store.get('post',d.id))?d.id:uidGen();d.id=id;r.doc.id=id;
     try{await Store.put('post',{id,bid:state.bid,name:(d.name||'').trim()||'Untitled layout',type:'free',doc:r.doc});}catch(e){Free.say(e&&e.code==='too_large'?'This layout holds too much text to save as one post. Remove some layers and try again.':'The layout could not be saved.');return;}
     Free.clean();buildDrafts();acct();Free.say('Saved to '+state.brandName+'.'+(r.lost?' '+r.lost+' image '+(r.lost===1?'layer':'layers')+' could not be stored and will be missing next time.':''));}
@@ -62,7 +62,7 @@ const Lib=(function(){
   function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
@@ -84,9 +84,9 @@ const Lib=(function(){
   function enterBrand(){postLook=state.postId?LOOK.reduce((o,k)=>(o[k]=clone(state[k]),o),{}):null;if(draft)Object.assign(state,clone(draft));
     $('#q').value='';renderChips();syncIdentity();buildColors();runSearch();setStep(state.bstep);useType(state.typeId);}
   function leaveBrand(){draft=pick(state);if(postLook){Object.assign(state,postLook);postLook=null;}buildColors();buildFields();useType(state.typeId);renderLook();}
-  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
+  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';const navV=v==='free'?'design':v;document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===navV)));$('#mediaMode').hidden=navV!=='design';document.querySelectorAll('#mediaMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
     if(v==='design'){renderLook();requestPaint(true);}else if(v==='brand')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
-  function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Brands and posts are saved to your Claude account on this page.':S.reason;}
+  function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Library are saved to your Claude account on this page.':S.reason;}
 
   /* ---------- library ---------- */
   function askName(title,value,onOk){$('#askH').textContent=title;const i=$('#askIn');i.value=value||'';$('#ovAsk').hidden=false;setTimeout(()=>{i.focus();i.select();},30);const ok=()=>{$('#ovAsk').hidden=true;onOk(i.value.trim());};$('#askOk').onclick=ok;i.onkeydown=e=>{if(e.key==='Enter')ok();};}
@@ -94,7 +94,7 @@ const Lib=(function(){
   function buildLib(){if(view!=='lib')return;const S=Store.S;if(!libBrand||!Store.get('brand',libBrand))libBrand=state.bid;const brands=Store.all('brand'),posts=Store.all('post');
     const a=$('#libAcct');a.textContent='';a.append(el('div',{class:'who'},S.me.avatarUrl?el('img',{src:S.me.avatarUrl,alt:'',width:44,height:44}):null,el('div',null,el('h2',{text:S.me.name||'Your workspace'}),el('p',{class:'lede',style:'margin:0',text:S.mode==='cloud'?'Signed in with your Claude account. Your brands and posts are private to you and follow you to any device.':S.reason}))),
       el('div',{class:'rowbtns'},el('span',{class:'meta',text:`${brands.length} ${brands.length===1?'brand':'brands'} · ${posts.length} ${posts.length===1?'post':'posts'}`}),el('button',{type:'button',class:'btn small',title:'One file with every brand, post and image in this workspace',text:'Back up everything',onclick:async()=>{libSay('Building the backup…');await saveFile('brand-media-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(await Store.exportAll()),false);libSay('Backup saved. Keep the file somewhere safe; open it here to restore.');}}),el('label',{class:'btn small',style:'cursor:pointer',title:'Open a backup, or a brand or post file someone shared with you'},'Open a backup or shared file',el('input',{type:'file',id:'libOpen',accept:'application/json,.json',hidden:true,onchange:openFile}))));
-    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open in the designer':''}`}))));});
+    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;libFolder=null;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open now':''}`}))));});
     bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>guard(makeBrand)}));
     const b=Store.get('brand',libBrand),pn=$('#libPanel');pn.textContent='';if(!b)return;const ps=brandPosts(b.id),t=TYP[b.typeId]||TYP.clear;
     const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;await Store.put('brand',Object.assign({},b,{name:v}));if(b.id===state.bid){state.brandName=v;if(draft)draft.brandName=v;const f=JSON.parse(sig.slice(state.bid.length));f.name=v;sig=state.bid+JSON.stringify(f);syncIdentity();renderLook();requestPaint(true);}fillBrandSelect();buildLib();});
@@ -106,10 +106,41 @@ const Lib=(function(){
     const pals=[{name:'Current colors',cols:b.colors}].concat((b.palettes||[]).map(p=>({name:p.name,cols:p})));
     pn.append(el('div',{class:'h',text:'Identity'}),el('div',{class:'ident'},el('div',null,el('small',{text:'Typefaces'}),el('b',{text:t.display.family+(t.body.family!==t.display.family?' with '+t.body.family:'')})),el('div',null,el('small',{text:'Keywords'}),el('b',{text:b.query||'None yet'})),el('div',null,el('small',{text:'Logo'}),el('b',{text:b.logo?'Uploaded':'Text wordmark'}))),
       el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+p.cols[r]}))),el('span',{text:p.name})))));
-    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');})}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
-    const grid=el('div',{class:'pgrid'});if(!ps.length)grid.append(el('p',{class:'empty',text:'No posts in this brand yet.'}));
-    ps.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
-      grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d)));thumb(cv,p,220,200);});pn.append(grid);}
+    const fl=folders(b.id),inF=f=>ps.filter(p=>(p.folder||'')===f).length;if(libFolder!=null&&libFolder!==''&&!fl.includes(libFolder))libFolder=null;
+    const newPost=()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';fillFolderSel(libFolder||'');buildDrafts();setView('design');});
+    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:newPost}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
+    /* folders */
+    const fb=el('div',{class:'fbar',role:'group','aria-label':'Folders'});const fbtn=(f,label,n)=>el('button',{type:'button',class:'fchip','aria-pressed':String(libFolder===f),onclick:()=>{libFolder=f;buildLib();}},el('span',{text:label}),el('small',{text:String(n)}));
+    fb.append(fbtn(null,'All posts',ps.length));fl.forEach(f=>fb.append(fbtn(f,f,inF(f))));if(fl.length)fb.append(fbtn('','No folder',inF('')));
+    fb.append(el('button',{type:'button',class:'btn small',text:'+ New folder',onclick:()=>askFolder(b.id,n=>{libFolder=n;buildLib();})}));pn.append(fb);
+    if(libFolder){const f=libFolder,rn=el('button',{type:'button',class:'btn small',text:'Rename folder'}),dl=el('button',{type:'button',class:'btn small',text:'Delete folder'});
+      rn.addEventListener('click',()=>askName('Rename the folder',f,async n=>{n=(n||'').trim().slice(0,40);if(!n||n===f)return;for(const p of ps.filter(p=>p.folder===f))await Store.put('post',Object.assign({},p,{folder:n}));await setFolders(b.id,folders(b.id).map(x=>x===f?n:x));libFolder=n;fillFolderSel();buildLib();}));
+      dl.addEventListener('click',()=>sure(dl,async()=>{for(const p of ps.filter(p=>p.folder===f))await Store.put('post',Object.assign({},p,{folder:''}));await setFolders(b.id,folders(b.id).filter(x=>x!==f));libFolder=null;fillFolderSel();libSay('Deleted the folder “'+f+'”. Its posts are kept, with no folder.');buildLib();}));
+      pn.append(el('div',{class:'rowbtns',style:'margin:-2px 0 10px'},el('span',{class:'meta',text:'Folder “'+f+'”'}),rn,dl));}
+    const shown=libFolder==null?ps:ps.filter(p=>(p.folder||'')===libFolder),others=Store.all('brand').filter(x=>x.id!==b.id);
+    const grid=el('div',{class:'pgrid'});if(!shown.length)grid.append(el('p',{class:'empty',text:ps.length?'No posts in this folder.':'No posts in this brand yet.'}));
+    shown.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
+      const mv=el('select',{'aria-label':'Move '+p.name+' to a folder',class:'small'},el('option',{value:'',text:'No folder'}),fl.map(f=>el('option',{value:f,text:f})),el('option',{value:'__new',text:'New folder…'}));mv.value=p.folder&&fl.includes(p.folder)?p.folder:'';
+      mv.addEventListener('change',async()=>{const put=async f=>{await Store.put('post',Object.assign({},p,{folder:f}));if(p.id===state.postId)fillFolderSel(f);buildLib();};if(mv.value==='__new'){mv.value=p.folder||'';askFolder(b.id,put);}else put(mv.value);});
+      const cp=others.length?el('select',{'aria-label':'Copy '+p.name+' to another brand',class:'small'},el('option',{value:'',text:'Copy to brand…'}),others.map(x=>el('option',{value:x.id,text:x.name}))):null;if(cp)cp.addEventListener('change',()=>{if(cp.value)copyToBrand(p.id,cp.value);});
+      grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),
+        el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d),
+        el('div',{class:'pmove'},el('label',null,'Folder ',mv),cp)));thumb(cv,p,220,200);});pn.append(grid);}
+  /* Theme: stored per browser; the page head applies it before first paint. */
+  const THEMES=['noir','light','dark','graphite'];
+  function setTheme(t){if(!THEMES.includes(t))t='noir';document.documentElement.dataset.theme=t;try{localStorage.setItem('brandlab.theme.v1',t);}catch(e){}syncTheme();if(view==='brand')requestPaint(false);}
+  function syncTheme(){const t=document.documentElement.dataset.theme||'noir';document.querySelectorAll('#themeSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===t)));}
+  /* Folders: one level per brand. The list lives on the brand record and is written at once:
+     it organizes posts, so it is not part of the brand draft that waits for Save brand. */
+  const folders=bid=>((Store.get('brand',bid)||{}).folders||[]).slice();
+  async function setFolders(bid,list){const b=Store.get('brand',bid);if(!b)return;await Store.put('brand',Object.assign({},b,{folders:[...new Set(list.map(f=>f.trim()).filter(Boolean))]}));}
+  function fillFolderSel(cur){const sel=$('#postFolder');if(!sel)return;const v=cur!=null?cur:sel.value;sel.textContent='';sel.append(el('option',{value:'',text:'No folder'}));folders(state.bid).forEach(f=>sel.append(el('option',{value:f,text:f})));sel.append(el('option',{value:'__new',text:'New folder…'}));sel.value=folders(state.bid).includes(v)?v:'';}
+  function askFolder(bid,then){askName('Name the folder','',async n=>{n=(n||'').trim().slice(0,40);if(!n)return;await setFolders(bid,folders(bid).concat(n));if(then)then(n);});}
+  /* Copy a post into another brand. A template post takes on that brand's look (colors, type, graphic,
+     name and handle); the original is left as it was. A layer layout is copied as it is. */
+  async function copyToBrand(id,bid){const p=Store.get('post',id),b=Store.get('brand',bid);if(!p||!b)return;const c=clone(p);c.id=uidGen();c.bid=bid;c.folder='';
+    if(c.s){Object.assign(c.s,{paletteId:b.paletteId,colors:Object.assign({},b.colors),typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength!=null?b.gStrength:c.s.gStrength,brandName:b.name,handle:b.handle||'',query:b.query||''});}
+    if(c.doc)c.doc.id=c.id;await Store.put('post',c);libSay('Copied \u201C'+p.name+'\u201D to '+b.name+(c.s?', in that brand\u2019s look.':'. Layer layouts are copied as they are.'));buildLib();acct();}
   function guardIf(bid,fn){if(bid!==state.bid)guard(fn);else fn();}
   function libSay(t){const m=$('#libMsg');if(m)m.textContent=t;}
   async function exportKit(id,kind){const b=Store.get('brand',id);if(!b)return;libSay('Building the '+(kind==='zip'?'brand kit':'guidelines PDF')+'…');try{const ps=brandPosts(id);const blob=kind==='zip'?await Kit.zip(b,ps):await Kit.guidelines(b,ps);await saveFile(slug(b.name)+(kind==='zip'?'-brand-kit.zip':'-brand-guidelines.pdf'),blob,false);libSay(kind==='zip'?'Brand kit ready. Unzip it first: Canva takes the PDF, logo and font files one at a time, not the ZIP.':'Guidelines PDF ready. In Canva, open an empty Brand Kit and upload it to Brand Kit Builder.');}catch(e){console.error(e);libSay('The export could not be built. Try again.');}}
@@ -122,7 +153,7 @@ const Lib=(function(){
   /* ---------- sharing ---------- */
   function showLink(title,url,note){$('#shareH').textContent=title;$('#shareLinkRow').hidden=false;const i=$('#shareUrl');i.value=url;$('#shareNote').textContent=note;$('#shareCopied').textContent='';$('#ovShare').hidden=false;setTimeout(()=>{i.focus();i.select();},30);}
   async function shareFile(kind,data,name){libSay('Preparing the file…');try{const r=await Store.pack(kind,data),fn=slug(name)+'.'+kind+'.json';await saveFile(fn,JSON.stringify(r.file),false);libSay('');
-      $('#shareH').textContent='Shared as a file';$('#shareLinkRow').hidden=true;$('#shareCopied').textContent='';$('#shareNote').textContent='“'+fn+'” was saved to your downloads. Send it by email or any file-sharing service. The other person opens their copy of the app, goes to Brands and posts, and chooses Open a backup or shared file. They get their own copy, images included; later changes need a new file.'+(r.lost?' '+r.lost+' '+(r.lost===1?'image':'images')+' could not be read and '+(r.lost===1?'is':'are')+' not in the file.':'');$('#ovShare').hidden=false;}
+      $('#shareH').textContent='Shared as a file';$('#shareLinkRow').hidden=true;$('#shareCopied').textContent='';$('#shareNote').textContent='“'+fn+'” was saved to your downloads. Send it by email or any file-sharing service. The other person opens their copy of the app, goes to Library, and chooses Open a backup or shared file. They get their own copy, images included; later changes need a new file.'+(r.lost?' '+r.lost+' '+(r.lost===1?'image':'images')+' could not be read and '+(r.lost===1?'is':'are')+' not in the file.':'');$('#ovShare').hidden=false;}
     catch(e){console.error(e);libSay('The file could not be created.');}}
   const SHARE_NOTE='Anyone who can open this page can use the link to copy this into their own account. Give them access to the page first, from its Share menu in Claude. The link carries a snapshot: later changes need a new link.';
   async function shareBrand(id){const b=Store.get('brand',id);if(!b)return;if(id===state.bid)await saveBrandNow();if(!Store.S.canShare){await shareFile('brand',{brand:clone(Store.get('brand',id)),posts:brandPosts(id).map(clone)},b.name);return;}const data={brand:clone(Store.get('brand',id)),posts:[]};let size=JSON.stringify(data).length;for(const p of brandPosts(id)){const n=JSON.stringify(p).length;if(size+n>200000)break;data.posts.push(clone(p));size+=n;}
@@ -144,10 +175,15 @@ const Lib=(function(){
 
   /* ---------- start ---------- */
   async function start(){boot();Free.boot();acct();
-    document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));$('#acct').addEventListener('click',()=>setView('lib'));
+    document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v==='design'&&view==='free'?'free':b.dataset.v)));
+    document.querySelectorAll('#mediaMode button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));
+    $('#btnSettings').addEventListener('click',()=>{syncTheme();$('#ovSettings').hidden=false;});
+    document.querySelectorAll('#themeSeg button').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.v)));
+    ['#btnHelp','#btnSources'].forEach(id=>$(id).addEventListener('click',()=>{$('#ovSettings').hidden=true;}));syncTheme();$('#acct').addEventListener('click',()=>setView('lib'));
     $('#brandSel').addEventListener('change',e=>{const v=e.target.value;e.target.value=state.bid;if(v==='__lib')setView('lib');else if(v==='__new')guard(makeBrand);else if(v!==state.bid)guard(()=>activate(v));});
     $('#btnSaveBrand').addEventListener('click',()=>saveBrandNow());$('#btnDiscard').addEventListener('click',discard);
     window.addEventListener('beforeunload',e=>{if(isDirty()){e.preventDefault();e.returnValue='';}});
+    $('#postFolder').addEventListener('change',e=>{if(e.target.value==='__new'){e.target.value='';askFolder(state.bid,n=>fillFolderSel(n));}});
     $('#btnSave').addEventListener('click',()=>savePost(false));$('#btnSaveNew').addEventListener('click',()=>savePost(true));$('#btnCompare').addEventListener('click',compare);$('#btnLib').addEventListener('click',()=>setView('lib'));
     $('#fSave').addEventListener('click',()=>saveFree(false));$('#fSaveNew').addEventListener('click',()=>saveFree(true));
     $('#shareCopy').addEventListener('click',()=>{const v=$('#shareUrl').value;if(!v)return;const done=()=>{$('#shareCopied').textContent='Link copied.';};try{navigator.clipboard.writeText(v).then(done,()=>{$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';});}catch(e){$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';}});

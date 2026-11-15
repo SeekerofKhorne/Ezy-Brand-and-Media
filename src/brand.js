@@ -60,7 +60,9 @@ function fitSentence(t,c){if(!t)return'Add keywords to compare them with your pi
 
 /* ---------- keywords: committed words are chips; the box holds the word being typed ---------- */
 const kwList=()=>String(state.query||'').split(/[,;\n]+/).map(s=>s.trim()).filter(Boolean);
-function setKw(list){state.query=list.join(', ');renderChips();runSearch();}
+/* A search queued while typing must not run after the word is committed: it would rebuild the panels under the user. */
+let kwT=0;
+function setKw(list){clearTimeout(kwT);state.query=list.join(', ');renderChips();runSearch();}
 function commitKeywords(text){const cur=kwList(),low=cur.map(w=>w.toLowerCase());String(text).split(/[,;\n]+/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean).forEach(w=>{if(!low.includes(w.toLowerCase())){cur.push(w);low.push(w.toLowerCase());}});setKw(cur);}
 function removeKeyword(i){const cur=kwList();cur.splice(i,1);setKw(cur);}
 function replaceKeyword(from,to){const cur=kwList().map(w=>w.toLowerCase()===from.toLowerCase()?to:w);setKw(cur);}
@@ -117,7 +119,7 @@ function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
   myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));}
 
-function bootBrand(){const q=$('#q');let qt=0;const live=()=>{clearTimeout(qt);qt=setTimeout(runSearch,120);};
+function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};
   q.addEventListener('input',()=>{const v=q.value;if(/[,;\n]/.test(v)){const parts=v.split(/[,;\n]/),last=parts.pop();if(parts.join('').trim())commitKeywords(parts.join(','));q.value=last.replace(/^\s+/,'');}acRender();live();});
   q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if($('#acList').hidden)acRender();acMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();acMove(-1);}
     /* Enter keeps a known word as typed; a partial word takes the top prefix match. A near spelling is only offered, never taken. */

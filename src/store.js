@@ -37,7 +37,7 @@ const Store=(function(){
     if(db&&uid){try{col=db.collection('data/users/'+uid);const snap=await timeout(col.get(),10000);snap.docs.forEach(d=>{const v=d.data();if(v&&cache[v.kind])cache[v.kind].set(v.id,plain(v));});S.mode='cloud';S.canShare=true;
         if(user.can){const w=await user.can('data.write');if(w===false){S.mode='local';S.canShare=false;S.reason='Your access to this page is view-only, so your work is kept in this browser only. Ask the owner for Contributor access to save to your account.';}}}
       catch(e){S.mode='local';S.reason='Your account storage could not be reached, so your work is kept in this browser for now.';}}
-    else S.reason=!window.claude?'Your work is saved in this browser, on this device. Nothing is uploaded. To keep a copy or move to another computer, use Back up everything under Brands and posts.':'No signed-in account was found for this page, so your work is kept in this browser only.';
+    else S.reason=!window.claude?'Your work is saved in this browser, on this device. Nothing is uploaded. To keep a copy or move to another computer, use Back up everything under Library.':'No signed-in account was found for this page, so your work is kept in this browser only.';
     if(S.mode==='local'){const keys=await kv('keys')||[];for(const k of keys){const m=/^(brand|post):/.exec(k);if(m){const v=await kv('get',k);if(v)cache[m[1]].set(v.id,v);}}}
     S.ready=true;return S;}
   function all(kind){return[...cache[kind].values()].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));}
