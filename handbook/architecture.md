@@ -1,6 +1,6 @@
 # How the code is organized
 
-The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joining the stylesheet, the markup and ten script files from `src/`, in the order below. Later files use names defined by earlier ones; there are no modules and no imports between them. Fonts and three libraries are copied beside the page and loaded only when needed.
+The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joining the stylesheet, the markup and eleven script files from `src/`, in the order below. Later files use names defined by earlier ones; there are no modules and no imports between them. Fonts and three libraries are copied beside the page and loaded only when needed.
 
 | File | What it holds |
 |---|---|
@@ -11,7 +11,8 @@ The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joinin
 | `engine.js` | Color math, the tagging rules, keyword parsing, ranking, color harmony and companion colors |
 | `draw.js` | The Canvas renderer: color scheme, text fitting, graphics, layouts, platform guides |
 | `store.js` | Storage. The only file that knows where data lives |
-| `ui.js` | The Designer: state, search results, color and pairing builders, Advanced options, export |
+| `ui.js` | Shared state, search results, color and pairing builders, the Media page canvas, Advanced options, export |
+| `brand.js` | The Brand page: keyword chips and autocomplete, the brand fingerprint (radar), the describe and build steps, the sample-post preview, saved-palette pickers |
 | `free.js` | The Layer editor and PDF / image import |
 | `kit.js` | Brand kit export (guidelines PDF and ZIP) |
 | `lib.js` | Brands, posts, the Brands and posts tab, sharing, start-up |
@@ -24,6 +25,10 @@ The app is one HTML page. `scripts/build.mjs` writes `docs/index.html` by joinin
 **Tags come from rules.** At load, `engine.js` runs every palette, color, pairing and graphic through rules that read measurable features (hue, brightness, saturation; serif, weight, roundness; curvature, symmetry) and attach concept tags with a weight, a reason and a source. A keyword is parsed to the same concepts and results are ranked by overlap. Nothing is tagged by hand except the `conv` field, which is always shown as a convention.
 
 **State is a plain object.** `state` in `ui.js` is the open post plus a few display preferences. `sane()` fills in defaults and clamps values, so an old or partial object always opens. `snap()` turns state into the description the renderer takes.
+
+**The brand is edited as a draft.** On the Brand page the draft lives in `state`, so the existing builders work on it unchanged. Leaving the page copies it to `draft` in `lib.js`; a saved post open on the Media page then gets its own colors, type and graphic back, while a new post takes the brand's. Nothing about the brand is written until **Save brand** (saving a named palette or starting a type pairing also saves, because those are explicit saves). Switching brands, opening another brand's post, accepting a shared brand or leaving the page with unsaved changes asks first.
+
+**The fingerprint has eight fixed axes**: Aaker's five personality dimensions, then pleasure, arousal and dominance. Personality axes run from none to strong; the three feeling axes are bipolar, with 0.5 neutral. Only concepts with a `pad` position in `concepts.js` move the feeling axes, so an emotion without one moves nothing; no mapping is invented to fill the chart. Each shape is scaled to its own strongest on-chart concept, so the keyword shape and the picks shape compare by shape, not by raw totals.
 
 **Brands own things; posts point at a brand.** A brand record holds the name, colors, saved palettes, custom pairings, logo and sample text. A post is either a template post (a copy of `state`) or a layer layout (a document of layers). Records are JSON; images are stored separately and referenced by short strings.
 

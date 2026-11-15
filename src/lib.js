@@ -5,29 +5,43 @@
    ============================================================ */
 let logoRef=null,photoRef=null;
 const Lib=(function(){
-  let view='design',libBrand=null,sig='',saveT=0,incoming=null;
+  let view='design',libBrand=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
   const clone=o=>JSON.parse(JSON.stringify(o));
   const brandPosts=bid=>Store.all('post').filter(p=>p.bid===bid);
   const postMeta=p=>p.type==='free'?`Layer layout · ${p.doc.w} × ${p.doc.h}`:(()=>{const f=FMT[p.s.format]||FMT['fb-feed'];return PLATFORMS.find(x=>x.id===f.p).name+' · '+f.name;})();
   const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':new Date(t).toLocaleDateString();};
 
   /* ---------- brand <-> designer state ---------- */
-  function brandFields(){return{name:(state.brandName||'').trim()||'Untitled brand',handle:state.handle||'',query:state.query||'',typeId:state.typeId,graphicId:state.graphicId,gStrength:state.gStrength,paletteId:state.paletteId,colors:Object.assign({},state.colors),palettes:myPalettes.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text})),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
-  function touchBrand(){if(!Store.S.ready||!state.bid)return;clearTimeout(saveT);saveT=setTimeout(saveBrandNow,1200);}
+  /* The brand being edited is a draft. On the Brand page it lives in `state`; elsewhere it is held in `draft`,
+     so the post open on the Media page can keep its own look. Nothing is written until Save brand. */
+  const LOOK=['paletteId','colors','typeId','graphicId','gStrength'];
+  function pick(s){return{brandName:s.brandName,handle:s.handle,query:s.query,typeId:s.typeId,graphicId:s.graphicId,gStrength:s.gStrength,paletteId:s.paletteId,colors:Object.assign({},s.colors)};}
+  function live(){return view==='brand'||!draft?pick(state):draft;}
+  function brandFields(){const L=live(),old=Store.get('brand',state.bid)||{};return{name:(L.brandName||'').trim()||'Untitled brand',handle:L.handle||'',query:L.query||'',typeId:L.typeId,graphicId:L.graphicId,gStrength:L.gStrength,paletteId:L.paletteId,colors:ROLES.reduce((o,[r])=>(o[r]=L.colors[r],o),{}),palettes:myPalettes.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text})),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},old.content||state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
+  const fieldsSig=()=>{const f=brandFields();delete f.content;return state.bid+JSON.stringify(f);};
+  function isDirty(){return !!(Store.S.ready&&state.bid&&sig&&((logoRef&&logoRef.startsWith('mem:'))||fieldsSig()!==sig));}
+  function syncDirty(){const d=isDirty();$('#navDirty').hidden=!d;const st=$('#bSaveState');st.textContent=d?'Unsaved changes':'All changes saved';st.classList.toggle('on',d);$('#btnDiscard').hidden=!d;$('#btnSaveBrand').disabled=!d;}
+  function touchBrand(){clearTimeout(saveT);saveT=setTimeout(syncDirty,150);}
   async function saveBrandNow(){if(!Store.S.ready||!state.bid)return;if(logoRef&&logoRef.startsWith('mem:')){const r=await Store.persistRef(logoRef);if(r)logoRef=r;}
-    const f=brandFields(),s=state.bid+JSON.stringify(f);if(s===sig)return;sig=s;const old=Store.get('brand',state.bid)||{};try{await Store.put('brand',Object.assign({},old,f,{id:state.bid}));}catch(e){}fillBrandSelect();acct();if(view==='lib')buildLib();}
-  function fillBrandSelect(){const bs=$('#brandSel');bs.textContent='';Store.all('brand').slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(b=>bs.append(el('option',{value:b.id,text:b.name})));bs.append(el('option',{value:'__lib',text:'Manage brands…'}));bs.value=state.bid;}
-  function activate(id,quiet){const b=Store.get('brand',id);if(!b)return;const keep={platform:state.platform,format:state.format,layout:state.layout,tab:state.tab,guides:state.guides,shuffle:state.shuffle,colorMode:state.colorMode,typeClass:state.typeClass,typeMode:state.typeMode,arrangement:state.arrangement,seed:state.seed};
+    const f=brandFields(),old=Store.get('brand',state.bid)||{};try{await Store.put('brand',Object.assign({},old,f,{id:state.bid}));}catch(e){syncDirty();return false;}sig=fieldsSig();if(view!=='brand')draft=live();fillBrandSelect();acct();syncDirty();renderLook();if(view==='lib')buildLib();return true;}
+  /* Unsaved brand changes are never dropped silently: switching brands asks first. */
+  function guard(fn){if(!isDirty()){fn();return;}const L=live();$('#unsMsg').textContent='\u201C'+((L.brandName||'').trim()||'This brand')+'\u201D has changes that are not saved. Save them before you continue?';$('#ovUnsaved').hidden=false;
+    $('#unsSave').onclick=async()=>{$('#ovUnsaved').hidden=true;if(await saveBrandNow())fn();};$('#unsDrop').onclick=()=>{$('#ovUnsaved').hidden=true;discard();fn();};}
+  function discard(){if(state.bid&&Store.get('brand',state.bid))activate(state.bid,true);}
+  function askPalette(){askName('Name this palette','',n=>savePalette(n));}
+  function fillBrandSelect(){const bs=$('#brandSel');bs.textContent='';Store.all('brand').slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(b=>bs.append(el('option',{value:b.id,text:b.name})));bs.append(el('option',{value:'__new',text:'New brand…'}),el('option',{value:'__lib',text:'Manage brands…'}));bs.value=state.bid;}
+  function makeBrand(){askName('Name the new brand','',async n=>{const b=await newBrand(n||'New brand');activate(b.id,true);setView('brand');setStep('describe');say('Created '+b.name+'.');});}
+  function activate(id,quiet){const b=Store.get('brand',id);if(!b)return;const keep={platform:state.platform,format:state.format,layout:state.layout,tab:state.tab,guides:state.guides,shuffle:state.shuffle,colorMode:state.colorMode,typeClass:state.typeClass,typeMode:state.typeMode,arrangement:state.arrangement,seed:state.seed,pvFmt:state.pvFmt,bstep:b.query?'build':'describe'};
     myPalettes=(b.palettes||[]).filter(p=>p&&p.id&&ROLES.every(([r])=>validHex(String(p[r]||'')))).map(clone);registerPalettes();
     myTypes=(b.types||[]).filter(validType).map(clone);state.bid=b.id;registerTypes();
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
     logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
-    sig=state.bid+JSON.stringify(brandFields());fillBrandSelect();initAll();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
+    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
   /* ---------- named palettes ---------- */
-  async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the ready-made palettes.');await saveBrandNow();}
+  async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the premade palettes.');await saveBrandNow();}
   function renamePalette(id,name){const p=myPalettes.find(x=>x.id===id);if(!p)return;p.name=(name||'').trim().slice(0,40)||p.name;registerPalettes();buildResults();touchBrand();}
   function deletePalette(id){myPalettes=myPalettes.filter(x=>x.id!==id);if(state.paletteId===id)state.paletteId=DEFAULT_PAL;registerPalettes();buildColors();buildResults();touchBrand();}
 
@@ -44,10 +58,11 @@ const Lib=(function(){
   async function saveFree(asNew){const d=Free.doc;if(!d){Free.say('Nothing to save yet.');return;}Free.say('Saving…');const r=await Free.persistable();const id=(!asNew&&d.id&&Store.get('post',d.id))?d.id:uidGen();d.id=id;r.doc.id=id;
     try{await Store.put('post',{id,bid:state.bid,name:(d.name||'').trim()||'Untitled layout',type:'free',doc:r.doc});}catch(e){Free.say(e&&e.code==='too_large'?'This layout holds too much text to save as one post. Remove some layers and try again.':'The layout could not be saved.');return;}
     Free.clean();buildDrafts();acct();Free.say('Saved to '+state.brandName+'.'+(r.lost?' '+r.lost+' image '+(r.lost===1?'layer':'layers')+' could not be stored and will be missing next time.':''));}
-  function openPost(id){const p=Store.get('post',id);if(!p)return;if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
+  function openPost(id){const p=Store.get('post',id);if(!p)return;if(p.bid!==state.bid&&Store.get('brand',p.bid))guard(()=>openPostNow(id));else openPostNow(id);}
+  function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
@@ -64,8 +79,13 @@ const Lib=(function(){
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(blob)await saveFile(`${slug(p.name)}-${fmt.w}x${fmt.h}.png`,blob,true);}
 
   /* ---------- views ---------- */
-  function setView(v){view=v;$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
-    if(v==='design')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
+  /* Entering the Brand page puts the draft into `state`; leaving takes it back out. A saved post that is
+     open on the Media page keeps its own colors, type and graphic; a new post takes the brand's. */
+  function enterBrand(){postLook=state.postId?LOOK.reduce((o,k)=>(o[k]=clone(state[k]),o),{}):null;if(draft)Object.assign(state,clone(draft));
+    $('#q').value='';renderChips();syncIdentity();buildColors();runSearch();setStep(state.bstep);useType(state.typeId);}
+  function leaveBrand(){draft=pick(state);if(postLook){Object.assign(state,postLook);postLook=null;}buildColors();buildFields();useType(state.typeId);renderLook();}
+  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
+    if(v==='design'){renderLook();requestPaint(true);}else if(v==='brand')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
   function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Brands and posts are saved to your Claude account on this page.':S.reason;}
 
   /* ---------- library ---------- */
@@ -75,21 +95,22 @@ const Lib=(function(){
     const a=$('#libAcct');a.textContent='';a.append(el('div',{class:'who'},S.me.avatarUrl?el('img',{src:S.me.avatarUrl,alt:'',width:44,height:44}):null,el('div',null,el('h2',{text:S.me.name||'Your workspace'}),el('p',{class:'lede',style:'margin:0',text:S.mode==='cloud'?'Signed in with your Claude account. Your brands and posts are private to you and follow you to any device.':S.reason}))),
       el('div',{class:'rowbtns'},el('span',{class:'meta',text:`${brands.length} ${brands.length===1?'brand':'brands'} · ${posts.length} ${posts.length===1?'post':'posts'}`}),el('button',{type:'button',class:'btn small',title:'One file with every brand, post and image in this workspace',text:'Back up everything',onclick:async()=>{libSay('Building the backup…');await saveFile('brand-media-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(await Store.exportAll()),false);libSay('Backup saved. Keep the file somewhere safe; open it here to restore.');}}),el('label',{class:'btn small',style:'cursor:pointer',title:'Open a backup, or a brand or post file someone shared with you'},'Open a backup or shared file',el('input',{type:'file',id:'libOpen',accept:'application/json,.json',hidden:true,onchange:openFile}))));
     const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open in the designer':''}`}))));});
-    bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>askName('Name the new brand','',async n=>{const b=await newBrand(n||'New brand');libBrand=b.id;fillBrandSelect();buildLib();})}));
+    bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>guard(makeBrand)}));
     const b=Store.get('brand',libBrand),pn=$('#libPanel');pn.textContent='';if(!b)return;const ps=brandPosts(b.id),t=TYP[b.typeId]||TYP.clear;
-    const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;if(b.id===state.bid){state.brandName=v;buildFields();requestPaint(true);await saveBrandNow();}else{await Store.put('brand',Object.assign({},b,{name:v}));fillBrandSelect();}buildLib();});
+    const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;await Store.put('brand',Object.assign({},b,{name:v}));if(b.id===state.bid){state.brandName=v;if(draft)draft.brandName=v;const f=JSON.parse(sig.slice(state.bid.length));f.name=v;sig=state.bid+JSON.stringify(f);syncIdentity();renderLook();requestPaint(true);}fillBrandSelect();buildLib();});
     const del=el('button',{type:'button',class:'btn small',text:'Delete brand'});del.addEventListener('click',()=>sure(del,async()=>{for(const p of ps)await Store.del('post',p.id);await Store.del('brand',b.id);if(b.id===state.bid){let nx=Store.all('brand')[0];if(!nx)nx=await newBrand('New brand');activate(nx.id,true);}libBrand=null;fillBrandSelect();buildLib();}));
-    pn.append(el('div',{class:'phead'},nm,el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn primary',text:'Open in designer',onclick:()=>{if(b.id!==state.bid)activate(b.id);setView('design');}}),
+    pn.append(el('div',{class:'phead'},nm,el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn primary',text:'Edit brand',onclick:()=>{if(b.id!==state.bid)guard(()=>{activate(b.id);setView('brand');});else setView('brand');}}),el('button',{type:'button',class:'btn',text:'Make a post',onclick:()=>{if(b.id!==state.bid)guard(()=>{activate(b.id);setView('design');});else setView('design');}}),
       el('button',{type:'button',class:'btn',title:S.canShare?'Create a link other accounts can open':'Save the brand, its posts and images as one file to send to someone',text:S.canShare?'Share brand':'Share brand as a file',onclick:()=>shareBrand(b.id)}),el('button',{type:'button',class:'btn',text:'Export brand kit',onclick:()=>exportKit(b.id,'zip')}),el('button',{type:'button',class:'btn',text:'Guidelines PDF',onclick:()=>exportKit(b.id,'pdf')}),
       el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:async()=>{const c=clone(b);c.id=uidGen();c.name=(b.name+' copy').slice(0,40);await Store.put('brand',c);libBrand=c.id;fillBrandSelect();buildLib();}}),del)));
     pn.append(el('p',{class:'note',id:'libMsg','aria-live':'polite',text:'Brand kit: a ZIP with a guidelines PDF, logo, palette files and fonts. In Canva, give the PDF to Brand Kit Builder, or add the pieces by hand.'}));
     const pals=[{name:'Current colors',cols:b.colors}].concat((b.palettes||[]).map(p=>({name:p.name,cols:p})));
     pn.append(el('div',{class:'h',text:'Identity'}),el('div',{class:'ident'},el('div',null,el('small',{text:'Typefaces'}),el('b',{text:t.display.family+(t.body.family!==t.display.family?' with '+t.body.family:'')})),el('div',null,el('small',{text:'Keywords'}),el('b',{text:b.query||'None yet'})),el('div',null,el('small',{text:'Logo'}),el('b',{text:b.logo?'Uploaded':'Text wordmark'}))),
       el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+p.cols[r]}))),el('span',{text:p.name})))));
-    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');}}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>{if(b.id!==state.bid)activate(b.id);setView('free');}}))));
+    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');})}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
     const grid=el('div',{class:'pgrid'});if(!ps.length)grid.append(el('p',{class:'empty',text:'No posts in this brand yet.'}));
     ps.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
       grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d)));thumb(cv,p,220,200);});pn.append(grid);}
+  function guardIf(bid,fn){if(bid!==state.bid)guard(fn);else fn();}
   function libSay(t){const m=$('#libMsg');if(m)m.textContent=t;}
   async function exportKit(id,kind){const b=Store.get('brand',id);if(!b)return;libSay('Building the '+(kind==='zip'?'brand kit':'guidelines PDF')+'…');try{const ps=brandPosts(id);const blob=kind==='zip'?await Kit.zip(b,ps):await Kit.guidelines(b,ps);await saveFile(slug(b.name)+(kind==='zip'?'-brand-kit.zip':'-brand-guidelines.pdf'),blob,false);libSay(kind==='zip'?'Brand kit ready. Unzip it first: Canva takes the PDF, logo and font files one at a time, not the ZIP.':'Guidelines PDF ready. In Canva, open an empty Brand Kit and upload it to Brand Kit Builder.');}catch(e){console.error(e);libSay('The export could not be built. Try again.');}}
   /* One reader for the three kinds of file: a full backup, a shared brand, a shared post. */
@@ -116,7 +137,7 @@ const Lib=(function(){
     box.append(el('p',{text:(r.mine?'You shared this.':r.by?'Shared by '+r.by+'.':r.file?'From a shared file.':'Shared by another account.')+' '+(isB?`It includes the brand, ${(b.palettes||[]).length} saved ${(b.palettes||[]).length===1?'palette':'palettes'} and ${r.data.posts.length} ${r.data.posts.length===1?'post':'posts'}.`:`It belongs to the brand “${b.name||'Untitled'}”, which is copied with it.`)}));
     if(b.colors)box.append(el('div',{class:'pals'},el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([x])=>el('i',{style:'width:20%;background:'+b.colors[x]}))),el('span',{text:b.name||'Brand colors'}))));
     const prev=el('div',{class:'cmp'});(isB?r.data.posts.slice(0,4):[p]).forEach(q=>{const cv=el('canvas');prev.append(el('figure',null,cv,el('figcaption',{text:q.name})));thumb(cv,q,220,240);});box.append(prev);$('#inAdd').hidden=false;$('#inAdd').textContent=isB?'Add to my brands':'Add to my posts';}
-  async function acceptIncoming(){const r=incoming;if(!r)return;const src=r.data.brand||{};let b=r.kind==='post'&&src.id?Store.all('brand').find(x=>x.from===src.id):null;
+  async function acceptIncoming(){const r=incoming;if(!r)return;if(isDirty()){guard(acceptIncoming);return;}const src=r.data.brand||{};let b=r.kind==='post'&&src.id?Store.all('brand').find(x=>x.from===src.id):null;
     if(!b){const d=defaults('sample');b=src.colors?clone(src):{handle:'',query:'',typeId:d.typeId,graphicId:d.graphicId,gStrength:.55,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:d.content,logo:null};delete b.kind;b.id=uidGen();b.from=src.id||null;b.name=(src.name||'Shared brand').slice(0,40);await Store.put('brand',b);}
     const list=r.kind==='brand'?r.data.posts:[r.data.post];let last=null;for(const p of list){const c=clone(p);c.id=uidGen();c.bid=b.id;if(c.doc)c.doc.id=c.id;await Store.put('post',c);last=c;}
     incoming=null;$('#ovIncoming').hidden=true;fillBrandSelect();activate(b.id,true);acct();if(r.kind==='post'&&last)openPost(last.id);else{libBrand=b.id;setView('lib');}say(Store.S.mode==='cloud'?'Added to your account.':'Added to your brands.');}
@@ -124,7 +145,9 @@ const Lib=(function(){
   /* ---------- start ---------- */
   async function start(){boot();Free.boot();acct();
     document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));$('#acct').addEventListener('click',()=>setView('lib'));
-    $('#brandSel').addEventListener('change',e=>{if(e.target.value==='__lib'){e.target.value=state.bid;setView('lib');}else activate(e.target.value);});
+    $('#brandSel').addEventListener('change',e=>{const v=e.target.value;e.target.value=state.bid;if(v==='__lib')setView('lib');else if(v==='__new')guard(makeBrand);else if(v!==state.bid)guard(()=>activate(v));});
+    $('#btnSaveBrand').addEventListener('click',()=>saveBrandNow());$('#btnDiscard').addEventListener('click',discard);
+    window.addEventListener('beforeunload',e=>{if(isDirty()){e.preventDefault();e.returnValue='';}});
     $('#btnSave').addEventListener('click',()=>savePost(false));$('#btnSaveNew').addEventListener('click',()=>savePost(true));$('#btnCompare').addEventListener('click',compare);$('#btnLib').addEventListener('click',()=>setView('lib'));
     $('#fSave').addEventListener('click',()=>saveFree(false));$('#fSaveNew').addEventListener('click',()=>saveFree(true));
     $('#shareCopy').addEventListener('click',()=>{const v=$('#shareUrl').value;if(!v)return;const done=()=>{$('#shareCopied').textContent='Link copied.';};try{navigator.clipboard.writeText(v).then(done,()=>{$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';});}catch(e){$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';}});
@@ -134,11 +157,11 @@ const Lib=(function(){
     if(!Store.all('brand').length){const legacyP=(store.get('brandlab.mypalettes.v1')||[]).filter(p=>p&&p.id&&ROLES.every(([r])=>validHex(String(p[r]||''))));const legacyD=(store.get('brandlab.drafts.v1')||[]).filter(d=>d&&d.s);
       const id=uidGen();myPalettes=legacyP.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text}));registerPalettes();state.bid=id;await Store.put('brand',Object.assign(brandFields(),{id}));
       let n=0;for(const d of legacyD.slice(0,40)){await Store.put('post',{id:uidGen(),bid:id,name:'Draft '+(++n),type:'template',s:sane(d.s),photo:null});}}
-    const want=Store.get('brand',state.bid)?state.bid:Store.all('brand')[0].id;activate(want,true);acct();buildDrafts();
+    const want=Store.get('brand',state.bid)?state.bid:Store.all('brand')[0].id;activate(want,true);acct();buildDrafts();{const v=store.get('brandlab.view.v1');setView(['brand','design','free','lib'].includes(v)?v:'brand');}
     {const S=Store.S;$('#welBody').textContent=S.mode==='cloud'?'Your account here is your Claude sign-in'+(S.me.name?' ('+S.me.name+')':'')+'. There is nothing to register. Brands, palettes and posts you save are private to your account and open on any device where you are signed in.':S.reason;}
     if(!store.get('brandlab.welcomed.v3')){store.set('brandlab.welcomed.v3',1);$('#ovWelcome').hidden=false;}
     checkHash();}
-  return{start,setView,savePalette,renamePalette,deletePalette,saveType,updateType,deleteType,touchBrand,buildDraftsImpl,openPost,get view(){return view;}};
+  return{start,setView,askPalette,look:()=>draft?live():pick(state),isDirty,savePalette,renamePalette,deletePalette,saveType,updateType,deleteType,touchBrand,buildDraftsImpl,openPost,get view(){return view;}};
 })();
 function buildDrafts(){Lib.buildDraftsImpl();}
 function paintDrafts(){}

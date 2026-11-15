@@ -38,13 +38,13 @@ function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('b
   document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
 function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{colors:true,type:true,graphic:true,layout:false},
-  headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};}
+  headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
-  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';return o;}
+  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -65,12 +65,12 @@ function useType(id){ensureType(id).then(()=>{updateReadout.k='';requestPaint(tr
 let paintQ=false,thumbT=0,saveT=0;
 function requestPaint(thumbs){if(!paintQ){paintQ=true;requestAnimationFrame(()=>{paintQ=false;paint();});}
   if(thumbs){clearTimeout(thumbT);thumbT=setTimeout(()=>{paintLayoutThumbs();paintDrafts();if(state.tab==='graphic')paintGraphicThumbs();},140);}
-  clearTimeout(saveT);saveT=setTimeout(()=>{store.set('brandlab.state.v1',state);Lib.touchBrand();},400);}
+  Lib.touchBrand();clearTimeout(saveT);saveT=setTimeout(()=>{store.set('brandlab.state.v1',state);},400);}
 function sizeStage(){const st=$('#stage'),fmt=FMT[state.format];const narrow=window.matchMedia('(max-width:1060px)').matches;let h;
   if(narrow){const w=st.clientWidth-36;h=Math.min(w*fmt.h/fmt.w,Math.max(360,window.innerHeight*.6))+36;}
   else{const col=st.parentElement;h=clamp(col.clientHeight-250,320,1000);}
   st.style.height=Math.round(h)+'px';}
-function paint(){const fmt=FMT[state.format],st=$('#stage'),cv=$('#cv');sizeStage();const aw=st.clientWidth-36,ah=st.clientHeight-36;const sc=Math.min(aw/fmt.w,ah/fmt.h);
+function paint(){if(Lib.view==='brand'){paintBrand();return;}const fmt=FMT[state.format],st=$('#stage'),cv=$('#cv');sizeStage();const aw=st.clientWidth-36,ah=st.clientHeight-36;const sc=Math.min(aw/fmt.w,ah/fmt.h);
   const cw=Math.max(60,Math.floor(fmt.w*sc)),ch=Math.max(20,Math.floor(fmt.h*sc));const dpr=Math.min(2,window.devicePixelRatio||1);const pw=Math.min(fmt.w,Math.round(cw*dpr)),ph=Math.round(pw*fmt.h/fmt.w);
   if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph;}cv.style.width=cw+'px';cv.style.height=ch+'px';const ctx=cv.getContext('2d');ctx.setTransform(pw/fmt.w,0,0,pw/fmt.w,0,0);
   const c=renderDraft(ctx,fmt.w,fmt.h,snap(),{guides:state.guides,preview:true});updateReadout(c);}
@@ -88,10 +88,10 @@ function setFormat(id){state.format=id;state.platform=FMT[id].p;if(!FMT[id].layo
 let parsed={terms:[],cw:{},concepts:[]};
 const cLabel=id=>CONCEPT_BY_ID[id].label;
 function tierEl(src){const t=SRC[src].t;return el('i',{class:'tier tier-'+t,title:TIER[t].long+': '+SRC[src].short,text:t});}
-function addKeyword(w){const cur=state.query.trim();if(cur.toLowerCase().split(/[,;]+/).map(s=>s.trim()).includes(w.toLowerCase()))return;state.query=cur?cur.replace(/[,;\s]+$/,'')+', '+w:w;$('#q').value=state.query;runSearch();}
+function addKeyword(w){commitKeywords(w);}
 function buildTerms(){const box=$('#terms');box.textContent='';parsed.terms.forEach(t=>{if(t.hits){const parts=[...new Set(t.hits.map(h=>{const c=CONCEPT_BY_ID[h.c];return c.bridge?c.label+' (value) \u2192 '+Object.keys(c.bridge).map(cLabel).join(', '):c.label;}))].join('; ');const ak=t.hits.some(h=>h.kind==='aaker'),br=t.hits.some(h=>CONCEPT_BY_ID[h.c].bridge),sg=t.hits.every(h=>h.kind==='sugg');
     box.append(el('span',{class:'term',title:ak?'One of the 42 trait words in Aaker\u2019s brand-personality scale':br?'A basic value. No study links values to visuals, so it is bridged by meaning to the concepts shown.':sg?'Suggested by a language model and reviewed by hand. Mapped by meaning only: no study links this word to visuals.':'Mapped by meaning to this concept'},el('b',{text:t.text}),'\u2192 '+parts,ak?tierEl('AAKER'):br?tierEl('CONV'):null));}
-   else{const s=el('span',{class:'term miss'},`\u201C${t.text}\u201D has no link on file.`);if(t.near&&t.near.length){s.append(' Try ');t.near.forEach((w,i)=>{s.append(el('button',{type:'button',text:w,onclick:()=>{state.query=state.query.replace(new RegExp('\\b'+t.text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i'),w);$('#q').value=state.query;runSearch();}}));if(i<t.near.length-1)s.append(', ');});}box.append(s);}});}
+   else{const s=el('span',{class:'term miss'},`\u201C${t.text}\u201D has no link on file.`);if(t.near&&t.near.length){s.append(' Try ');t.near.forEach((w,i)=>{s.append(el('button',{type:'button',text:w,onclick:()=>replaceKeyword(t.text,w)}));if(i<t.near.length-1)s.append(', ');});}box.append(s);}});}
 function buildDirectory(){const box=$('#dirBody');box.textContent='';box.append(el('p',{class:'note',text:`${CONCEPTS.length} ideas, reachable through ${LEX_KEYS.length} keywords. Select one to add it to your search.`}));
   GROUPS.forEach(g=>{const cs=CONCEPTS.filter(c=>c.group===g.id);box.append(el('div',{class:'dirh'},el('b',{text:g.id}),el('span',{text:g.note}),tierEl(g.src)),el('div',{class:'sugg'},cs.map(c=>el('button',{type:'button',text:c.label,title:c.def+'. Also: '+(c.aaker||[]).concat(c.syn).slice(0,8).join(', '),onclick:()=>addKeyword(c.key)}))));});}
 function results(){const cw=parsed.cw;return{colors:rank('palette',PALETTES,cw),type:rank('type',listedTypes(),cw),graphic:rank('graphic',GRAPHICS,cw)};}
@@ -100,13 +100,14 @@ function kwLabels(){return parsed.concepts.map(cLabel).join(', ');}
 
 /* ---------- results ---------- */
 function buildSubbar(){const bar=$('#subbar');bar.textContent='';
-  if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Ready-made palettes'],['build','Build color by color']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
+  if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Premade palettes'],['build','Build your own']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
   else if(state.tab==='type'){const build=uiMode==='advanced'&&state.typeMode==='build',ts=listedTypes();
     if(uiMode==='advanced')bar.append(el('div',{class:'seg',role:'group','aria-label':'Type mode'},[['sets','Ready-made pairings'],['build','Build a pairing']].map(([v,t])=>el('button',{type:'button','aria-pressed':String((build?'build':'sets')===v),text:t,onclick:()=>{state.typeMode=v;buildResults();}}))));
     if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));}}
 function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>has?res[k].filter(r=>r.score>0).length:res[k].length;
   $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=count('graphic');
-  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));buildSubbar();
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
+  const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
   const kind=state.tab;if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;buildColorBuilder();return;}
   if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;buildTypeBuilder();return;}$('#rhead').hidden=false;
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
@@ -123,8 +124,8 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
   if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
 function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
-function runSearch(){parsed=parseQuery(state.query);buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
-function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palColors(PAL[id]);buildColors();}else if(kind==='type'){state.typeId=id;useType(id);}else state.graphicId=id;buildResults();requestPaint(true);}
+function runSearch(){parsed=parseQuery(liveQuery());buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
+function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palColors(PAL[id]);buildColors();renderLook();}else if(kind==='type'){state.typeId=id;useType(id);}else state.graphicId=id;buildResults();requestPaint(true);}
 
 /* ---------- build color by color ---------- */
 function setRole(role,hex){state.colors[role]=hex.toUpperCase();buildColors();buildResults();requestPaint(true);}
@@ -178,8 +179,10 @@ function buildTypeBuilder(){const box=$('#results');box.textContent='';const cur
   if(myTypes.length){box.append(el('div',{class:'bhead'},el('h3',{text:'Your pairings in this brand'})));box.append(el('div',{class:'mine'},myTypes.map(m=>el('span',{class:'term'},el('b',{text:m.name}),el('button',{type:'button',class:'link',text:m.id===state.typeId?'In use':'Use',onclick:()=>apply('type',m.id)}),el('button',{type:'button','aria-label':'Delete '+m.name,text:'\u00D7',onclick:()=>Lib.deleteType(m.id)})))));}}
 
 /* ---------- readout ---------- */
-function updateReadout(c){const parts=[['Color',curPaletteTags(),1],['Type',TAGS.type[state.typeId],.8],['Graphic',TAGS.graphic[state.graphicId],.6]];const agg={};
-  parts.forEach(([nm,tg,w])=>{for(const k in tg.tags){const t=tg.tags[k];const a=agg[k]||(agg[k]={w:0,from:[],srcs:{}});a.w+=Math.min(1,t.w)*w;a.from.push(nm);a.srcs[SRC[t.src].t]=t.src;}});
+/* What the current colors, type and graphic signal together: one weight per concept. */
+function draftParts(){return[['Color',curPaletteTags(),1],['Type',TAGS.type[state.typeId]||TAGS.type.clear,.8],['Graphic',TAGS.graphic[state.graphicId]||TAGS.graphic.none,.6]];}
+function draftAgg(parts){const agg={};(parts||draftParts()).forEach(([nm,tg,w])=>{for(const k in tg.tags){const t=tg.tags[k];const a=agg[k]||(agg[k]={w:0,from:[],srcs:{}});a.w+=Math.min(1,t.w)*w;a.from.push(nm);a.srcs[SRC[t.src].t]=t.src;}});return agg;}
+function updateReadout(c){const parts=draftParts(),agg=draftAgg(parts);
   const ids=Object.keys(agg).sort((a,b)=>agg[b].w-agg[a].w).slice(0,6),mx=ids.length?agg[ids[0]].w:1;const key=JSON.stringify([ids.map(i=>[i,agg[i].w.toFixed(2)]),c.bg,c.fg,c.head,c.accent,c.onAccent,state.typeId,state.graphicId,parsed.concepts]);if(key===updateReadout.k)return;updateReadout.k=key;
   const box=$('#signals');box.textContent='';ids.forEach(id=>{const a=agg[id];const hit=parsed.concepts.includes(id);box.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)+(hit?' \u2713':'')}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(a.w/mx*100)}%`})),el('span',{class:'from'},['R','S','C'].filter(t=>a.srcs[t]).map(t=>tierEl(a.srcs[t])),' from '+a.from.join(', ').toLowerCase())));});
   const miss=parsed.concepts.filter(cid=>!agg[cid]||agg[cid].w<.25);if(miss.length)box.append(el('div',{class:'empty',text:'Asked for but weak or missing in this draft: '+miss.map(cLabel).join(', ')+'.'}));
@@ -191,7 +194,6 @@ function updateReadout(c){const parts=[['Color',curPaletteTags(),1],['Type',TAGS
 /* ---------- right column forms ---------- */
 function buildFields(){const box=$('#fields');box.textContent='';const mk=(id,label,val,max,area,on)=>{const inp=area?el('textarea',{id:'f_'+id,maxlength:max,rows:2}):el('input',{id:'f_'+id,type:'text',maxlength:max});inp.value=val||'';inp.addEventListener('input',()=>{on(inp.value);requestPaint(true);});return el('label',{for:'f_'+id},label,inp);};
   LAYOUTS[state.layout].fields.forEach(f=>box.append(mk(f,FIELDS[f].label,state.content[f],FIELDS[f].max,FIELDS[f].area,v=>state.content[f]=v)));
-  box.append(el('div',{class:'two'},mk('brandName','Brand name',state.brandName,40,false,v=>state.brandName=v),mk('handle','Handle',state.handle,30,false,v=>state.handle=v)));
   box.append(el('p',{class:'note',text:'Fields change with the layout. Placeholder copy avoids result claims; replace it with wording you can stand behind.'}));}
 function buildColors(){const box=$('#colors');box.textContent='';ROLES.forEach(([role,label])=>{const pick=el('input',{type:'color',id:'c_'+role,'aria-label':label+' color'}),hex=el('input',{type:'text',id:'h_'+role,maxlength:7,'aria-label':label+' hex value'});pick.value=state.colors[role];hex.value=state.colors[role].toUpperCase();
     const set=v=>{state.colors[role]=v.toUpperCase();pick.value=v;hex.value=v.toUpperCase();palNote();buildResults();requestPaint(true);};pick.addEventListener('change',()=>set(pick.value));hex.addEventListener('change',()=>{let v=hex.value.trim();if(validHex(v))set(v[0]==='#'?v:'#'+v);else hex.value=state.colors[role];});
@@ -270,11 +272,10 @@ function closeOverlays(){document.querySelectorAll('.overlay').forEach(o=>o.hidd
 
 /* ---------- wiring ---------- */
 function loadImage(file,cb){if(!file)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>cb(im);im.onerror=()=>say('That file could not be read as an image.');im.src=fr.result;};fr.readAsDataURL(file);}
-function initAll(){$('#q').value=state.query;syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
+function initAll(){$('#q').value='';renderChips();syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
 function boot(){
   $('#appName').textContent=APP_NAME;setMode(uiMode,true);bootAdv();
-  const sg=$('#sugg');SUGGEST.forEach(w=>sg.append(el('button',{type:'button',text:w,onclick:()=>addKeyword(w)})));buildDirectory();
-  let qt=0;$('#q').addEventListener('input',e=>{state.query=e.target.value;clearTimeout(qt);qt=setTimeout(runSearch,120);});
+  bootBrand();
   document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.v;buildResults();}));
   $('#btnAll').addEventListener('click',()=>{state.showAll=!state.showAll;buildResults();});
   document.querySelectorAll('#arr button').forEach(b=>b.addEventListener('click',()=>{state.arrangement=b.dataset.v;syncSeg();requestPaint(true);}));

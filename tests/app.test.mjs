@@ -14,6 +14,10 @@ let server, url, browser;
 const out = join(root, 'tests', 'output');
 before(async () => { ({ server, url } = await startServer()); browser = await launch(); await mkdir(out, { recursive: true }); });
 after(async () => { await browser?.close(); server?.close(); });
+const toMedia = page => page.click('#nav button[data-v=design]');
+const toBrand = page => page.click('#nav button[data-v=brand]');
+/* type a keyword into the chip box and commit it */
+async function addKw(page, w) { await page.click('#q'); await page.keyboard.type(w); await page.keyboard.press('Enter'); }
 
 test('opens in Simple mode with a starter brand and no errors', async () => {
   const page = await openApp(browser, url, { keepWelcome: true });
@@ -22,7 +26,12 @@ test('opens in Simple mode with a starter brand and no errors', async () => {
   const s = await page.evaluate('({mode:Store.S.mode,ui:uiMode,brands:Store.all("brand").length,palettes:PALETTES.length,types:TYPESETS.length,formats:FORMATS.length})');
   assert.deepEqual({ mode: s.mode, ui: s.ui, brands: s.brands }, { mode: 'local', ui: 'simple', brands: 1 });
   assert.ok(s.palettes >= 28 && s.types >= 52 && s.formats >= 30);
-  for (const id of ['#accAdv', '#accFine', '#advBar']) assert.equal(await page.isVisible(id), false, id + ' is hidden in Simple mode');
+  // a first visit starts on the Brand page, at the describe step
+  assert.equal(await page.isVisible('#bDescribe'), true);
+  assert.equal(await page.evaluate('Lib.view'), 'brand');
+  await page.screenshot({ path: join(out, 'brand-describe.png') });
+  await toMedia(page);
+  for (const id of ['#accAdv', '#advBar']) assert.equal(await page.isVisible(id), false, id + ' is hidden in Simple mode');
   assert.equal(await page.isVisible('.stepline'), true, 'step labels show in Simple mode');
   await page.screenshot({ path: join(out, 'simple.png') });
   assert.deepEqual(page.errors, []);
@@ -39,33 +48,103 @@ test('can be installed as an app (Dock, Start menu, phone home screen)', async (
   await page.context().close();
 });
 
-test('keywords rank the options, and choosing one changes the post', async () => {
+test('keywords rank the options, and choosing one changes the brand preview', async () => {
   const page = await openApp(browser, url);
-  const before = await page.evaluate('document.getElementById("cv").toDataURL()');
-  await page.fill('#q', 'calm, trustworthy');
+  // autocomplete: a partial word offers known keywords, and Enter takes the top one
+  await page.click('#q'); await page.keyboard.type('trustw');
+  await page.waitForSelector('#acList:not([hidden]) .acopt');
+  assert.match(await page.textContent('#acList .acopt >> nth=0'), /trustworthy.*Competence|trustworthy.*Sincerity/);
+  await page.keyboard.press('Enter');
+  await addKw(page, 'calm');
   await page.waitForFunction('parsed.concepts.length >= 2');
+  assert.equal(await page.evaluate('state.query'), 'trustworthy, calm');
+  assert.equal(await page.locator('#kwChips .chip').count(), 2);
+  // the fingerprint draws the keywords on eight axes
+  assert.equal(await page.locator('#radarBig svg text.rl').count(), 8);
+  assert.equal(await page.locator('#radarBig svg polygon.rt').count(), 1);
+  await page.click('#btnUseKw');
+  await page.waitForSelector('#bBuild:not([hidden])');
   assert.match(await page.textContent('#rSummary'), /match/);
-  const first = await page.evaluate('results().colors[0].it.id');
-  await page.click('#results .opt >> nth=0');
+  await page.waitForTimeout(250);
+  const before = await page.evaluate('document.getElementById("pcv").toDataURL()');
+  const first = await page.evaluate('results().colors[1].it.id');
+  await page.click('#results .opt >> nth=1');
   assert.equal(await page.evaluate('state.paletteId'), first);
   await page.waitForTimeout(250);
-  assert.notEqual(await page.evaluate('document.getElementById("cv").toDataURL()'), before, 'the preview was redrawn');
+  assert.notEqual(await page.evaluate('document.getElementById("pcv").toDataURL()'), before, 'the preview was redrawn');
+  // the small radar compares the keywords with the current picks
+  assert.equal(await page.locator('#radarSmall svg polygon.rc').count(), 1);
+  assert.notEqual(await page.textContent('#fpFit'), '');
   // every result names a source tier
   assert.ok(await page.locator('#results .opt .tier').count() > 0);
+  // the three preview formats
+  for (const [v, w, h] of [['story', 1080, 1920], ['banner', 1200, 630], ['square', 1080, 1080]]) {
+    await page.click(`#pvFmt button[data-v=${v}]`); await page.waitForTimeout(120);
+    const r = await page.evaluate('(()=>{const c=document.getElementById("pcv");return c.width/c.height;})()');
+    assert.ok(Math.abs(r - w / h) < 0.02, v + ' preview ratio ' + r);
+  }
   // a word with no mapping is reported, not guessed
-  await page.fill('#q', 'calm, zzzqqq');
+  await page.click('#btnEditKw');
+  await addKw(page, 'zzzqqq');
   await page.waitForFunction('parsed.terms.some(t => !t.hits)');
   assert.match(await page.textContent('#terms'), /no link on file/);
+  assert.equal(await page.locator('#kwChips .chip.miss').count(), 1);
+  await page.click('#kwChips .chip.miss button');
   // a reviewed, model-suggested word is understood, and its chip says where the link comes from
-  await page.fill('#q', 'opulent');
+  await addKw(page, 'opulent');
   await page.waitForFunction('parsed.concepts.includes("sophistication")');
-  assert.match(await page.getAttribute('#terms .term', 'title'), /Suggested by a language model/);
+  assert.match(await page.getAttribute('#terms .term:has-text("opulent")', 'title'), /Suggested by a language model/);
   // the color builder accepts a typed hex code
-  await page.fill('#q', 'calm');
-  await page.click('#subbar button:has-text("Build color by color")');
+  await page.click('#bStep2');
+  await page.click('#subbar button:has-text("Build your own")');
   await page.fill('#bHex', '#0B6E4F');
   await page.press('#bHex', 'Enter');
   assert.equal(await page.evaluate('state.colors.primary'), '#0B6E4F');
+  // nothing is stored until Save brand
+  assert.equal(await page.evaluate('Lib.isDirty()'), true);
+  assert.equal(await page.evaluate('Store.get("brand",state.bid).query'), '');
+  await page.click('#btnSaveBrand');
+  await page.waitForFunction('!Lib.isDirty()');
+  assert.deepEqual(await page.evaluate('(()=>{const b=Store.get("brand",state.bid);return [b.query,b.colors.primary];})()'), ['trustworthy, calm, opulent', '#0B6E4F']);
+  await page.screenshot({ path: join(out, 'brand-build.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
+test('unsaved brand changes are guarded, and a saved post keeps its own look', async () => {
+  const page = await openApp(browser, url);
+  // save a post in the starter look
+  await toMedia(page);
+  await page.fill('#postName', 'Starter look');
+  await page.click('#btnSave');
+  await page.waitForFunction('Store.all("post").length === 1');
+  const look = await page.evaluate('state.colors.primary');
+  // change the brand's colors on the Brand page
+  await toBrand(page);
+  await page.click('#bStep2');
+  await page.click('#results .opt >> nth=3');
+  const brandPrimary = await page.evaluate('state.colors.primary');
+  assert.notEqual(brandPrimary, look);
+  await page.waitForSelector('#navDirty:not([hidden])', { timeout: 2000 }); // the Brand tab shows a dot while changes are unsaved
+  // the open post keeps its own look on the Media page
+  await toMedia(page);
+  assert.equal(await page.evaluate('state.colors.primary'), look);
+  // the brand look is one click away
+  await page.click('#mPals .palpick:has-text("Brand colors")');
+  assert.equal(await page.evaluate('state.colors.primary'), brandPrimary);
+  // switching brands asks first
+  await page.evaluate('Lib.setView("lib")');
+  await page.click('#libBrands button:has-text("New brand")');
+  await page.waitForSelector('#ovUnsaved:not([hidden])');
+  await page.click('#unsCancel');
+  assert.equal(await page.isVisible('#ovUnsaved'), false);
+  await page.click('#libBrands button:has-text("New brand")');
+  await page.click('#unsSave');
+  await page.waitForSelector('#ovAsk:not([hidden])');
+  await page.fill('#askIn', 'Second brand');
+  await page.click('#askOk');
+  await page.waitForFunction('Store.all("brand").length === 2 && Lib.view === "brand"');
+  assert.equal(await page.evaluate('Store.all("brand").find(b=>b.name==="Northfield Co.").colors.primary'), brandPrimary, 'Save kept the change');
   assert.deepEqual(page.errors, []);
   await page.context().close();
 });
@@ -73,14 +152,18 @@ test('keywords rank the options, and choosing one changes the post', async () =>
 test('Advanced mode adds controls; its settings and a custom type pairing are saved', async () => {
   const page = await openApp(browser, url);
   await page.click('#modeSeg button[data-v=advanced]');
-  for (const id of ['#accAdv', '#accFine', '#advBar']) assert.equal(await page.isVisible(id), true, id + ' shows in Advanced mode');
+  await toMedia(page);
+  for (const id of ['#accAdv', '#advBar']) assert.equal(await page.isVisible(id), true, id + ' shows in Advanced mode');
   assert.equal(await page.isVisible('.stepline'), false);
   await page.click('#accAdv summary');
   await page.evaluate('(()=>{const r=document.getElementById("aHead");r.value=130;r.dispatchEvent(new Event("input"));})()');
   await page.selectOption('#aCaps', 'upper');
   await page.uncheck('#aHandle');
   assert.deepEqual(await page.evaluate('[state.headScale,state.caps,state.showHandle,snap().type.display.upper,snap().noHandle]'), [1.3, 'upper', false, true, true]);
-  // build a pairing
+  // build a pairing on the Brand page
+  await toBrand(page);
+  await page.click('#bStep2');
+  assert.equal(await page.isVisible('#accFine'), true, 'hex fine-tuning shows on the Brand page in Advanced mode');
   await page.click('#tabs button[data-v=type]');
   await page.click('#subbar button:has-text("Build a pairing")');
   await page.click('#results button:has-text("Start a pairing from this one")');
@@ -93,7 +176,9 @@ test('Advanced mode adds controls; its settings and a custom type pairing are sa
   assert.match(t.id, /^myt-/);
   assert.deepEqual([t.d, t.b, t.name], ['Oswald', 'Lora', 'Poster pair']);
   assert.ok(t.tags > 0, 'a custom pairing still carries sourced associations');
+  await page.click('#btnSaveBrand');
   await page.waitForFunction('(Store.get("brand",state.bid).types||[]).some(t=>t.name==="Poster pair")', null, { timeout: 5000 });
+  await toMedia(page);
   await page.screenshot({ path: join(out, 'advanced.png') });
   // back in Simple mode the post keeps its settings and says so
   await page.click('#modeSeg button[data-v=simple]');
@@ -113,6 +198,7 @@ test('Advanced mode adds controls; its settings and a custom type pairing are sa
 
 test('exports are real files at the platform size', async () => {
   const page = await openApp(browser, url);
+  await toMedia(page);
   const png = await download(page, () => page.click('#btnExport'));
   assert.match(png.name, /facebook-feed-post-4-5-1080x1350\.png$/);
   assert.deepEqual(pngSize(png.data), { png: true, w: 1080, h: 1350 });
@@ -133,6 +219,7 @@ test('exports are real files at the platform size', async () => {
 test('a template post opens as editable layers', async () => {
   const page = await openApp(browser, url);
   await page.click('#modeSeg button[data-v=advanced]');
+  await toMedia(page);
   await page.setInputFiles('#inLogo', fixture('logo.png'));
   await page.waitForFunction('!!logoImg');
   const flat = await page.evaluate('(async()=>{const b=await draftBlob(state,false);const im=await createImageBitmap(b);const c=document.createElement("canvas");c.width=im.width;c.height=im.height;c.getContext("2d").drawImage(im,0,0);return c.toDataURL();})()');
@@ -188,6 +275,9 @@ test('a PDF is imported as separate text, image and shape layers', async () => {
 test('a brand travels to another browser as a file, with its posts and images', async () => {
   const a = await openApp(browser, url);
   await a.setInputFiles('#inLogo', fixture('logo.png'));
+  await a.click('#btnSaveBrand');
+  await a.waitForFunction('!!Store.get("brand",state.bid).logo');
+  await toMedia(a);
   await a.setInputFiles('#inPhoto', fixture('photo.jpg'));
   await a.waitForFunction('!!logoImg && !!photoImg');
   await a.fill('#postName', 'Photo post');
@@ -260,6 +350,7 @@ test('hosted with accounts (simulated): work saves per account and a share link 
   });
   const one = await openApp(browser, url + '?u=1', { context: ctx });
   assert.deepEqual(await one.evaluate('[Store.S.mode,Store.S.me.name,Store.S.canShare]'), ['cloud', 'Tester 1', true]);
+  await toMedia(one);
   await one.setInputFiles('#inPhoto', fixture('photo.jpg'));
   await one.waitForFunction('!!photoImg');
   await one.fill('#postName', 'Account post');

@@ -19,8 +19,8 @@ Nothing here is promised. It records what is known to be missing or unverified, 
 
 1. Photo layer controls in the Layer editor (crop, mask to a rounded shape).
 2. Multi-page documents: carousels as one post with several slides.
-3. More Advanced options in the Designer: text alignment, logo position, a second graphic.
-4. Custom formats in the Designer (any size, with user-defined safe zones).
+3. More Advanced options on the Media page: text alignment, logo position, a second graphic.
+4. Custom formats on the Media page (any size, with user-defined safe zones).
 5. Import a brand from a website address or a logo (extract colors, suggest the nearest palette roles).
 6. Group, align and distribute in the Layer editor; shape layers beyond rectangles.
 7. Split `src/` into ES modules and add unit tests for the engine's rules.
