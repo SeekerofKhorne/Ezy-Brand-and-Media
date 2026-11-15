@@ -363,3 +363,6 @@ body.mode-advanced .simple-only{display:none!important}
 .bprev .seg button{padding:5px 9px;font-size:12.5px}
 .look{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px;background:var(--bg)}
 .look .mpals{margin-top:8px}
+
+.fpoff{margin:4px 0 0;padding:8px 10px;border-radius:8px;background:var(--chip);font-size:12.5px;line-height:1.45}
+.fpoff b{font-weight:600}

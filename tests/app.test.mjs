@@ -60,6 +60,11 @@ test('keywords rank the options, and choosing one changes the brand preview', as
   assert.equal(await page.evaluate('state.query'), 'trustworthy, calm');
   assert.equal(await page.locator('#kwChips .chip').count(), 2);
   // the fingerprint draws the keywords on eight axes
+  await addKw(page, 'compassion');
+  await page.waitForSelector('#fpOff:not([hidden])');
+  assert.match(await page.textContent('#fpOff'), /Compassion \(emotion; no pleasure-arousal-dominance position on file\)/);
+  await page.click('#kwChips .chip:has-text("compassion") button');
+  await page.waitForSelector('#fpOff', { state: 'hidden' });
   assert.equal(await page.locator('#radarBig svg text.rl').count(), 8);
   assert.equal(await page.locator('#radarBig svg polygon.rt').count(), 1);
   await page.click('#btnUseKw');

@@ -45,8 +45,15 @@ function updateFingerprint(){const tgt=fingerprint(parsed.cw),cur=fingerprint(pi
   const sm=$('#radarSmall');sm.textContent='';sm.append(radarSVG([{fp:cur,cls:'rc'},{fp:tgt,cls:'rt'}],190,'Keywords compared with current picks'+(tgt?'. Keywords: '+fpText(tgt):'')+(cur?'. Picks: '+fpText(cur):'')));
   const list=$('#fpList');list.textContent='';const cw=parsed.cw,ids=Object.keys(cw).sort((a,b)=>cw[b]-cw[a]).slice(0,6);
   if(!ids.length)list.append(el('p',{class:'empty',text:'Add a keyword to see what it asks for.'}));
-  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the chart'}))));
-  $('#fpFit').textContent=fitSentence(tgt,cur);}
+  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the axes'}))));
+  $('#fpFit').textContent=fitSentence(tgt,cur);
+  const off=offAxis(cw);['#fpOff','#fpOff2'].forEach(sel=>{const p=$(sel);p.textContent='';p.hidden=!off.length;if(off.length)p.append(el('b',{text:'Asked for, but not on these axes: '}),off.join('; ')+'.');});}
+/* Say plainly which asked-for ideas the chart cannot show, and why, instead of leaving them out silently.
+   Emotions are off the chart only because no pleasure-arousal-dominance position is on file for them. */
+const OFF_WHY={'Positive emotions':['emotion','emotions'],'Difficult emotions':['emotion','emotions'],Style:['style','styles'],Topic:['topic','topics']};
+function offAxis(cw){const by={};Object.keys(cw).filter(id=>cw[id]>0&&!onChart(id)&&CONCEPT_BY_ID[id]).sort((a,b)=>cw[b]-cw[a]).forEach(id=>{const g=CONCEPT_BY_ID[id].group;(by[g]=by[g]||[]).push(cLabel(id));});
+  return Object.keys(by).map(g=>{const n=by[g],w=OFF_WHY[g]||['idea','ideas'],emo=w[0]==='emotion';
+    return n.join(', ')+' ('+(n.length>1?w[1]:w[0])+(emo?'; no pleasure-arousal-dominance position on file':'')+')';});}
 function fitSentence(t,c){if(!t)return'Add keywords to compare them with your picks.';if(!c)return'';const d=FP_AXES.map((a,i)=>({a,d:c[i].v-t[i].v})).filter(x=>Math.abs(x.d)>=.2).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
   if(!d.length)return'Close fit: your picks signal what your keywords ask for.';const hi=d.filter(x=>x.d>0).slice(0,2).map(x=>x.a.label),lo=d.filter(x=>x.d<0).slice(0,2).map(x=>x.a.label);
   return'Your picks run '+[hi.length?'higher on '+hi.join(' and '):'',lo.length?'lower on '+lo.join(' and '):''].filter(Boolean).join(' and ')+' than your keywords ask for.';}
