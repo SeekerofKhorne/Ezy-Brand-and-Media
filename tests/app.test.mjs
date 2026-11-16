@@ -117,6 +117,79 @@ test('keywords rank the options, and choosing one changes the brand preview', as
   await page.context().close();
 });
 
+test('graphics: every graphic has styles that lean apart, picked and stepped through on cards', async () => {
+  const page = await openApp(browser, url);
+  // the catalog: every graphic but "No graphic" has at least three styles, each one draws and is tagged
+  const cat = await page.evaluate(`(()=>{const cv=document.createElement('canvas');cv.width=240;cv.height=150;const ctx=cv.getContext('2d'),c=makeScheme(state.colors,'base');
+    return GFAMILIES.map(F=>({fam:F.fam,n:F.vars.length,leans:new Set(F.vars.map(v=>leans(v.id).top.map(L=>L.k).join())).size,
+      ok:F.vars.every(v=>{try{drawGraphic(ctx,v.id,{x:0,y:0,w:240,h:150},c,.8,7);return !!TAGS.graphic[v.id];}catch(e){return false;}})}));})()`);
+  for (const f of cat) {
+    assert.ok(f.ok, f.fam + ' draws every style');
+    if (f.fam === 'none') continue;
+    assert.ok(f.n >= 3, f.fam + ' has at least three styles');
+    assert.ok(f.leans >= 2, f.fam + ' styles lean toward different parts of the fingerprint');
+  }
+  // the ids saved before styles existed still name the same graphic
+  for (const id of ['waves', 'ripples', 'blobs', 'leaves', 'frame', 'bolts', 'checker'])
+    assert.equal(await page.evaluate(`GV["${id}"].fam`), id);
+  // the picker: one card per graphic; the arrows, dots and arrow keys step through its styles
+  await addKw(page, 'calm');
+  await page.click('#btnUseKw');
+  await page.click('#tabs button[data-v=graphic]');
+  await page.waitForSelector('#results .gcard');
+  assert.match(await page.textContent('#rSummary'), /graphics match Contentment/);
+  await page.click('#btnAll');
+  assert.equal(await page.locator('#results .gcard').count(), cat.length);
+  const card = '#results .gcard[data-fam=waves]';
+  await page.click(card + ' .gpick');
+  assert.equal(await page.evaluate('GV[state.graphicId].fam'), 'waves');
+  const first = await page.evaluate('state.graphicId');
+  await page.click(card + ' .garr >> nth=1');
+  const second = await page.evaluate('state.graphicId');
+  assert.notEqual(second, first);
+  assert.equal(await page.evaluate('GV[state.graphicId].fam'), 'waves', 'the arrows stay inside the graphic');
+  await page.focus(card + ' .gpick'); await page.keyboard.press('ArrowLeft');
+  assert.equal(await page.evaluate('state.graphicId'), first);
+  assert.equal(await page.evaluate('document.activeElement.closest(".gcard").dataset.fam'), 'waves', 'focus stays on the card');
+  await page.click(card + ' .gdot >> nth=3');
+  assert.equal(await page.evaluate('state.graphicId'), 'waves-deep');
+  // the in-use strip shows every style of the graphic, with its fingerprint lean
+  assert.equal(await page.locator('#results .gcur .gvar').count(), 4);
+  assert.ok(await page.locator('#results .gcur .lean').count() >= 4);
+  await page.click('#results .gcur .gvar >> nth=1');
+  assert.equal(await page.evaluate('state.graphicId'), 'waves-line');
+  // the lean filter keeps graphics with a style that leans that way, and shows that style
+  await page.click('#subbar .glbar button:has-text("High dominance")');
+  // (the card of the graphic in use keeps showing the style in use)
+  const shown = await page.evaluate('[...document.querySelectorAll("#results .gcard:not(.on) .gpick canvas")].map(c=>c.dataset.g)');
+  assert.ok(shown.length > 0 && shown.length < cat.length);
+  for (const id of shown) assert.ok(await page.evaluate(`leans("${id}").s["d+"] >= LEAN_MIN`), id + ' leans toward high dominance');
+  await page.click('#subbar .glbar button:has-text("Any")');
+  // the Media page: a graphic chosen for a post leaves the brand's graphic alone
+  await page.click('#btnSaveBrand'); await page.waitForFunction('!Lib.isDirty()');
+  await toMedia(page);
+  await page.click('#rail button[data-p=graphic]');
+  await page.waitForSelector('#mgGrid .gcard');
+  assert.match(await page.textContent('#mgNote'), /Waves · Fine lines/);
+  await page.click('#mgGrid .gcard[data-fam=hearts] .gpick');
+  assert.equal(await page.evaluate('GV[state.graphicId].fam'), 'hearts');
+  assert.equal(await page.evaluate('Lib.look().graphicId'), 'waves-line');
+  assert.equal(await page.evaluate('Lib.isDirty()'), false, 'a post graphic is not a brand change');
+  await page.click('#mgBrand');
+  assert.equal(await page.evaluate('state.graphicId'), 'waves-line');
+  // Shuffle can try another style of the post's graphic (Advanced), and never another graphic
+  await setMode(page, 'advanced');
+  for (const v of ['layout', 'arrangement', 'colors']) await page.click(`#shuf button[data-v=${v}]`);
+  await page.click('#shuf button[data-v=graphic]');
+  const seen = new Set();
+  for (let i = 0; i < 6; i++) { await page.click('#btnShuffle'); seen.add(await page.evaluate('state.graphicId')); }
+  assert.ok(seen.size >= 2, 'Shuffle changed the style');
+  for (const id of seen) assert.equal(await page.evaluate(`GV["${id}"].fam`), 'waves');
+  await page.screenshot({ path: join(out, 'graphics-media.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
 test('unsaved brand changes are guarded, and a saved post keeps its own look', async () => {
   const page = await openApp(browser, url);
   // save a post in the starter look

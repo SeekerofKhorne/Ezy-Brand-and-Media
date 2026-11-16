@@ -132,6 +132,7 @@
       <button type="button" data-p="layouts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg><span>Layouts</span></button>
       <button type="button" data-p="text"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6V4.5h14V6"></path><path d="M12 4.5v15"></path><path d="M9 19.5h6"></path></svg><span>Text</span></button>
       <button type="button" data-p="photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"></rect><circle cx="9" cy="10" r="1.8"></circle><path d="M20.5 16l-5-5-8.5 8"></path></svg><span>Photo</span></button>
+      <button type="button" data-p="graphic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 16c2.5-3 5-3 7.5 0s5 3 7.5 0"></path><path d="M3.5 11c2.5-3 5-3 7.5 0s5 3 7.5 0"></path><circle cx="17.5" cy="5.5" r="1.6"></circle></svg><span>Graphic</span></button>
       <button type="button" data-p="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 3.5a8.5 8.5 0 0 0 0 17z" fill="currentColor"></path></svg><span>Brand</span></button>
       <button type="button" data-p="adjust" class="adv"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span>Adjust</span></button>
       <button type="button" data-p="posts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg><span>Posts</span></button>
@@ -159,6 +160,18 @@
           <label>Photo (used by photo layouts)<span class="file"><input id="inPhoto" type="file" accept="image/*"><button class="btn small" id="rmPhoto" type="button">Remove</button></span></label>
           <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="tint" type="checkbox"> Tint the photo with the primary color</label>
           <p class="note">The photo is saved with the post. The logo belongs to the brand: change it on the Brand page, under Identity.</p>
+        </div>
+      </section>
+      <section class="mp gpanel" data-p="graphic" id="mgPanel" aria-labelledby="mgH" hidden>
+        <div class="rowbtns" style="justify-content:space-between"><div class="h" id="mgH" style="margin:0">Graphic</div><button type="button" class="link" id="mgBrand" hidden>Use the brand&rsquo;s graphic</button></div>
+        <p class="note" id="mgNote" style="margin-top:2px"></p>
+        <div id="mgCur"></div>
+        <div class="h">All graphics</div>
+        <div id="mgLean"></div>
+        <div class="ggrid compact" id="mgGrid"></div>
+        <div class="fields adv" style="margin-top:12px">
+          <label>Graphic strength<input id="mgStrength" type="range" min="0" max="100" step="1"></label>
+          <div class="rowbtns"><button class="btn small" id="mgSeed" type="button">Rearrange the graphic</button></div>
         </div>
       </section>
       <section class="mp look" data-p="brand" id="mLook" aria-labelledby="mLookH" hidden>
@@ -218,7 +231,7 @@
       <div class="toolbar adv" id="advBar" aria-label="More ways to export and edit">
         <span class="dim">Shuffle changes</span>
         <div class="seg" id="shuf" role="group" aria-label="What Shuffle changes">
-          <button type="button" data-v="layout">Layout</button><button type="button" data-v="arrangement">Arrangement</button><button type="button" data-v="colors">Brand palette</button>
+          <button type="button" data-v="layout">Layout</button><button type="button" data-v="arrangement">Arrangement</button><button type="button" data-v="colors">Brand palette</button><button type="button" data-v="graphic" title="Another style of the post's graphic, in the same family">Graphic style</button>
         </div>
         <span class="sp"></span>
         <button class="btn small" id="btnLayers" type="button" title="Open a copy of this post in the Layer editor, with each piece of text, button and logo on its own layer">Edit as layers</button>
@@ -322,9 +335,9 @@
     <p class="note">Advanced settings are saved with each post and still apply if you switch back to Simple.</p>
     <div class="cards2" id="modeSeg" role="group" aria-label="How much control to show">
       <button type="button" data-v="simple" class="tcard"><b>Simple</b><small>A guided set of controls for getting a good draft quickly.</small>
-        <span class="tlist">You get keyword search and the fingerprint, premade palettes and build-your-own, ready-made type pairings, graphics, every platform template, your text, photo and logo, the three color arrangements, saving to folders, and PNG export. Numbered steps show the order to work in.</span></button>
+        <span class="tlist">You get keyword search and the fingerprint, premade palettes and build-your-own, ready-made type pairings, graphics in several styles each, every platform template, your text, photo and logo, the three color arrangements, saving to folders, and PNG export. Numbered steps show the order to work in.</span></button>
       <button type="button" data-v="advanced" class="tcard"><b>Advanced</b><small>Everything in Simple, plus:</small>
-        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all five hex values at once; graphic strength; rearrange the graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
+        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all five hex values at once; graphic strength; rearrange the graphic</span><span>Let Shuffle try another style of the post’s graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
     </div>
   </section>
   <section class="setsec" aria-labelledby="hpH">

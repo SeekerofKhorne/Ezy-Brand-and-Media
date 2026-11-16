@@ -115,9 +115,10 @@ const sameColors=(a,b)=>ROLES.every(([r])=>String(a[r]).toUpperCase()===String(b
 
 /* ---------- Media page: the brand's look, and switching between its palettes ---------- */
 function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=TYP[state.typeId]||TYP.clear,g=GRA[state.graphicId];box.textContent='';
-  $('#mLookNote').textContent=(state.brandName||'This brand')+': '+t.name+' type, '+(g?g.name.toLowerCase():'no')+' graphic. Choose which saved palette this post uses.';
+  $('#mLookNote').textContent=(state.brandName||'This brand')+': '+t.name+' type, '+(g&&g.fam!=='none'?gLabel(g).toLowerCase():'no')+' graphic. Choose which saved palette this post uses.';
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
-  myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));}
+  myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));
+  buildMediaGraphic();}
 
 function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};
   q.addEventListener('input',()=>{const v=q.value;if(/[,;\n]/.test(v)){const parts=v.split(/[,;\n]/),last=parts.pop();if(parts.join('').trim())commitKeywords(parts.join(','));q.value=last.replace(/^\s+/,'');}acRender();live();});

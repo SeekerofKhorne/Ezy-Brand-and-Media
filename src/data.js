@@ -18,6 +18,8 @@ const SRC = {
   GGP:{t:'R',short:'Grohmann, Giese & Parkman 2013',cite:'Grohmann, B., Giese, J. L., & Parkman, I. D. (2013). Using type font characteristics to communicate brand personality of new brands. Journal of Brand Management, 20(5), 389–403.',url:'https://doi.org/10.1057/bm.2012.23',use:'Typeface naturalness, harmony and flourish move brand-personality ratings; font color acts independently of the font.'},
   JG:{t:'R',short:'Jiang et al. 2016',cite:'Jiang, Y., Gorn, G. J., Galli, M., & Chattopadhyay, A. (2016). Does your company have the right logo? How and why circular- and angular-logo shapes influence brand attribute judgments. Journal of Consumer Research, 42(5), 709–726.',url:'https://doi.org/10.1093/jcr/ucv049',use:'Circular shapes prompt softness judgments (comfort, care); angular shapes prompt hardness judgments (durability).'},
   BN:{t:'R',short:'Bar & Neta 2006',cite:'Bar, M., & Neta, M. (2006). Humans prefer curved visual objects. Psychological Science, 17(8), 645–648.',url:'https://pubmed.ncbi.nlm.nih.gov/16913943/',use:'Curved contours are liked more than sharp-angled ones. Small sample (14 people), since extended by others.'},
+  BB:{t:'R',short:'Bajaj & Bond 2018',cite:'Bajaj, A., & Bond, S. D. (2018). Beyond beauty: design symmetry and brand personality. Journal of Consumer Psychology, 28(1), 77\u201398.',url:'https://doi.org/10.1002/jcpy.1009',use:'In four experiments, asymmetric logos and artwork were judged more exciting than symmetric ones, partly because asymmetry is more arousing. Drives the asymmetry rule for graphics.'},
+  CKE:{t:'R',short:'Cian, Krishna & Elder 2014',cite:'Cian, L., Krishna, A., & Elder, R. S. (2014). This logo moves me: dynamic imagery from static images. Journal of Marketing Research, 51(2), 184\u2013197.',url:'https://scholarsarchive.byu.edu/facpub/8436/',use:'Static logos that imply movement raised engagement and, used with care, brand attitudes; the authors warn the effect can backfire for traditional or conservative brands. Drives the implied-motion rule for graphics.'},
   HC:{t:'R',short:'Henderson & Cote 1998',cite:'Henderson, P. W., & Cote, J. A. (1998). Guidelines for selecting or modifying logos. Journal of Marketing, 62(2), 14–30.',url:'https://doi.org/10.1177/002224299806200202',use:'Natural, harmonious and moderately elaborate marks earn the most positive response and recognition.'},
   WCAG:{t:'S',short:'WCAG 2.2',cite:'W3C (2023). Web Content Accessibility Guidelines 2.2, Success Criterion 1.4.3 Contrast (Minimum).',url:'https://www.w3.org/TR/WCAG22/#contrast-minimum',use:'Contrast checks: 4.5:1 for body text, 3:1 for large text.'},
   SPEC:{t:'S',short:'Platform size guides 2026',cite:'Buffer, Social media image sizes in 2026 (May 2026); Sked Social, Social media image sizes for brands and agencies: the 2026 guide.',url:'https://buffer.com/resources/social-media-image-sizes/',use:'Canvas sizes for each format. Platforms change these often; re-check before production.'},
@@ -59,37 +61,177 @@ const PALETTES = [
  {id:'midnight-ocean',name:'Midnight Ocean',bg:'#0C1B2A',surface:'#14293D',primary:'#4FC3D9',accent:'#F2E3C6',text:'#EAF4F8',conv:{water:.9}}
 ];
 
-/* ---------- Graphics: procedural, drawn in the active palette. `f` = shape features. */
-const GRAPHICS = [
- {id:'none',name:'No graphic',f:{},conv:{modern:.5}},
- {id:'waves',name:'Waves',f:{curved:1,organic:1,harmony:1},conv:{water:1,calm:.5,health:.3}},
- {id:'ripples',name:'Ripples',f:{curved:1,harmony:1},conv:{water:.7,calm:.6,relief:.4}},
- {id:'blobs',name:'Soft shapes',f:{curved:1,organic:1},conv:{modern:.4,playful:.3,health:.3}},
- {id:'circles',name:'Circles',f:{curved:1,harmony:.6},conv:{playful:.4,modern:.3}},
- {id:'arches',name:'Arches',f:{curved:1,harmony:1},conv:{sophistication:.4,beauty:.5,modern:.3}},
- {id:'leaves',name:'Leaves',f:{curved:1,organic:1,representational:1},conv:{natural:1,health:.6,food:.5,relief:.3}},
- {id:'glow',name:'Soft glow',f:{curved:1},conv:{calm:.5,modern:.5,tech:.3,beauty:.4,awe:.4,mystery:.3}},
- {id:'sunburst',name:'Sunburst',f:{angular:.5,harmony:1,elaborate:.5},conv:{joy:.7,energy:.6,celebration:.4,awe:.4,pride:.4,retro:.3}},
- {id:'stripes',name:'Diagonal stripes',f:{angular:.6,harmony:1},conv:{energy:.7,fitness:.5}},
- {id:'chevrons',name:'Chevrons',f:{angular:1,harmony:1},conv:{energy:.6,fitness:.5,finance:.3}},
- {id:'shards',name:'Shards',f:{angular:1,elaborate:.7},conv:{excitement:.5,tech:.4,anger:.3}},
- {id:'peaks',name:'Peaks',f:{angular:1,organic:1,representational:1},conv:{ruggedness:.6,fitness:.4,natural:.4}},
- {id:'topo',name:'Contour lines',f:{curved:.6,organic:1,elaborate:.6},conv:{ruggedness:.5,natural:.5,tech:.3}},
- {id:'grid',name:'Grid',f:{angular:.6,harmony:1},conv:{tech:.7,modern:.5,competence:.4}},
- {id:'dots',name:'Dot grid',f:{curved:.5,harmony:1},conv:{modern:.5,tech:.4}},
- {id:'halftone',name:'Halftone',f:{curved:.4,elaborate:.6},conv:{retro:.7,excitement:.4}},
- {id:'plus',name:'Plus signs',f:{angular:.7,harmony:1},conv:{health:.9,competence:.3}},
- {id:'growth',name:'Rising line',f:{angular:.7,representational:1},conv:{finance:1,competence:.4,fitness:.3,pride:.5}},
- {id:'frame',name:'Fine frame',f:{harmony:1},conv:{sophistication:.6,traditional:.6,delicate:.4,admiration:.4,sadness:.3}},
- {id:'sparkles',name:'Sparkles',f:{angular:.6,elaborate:.5},conv:{sophistication:.4,celebration:.6,beauty:.6,awe:.5}},
- {id:'confetti',name:'Confetti',f:{elaborate:1},conv:{celebration:1,playful:.8,joy:.6,amusement:.6,pride:.3}},
- {id:'hearts',name:'Hearts',f:{curved:1,representational:1},conv:{love:1,warmth:.5}},
- {id:'scribble',name:'Scribbles',f:{curved:.7,organic:1,elaborate:.5},conv:{human:1,playful:.5,amusement:.4}},
- {id:'checker',name:'Checkerboard',f:{angular:1,harmony:1},conv:{retro:.7,playful:.4,food:.3}},
- {id:'stars',name:'Night sky',f:{curved:.3,elaborate:.5},conv:{awe:.9,mystery:.7,calm:.3}},
- {id:'rain',name:'Rain',f:{harmony:.5},conv:{sadness:.8,calm:.3,water:.4,relief:.3}},
- {id:'bolts',name:'Lightning',f:{angular:1,elaborate:.6},conv:{energy:.8,anger:.5,fear:.5,power:.5,awe:.3}}
+/* ---------- Graphics: procedural, drawn in the active palette.
+   Each family holds several styles. A style's `f` lists its shape features; engine.js derives its tags
+   from them, so two styles of one family can lean toward different parts of the fingerprint.
+   The first style keeps the family's original id, so saved brands and posts open unchanged.
+   Feature scale is 0 to 1: curved, angular, organic, harmony (balanced, symmetric), elaborate,
+   representational (depicts a thing), asym (asymmetric), motion (implies movement), fine (thin lines),
+   bold (large solid masses), sparse (mostly empty space), rough (hand-made, irregular edges). */
+const GFAMILIES = [
+ {fam:'none',name:'No graphic',vars:[{id:'none',vn:'Plain ground',f:{},conv:{modern:.5}}]},
+ {fam:'waves',name:'Waves',vars:[
+  {id:'waves',vn:'Rolling swell',f:{curved:1,organic:1,harmony:1},conv:{water:1,calm:.5,health:.3}},
+  {id:'waves-line',vn:'Fine lines',f:{curved:1,harmony:1,fine:1},conv:{water:.7,calm:.5}},
+  {id:'waves-surf',vn:'Surf',f:{curved:.7,organic:1,asym:.7,motion:1,elaborate:.5},conv:{water:.8,energy:.4}},
+  {id:'waves-deep',vn:'Deep current',f:{curved:1,organic:1,bold:1},conv:{water:.6,power:.3}}]},
+ {fam:'ripples',name:'Ripples',vars:[
+  {id:'ripples',vn:'Corner rings',f:{curved:1,harmony:1},conv:{water:.7,calm:.6,relief:.4}},
+  {id:'ripples-drop',vn:'Still drop',f:{curved:1,harmony:1,sparse:1,fine:.6},conv:{calm:.7,relief:.4}},
+  {id:'ripples-overlap',vn:'Interference',f:{curved:1,asym:.7,elaborate:.7},conv:{water:.5,interest:.3}},
+  {id:'ripples-bold',vn:'Bold bands',f:{curved:1,bold:1,harmony:.6},conv:{retro:.4,power:.3}}]},
+ {fam:'blobs',name:'Soft shapes',vars:[
+  {id:'blobs',vn:'Corner forms',f:{curved:1,organic:1},conv:{modern:.4,playful:.3,health:.3}},
+  {id:'blobs-pebbles',vn:'Pebbles',f:{curved:1,organic:1,elaborate:.6,asym:.5},conv:{playful:.5,natural:.3}},
+  {id:'blobs-outline',vn:'Outlines',f:{curved:1,organic:1,fine:.9,sparse:.4},conv:{modern:.5,delicate:.3}},
+  {id:'blobs-giant',vn:'One big form',f:{curved:1,organic:1,bold:1,sparse:.5},conv:{modern:.4,calm:.2}}]},
+ {fam:'circles',name:'Circles',vars:[
+  {id:'circles',vn:'Scattered',f:{curved:1,harmony:.6},conv:{playful:.4,modern:.3}},
+  {id:'circles-bubbles',vn:'Bubbles',f:{curved:1,elaborate:.6,motion:.6,asym:.4},conv:{playful:.6,joy:.3}},
+  {id:'circles-orbit',vn:'Orbits',f:{curved:1,harmony:1,fine:.8},conv:{tech:.4,awe:.3}},
+  {id:'circles-polka',vn:'Polka dots',f:{curved:1,harmony:1,bold:.7},conv:{retro:.5,playful:.5}}]},
+ {fam:'arches',name:'Arches',vars:[
+  {id:'arches',vn:'Row of arches',f:{curved:1,harmony:1},conv:{sophistication:.4,beauty:.5,modern:.3}},
+  {id:'arches-rainbow',vn:'Rainbow',f:{curved:1,harmony:1,elaborate:.4},conv:{joy:.6,playful:.5,retro:.4}},
+  {id:'arches-window',vn:'Pointed windows',f:{curved:.5,angular:.5,harmony:1,fine:.7,elaborate:.5},conv:{traditional:.6,mystery:.5,awe:.3}},
+  {id:'arches-portal',vn:'Single portal',f:{curved:1,harmony:1,sparse:1},conv:{sophistication:.4,beauty:.4,calm:.3}}]},
+ {fam:'leaves',name:'Leaves',vars:[
+  {id:'leaves',vn:'Corner sprays',f:{curved:1,organic:1,representational:1},conv:{natural:1,health:.6,food:.5,relief:.3}},
+  {id:'leaves-scatter',vn:'Falling leaves',f:{curved:1,organic:1,representational:1,asym:.6,motion:.6},conv:{natural:.8,playful:.3}},
+  {id:'leaves-line',vn:'Line botanicals',f:{curved:1,organic:1,representational:1,fine:1},conv:{natural:.7,delicate:.5,beauty:.4}},
+  {id:'leaves-jungle',vn:'Dense foliage',f:{curved:1,organic:1,representational:1,bold:1,elaborate:.6},conv:{natural:1,ruggedness:.3}}]},
+ {fam:'glow',name:'Soft glow',vars:[
+  {id:'glow',vn:'Drifting light',f:{curved:1},conv:{calm:.5,modern:.5,tech:.3,beauty:.4,awe:.4,mystery:.3}},
+  {id:'glow-aura',vn:'Centered aura',f:{curved:1,harmony:1,sparse:1},conv:{calm:.6,awe:.4,beauty:.4}},
+  {id:'glow-neon',vn:'Neon streaks',f:{angular:.4,motion:.7,elaborate:.4,asym:.5},conv:{tech:.7,excitement:.5,energy:.5}},
+  {id:'glow-eclipse',vn:'Eclipse',f:{curved:1,bold:.9,harmony:1},conv:{mystery:.7,power:.6,awe:.3}}]},
+ {fam:'sunburst',name:'Sunburst',vars:[
+  {id:'sunburst',vn:'Corner rays',f:{angular:.5,harmony:1,elaborate:.5},conv:{joy:.7,energy:.6,celebration:.4,awe:.4,pride:.4,retro:.3}},
+  {id:'sunburst-center',vn:'Full burst',f:{angular:.5,harmony:1,bold:.7},conv:{joy:.6,retro:.6,celebration:.4,pride:.4}},
+  {id:'sunburst-rising',vn:'Rising sun',f:{curved:.6,angular:.3,harmony:1,representational:.7},conv:{joy:.7,retro:.5,relief:.3}},
+  {id:'sunburst-fine',vn:'Fine rays',f:{angular:.4,fine:1,harmony:.8,sparse:.4},conv:{awe:.5,joy:.3}}]},
+ {fam:'stripes',name:'Stripes',vars:[
+  {id:'stripes',vn:'Diagonal',f:{angular:.6,harmony:1},conv:{energy:.7,fitness:.5}},
+  {id:'stripes-pin',vn:'Pinstripe',f:{harmony:1,fine:1,sparse:.5},conv:{traditional:.5,finance:.4,competence:.3}},
+  {id:'stripes-speed',vn:'Speed lines',f:{angular:.5,motion:1,asym:.6},conv:{energy:.8,fitness:.5}},
+  {id:'stripes-bold',vn:'Wide bands',f:{angular:.6,harmony:1,bold:1},conv:{retro:.5,energy:.3}}]},
+ {fam:'chevrons',name:'Chevrons',vars:[
+  {id:'chevrons',vn:'Small chevrons',f:{angular:1,harmony:1},conv:{energy:.6,fitness:.5,finance:.3}},
+  {id:'chevrons-arrows',vn:'Forward arrows',f:{angular:1,motion:1,bold:.6},conv:{energy:.7,fitness:.5,pride:.3}},
+  {id:'chevrons-zigzag',vn:'Zigzag',f:{angular:1,harmony:.8,elaborate:.5},conv:{retro:.6,playful:.4,energy:.3}},
+  {id:'chevrons-fine',vn:'Herringbone',f:{angular:.7,harmony:1,fine:.8},conv:{traditional:.6,ruggedness:.2}}]},
+ {fam:'shards',name:'Shards',vars:[
+  {id:'shards',vn:'Scattered',f:{angular:1,elaborate:.7},conv:{excitement:.5,tech:.4,anger:.3}},
+  {id:'shards-crystal',vn:'Crystal facets',f:{angular:1,elaborate:.6,harmony:.5,fine:.3},conv:{sophistication:.5,beauty:.3,awe:.3}},
+  {id:'shards-broken',vn:'Broken glass',f:{angular:1,asym:1,elaborate:.6,fine:.4},conv:{anger:.5,fear:.5}},
+  {id:'shards-paper',vn:'Paper cut',f:{angular:.7,bold:.8,asym:.5},conv:{modern:.5,playful:.3}}]},
+ {fam:'peaks',name:'Peaks',vars:[
+  {id:'peaks',vn:'Mountain ranges',f:{angular:1,organic:1,representational:1},conv:{ruggedness:.6,fitness:.4,natural:.4}},
+  {id:'peaks-line',vn:'Ridge lines',f:{angular:.6,organic:1,representational:1,fine:1,sparse:.4},conv:{natural:.5,calm:.3}},
+  {id:'peaks-summit',vn:'Single summit',f:{angular:1,representational:1,bold:1,harmony:.5},conv:{ruggedness:.7,pride:.6,awe:.5}},
+  {id:'peaks-jagged',vn:'Jagged teeth',f:{angular:1,elaborate:.5,asym:.5},conv:{ruggedness:.5,anger:.3,energy:.3}}]},
+ {fam:'topo',name:'Contour lines',vars:[
+  {id:'topo',vn:'Two summits',f:{curved:.6,organic:1,elaborate:.6},conv:{ruggedness:.5,natural:.5,tech:.3}},
+  {id:'topo-dense',vn:'Dense terrain',f:{curved:.6,organic:1,elaborate:1,fine:.6},conv:{natural:.4,tech:.4}},
+  {id:'topo-flow',vn:'Flow lines',f:{curved:.9,organic:.6,motion:.8,harmony:.6,fine:.5},conv:{tech:.4,modern:.4}},
+  {id:'topo-bold',vn:'Bold bands',f:{curved:.6,organic:1,bold:1},conv:{ruggedness:.5,retro:.4,natural:.4}}]},
+ {fam:'grid',name:'Grid',vars:[
+  {id:'grid',vn:'Line grid',f:{angular:.6,harmony:1},conv:{tech:.7,modern:.5,competence:.4}},
+  {id:'grid-blueprint',vn:'Blueprint',f:{angular:.5,harmony:1,fine:1},conv:{tech:.7,competence:.5}},
+  {id:'grid-horizon',vn:'Horizon grid',f:{angular:.6,harmony:1,motion:.6,elaborate:.4},conv:{retro:.8,tech:.5,excitement:.4}},
+  {id:'grid-iso',vn:'Isometric',f:{angular:1,harmony:1},conv:{tech:.6,modern:.4}}]},
+ {fam:'dots',name:'Dot grid',vars:[
+  {id:'dots',vn:'Even grid',f:{curved:.5,harmony:1},conv:{modern:.5,tech:.4}},
+  {id:'dots-scatter',vn:'Scattered',f:{curved:.5,asym:.8,sparse:.6},conv:{modern:.4,playful:.3}},
+  {id:'dots-bold',vn:'Large dots',f:{curved:1,harmony:1,bold:.7},conv:{retro:.5,playful:.5}},
+  {id:'dots-matrix',vn:'LED matrix',f:{curved:.5,harmony:.8,elaborate:.5},conv:{tech:.7,retro:.3}}]},
+ {fam:'halftone',name:'Halftone',vars:[
+  {id:'halftone',vn:'Corner fade',f:{curved:.4,elaborate:.6},conv:{retro:.7,excitement:.4}},
+  {id:'halftone-band',vn:'Diagonal band',f:{curved:.4,elaborate:.6,motion:.6},conv:{retro:.6,energy:.3}},
+  {id:'halftone-pop',vn:'Pop-art spots',f:{curved:.7,elaborate:.6,bold:.7},conv:{retro:.7,amusement:.5,playful:.5}},
+  {id:'halftone-fine',vn:'Fine screen',f:{curved:.4,fine:1,harmony:.8},conv:{modern:.4,retro:.3}}]},
+ {fam:'plus',name:'Plus signs',vars:[
+  {id:'plus',vn:'Even grid',f:{angular:.7,harmony:1},conv:{health:.9,competence:.3}},
+  {id:'plus-scatter',vn:'Scattered marks',f:{angular:.7,asym:.7,elaborate:.4},conv:{playful:.4,health:.4}},
+  {id:'plus-bold',vn:'One bold cross',f:{angular:.7,harmony:1,bold:1,sparse:.5},conv:{health:1,competence:.4}},
+  {id:'plus-fine',vn:'Registration marks',f:{angular:.5,harmony:1,fine:1},conv:{tech:.4,competence:.4,modern:.4}}]},
+ {fam:'growth',name:'Rising line',vars:[
+  {id:'growth',vn:'Bars and line',f:{angular:.7,representational:1},conv:{finance:1,competence:.4,fitness:.3,pride:.5}},
+  {id:'growth-area',vn:'Smooth curve',f:{curved:.8,representational:1,motion:.5},conv:{finance:.9,competence:.4,pride:.4}},
+  {id:'growth-steps',vn:'Steps',f:{angular:1,representational:.6,bold:.8,harmony:1},conv:{finance:.6,pride:.6,fitness:.3}},
+  {id:'growth-arrow',vn:'Big arrow',f:{angular:.8,motion:1,bold:1,representational:.6},conv:{finance:.6,energy:.5,pride:.5}}]},
+ {fam:'frame',name:'Frame',vars:[
+  {id:'frame',vn:'Double rule',f:{harmony:1},conv:{sophistication:.6,traditional:.6,delicate:.4,admiration:.4,sadness:.3}},
+  {id:'frame-deco',vn:'Deco corners',f:{angular:.7,harmony:1,elaborate:.6},conv:{retro:.6,sophistication:.7,admiration:.3}},
+  {id:'frame-ornate',vn:'Scrollwork',f:{curved:1,harmony:1,elaborate:1,fine:.6},conv:{traditional:.8,admiration:.5,delicate:.3}},
+  {id:'frame-bold',vn:'Thick border',f:{harmony:1,bold:1,sparse:.7},conv:{modern:.5,competence:.3}}]},
+ {fam:'sparkles',name:'Sparkles',vars:[
+  {id:'sparkles',vn:'Scattered',f:{angular:.6,elaborate:.5},conv:{sophistication:.4,celebration:.6,beauty:.6,awe:.5}},
+  {id:'sparkles-cluster',vn:'Corner cluster',f:{angular:.5,sparse:.8,asym:.5},conv:{beauty:.7,sophistication:.5,delicate:.4}},
+  {id:'sparkles-glint',vn:'Long glints',f:{angular:.6,fine:.8,elaborate:.4},conv:{awe:.6,beauty:.4,mystery:.2}},
+  {id:'sparkles-burst',vn:'Glitter burst',f:{angular:.5,elaborate:1,motion:.6},conv:{celebration:.9,joy:.5}}]},
+ {fam:'confetti',name:'Confetti',vars:[
+  {id:'confetti',vn:'Party mix',f:{elaborate:1},conv:{celebration:1,playful:.8,joy:.6,amusement:.6,pride:.3}},
+  {id:'confetti-streamers',vn:'Streamers',f:{curved:1,elaborate:.8,motion:.7},conv:{celebration:.9,playful:.6,joy:.6}},
+  {id:'confetti-memphis',vn:'Memphis',f:{elaborate:1,asym:.8,angular:.4,curved:.4},conv:{retro:.8,playful:.8,amusement:.5}},
+  {id:'confetti-fall',vn:'Gentle fall',f:{elaborate:.4,sparse:.8,motion:.4},conv:{celebration:.6,joy:.4}}]},
+ {fam:'hearts',name:'Hearts',vars:[
+  {id:'hearts',vn:'Scattered',f:{curved:1,representational:1},conv:{love:1,warmth:.5}},
+  {id:'hearts-line',vn:'Line pattern',f:{curved:1,representational:1,fine:1,harmony:.6},conv:{love:.8,delicate:.5,warmth:.4}},
+  {id:'hearts-big',vn:'One big heart',f:{curved:1,representational:1,bold:1,sparse:.6},conv:{love:1,warmth:.6}},
+  {id:'hearts-float',vn:'Floating up',f:{curved:1,representational:1,motion:.8,elaborate:.5},conv:{love:.9,joy:.5,playful:.5}}]},
+ {fam:'scribble',name:'Scribbles',vars:[
+  {id:'scribble',vn:'Loops',f:{curved:.7,organic:1,elaborate:.5},conv:{human:1,playful:.5,amusement:.4}},
+  {id:'scribble-marker',vn:'Marker marks',f:{curved:.6,organic:1,rough:1,asym:.6,motion:.6,bold:.4},conv:{human:.9,interest:.3}},
+  {id:'scribble-doodle',vn:'Doodles',f:{curved:.6,organic:1,rough:1,elaborate:.8,representational:.5},conv:{human:1,playful:.8,amusement:.6}},
+  {id:'scribble-chalk',vn:'Chalk hatching',f:{angular:.6,organic:.7,rough:1,elaborate:.5},conv:{human:.7,ruggedness:.4,retro:.3}}]},
+ {fam:'checker',name:'Checkerboard',vars:[
+  {id:'checker',vn:'Bottom strip',f:{angular:1,harmony:1},conv:{retro:.7,playful:.4,food:.3}},
+  {id:'checker-full',vn:'All over',f:{angular:1,harmony:1,elaborate:.4},conv:{retro:.8,playful:.4}},
+  {id:'checker-warp',vn:'Warped',f:{angular:.4,curved:.6,elaborate:.8,asym:.4},conv:{retro:.8,playful:.6}},
+  {id:'checker-flag',vn:'Racing flag',f:{angular:1,motion:.8,representational:.6},conv:{energy:.6,fitness:.5,pride:.4}}]},
+ {fam:'stars',name:'Night sky',vars:[
+  {id:'stars',vn:'Starfield',f:{curved:.3,elaborate:.5},conv:{awe:.9,mystery:.7,calm:.3}},
+  {id:'stars-constellation',vn:'Constellations',f:{angular:.4,fine:1,elaborate:.5},conv:{awe:.7,mystery:.5,interest:.4}},
+  {id:'stars-shooting',vn:'Shooting stars',f:{motion:1,asym:.6,elaborate:.4},conv:{awe:.6,joy:.4}},
+  {id:'stars-moon',vn:'Crescent moon',f:{curved:1,representational:1,sparse:.8},conv:{calm:.6,mystery:.6,awe:.4}}]},
+ {fam:'rain',name:'Rain',vars:[
+  {id:'rain',vn:'Shower',f:{harmony:.5},conv:{sadness:.8,calm:.3,water:.4,relief:.3}},
+  {id:'rain-drizzle',vn:'Drizzle',f:{harmony:.7,fine:1,sparse:.8},conv:{sadness:.6,calm:.5}},
+  {id:'rain-storm',vn:'Storm',f:{angular:.5,motion:1,elaborate:.6},conv:{sadness:.5,fear:.5,water:.4}},
+  {id:'rain-drops',vn:'Droplets',f:{curved:1,representational:1},conv:{water:.6,sadness:.4,relief:.3}}]},
+ {fam:'bolts',name:'Lightning',vars:[
+  {id:'bolts',vn:'Forked',f:{angular:1,elaborate:.6},conv:{energy:.8,anger:.5,fear:.5,power:.5,awe:.3}},
+  {id:'bolts-single',vn:'One big bolt',f:{angular:1,bold:1,motion:.6},conv:{energy:.9,power:.7}},
+  {id:'bolts-arcs',vn:'Electric arcs',f:{angular:1,fine:.8,elaborate:1,asym:.6},conv:{energy:.7,tech:.5,fear:.4}},
+  {id:'bolts-icons',vn:'Bolt pattern',f:{angular:1,harmony:1,representational:.6},conv:{energy:.6,playful:.4,tech:.3}}]},
+ {fam:'brush',name:'Brush strokes',vars:[
+  {id:'brush',vn:'Swash',f:{curved:.6,organic:1,rough:1,motion:.6},conv:{human:.8,beauty:.3}},
+  {id:'brush-dabs',vn:'Paint dabs',f:{organic:1,rough:1,elaborate:.6,asym:.6},conv:{human:.7,playful:.5,joy:.3}},
+  {id:'brush-enso',vn:'Ink circle',f:{curved:1,organic:1,rough:.6,sparse:.8},conv:{calm:.6,traditional:.3,human:.4}}]},
+ {fam:'circuit',name:'Circuitry',vars:[
+  {id:'circuit',vn:'Circuit traces',f:{angular:1,harmony:.7,elaborate:.6},conv:{tech:1,competence:.3}},
+  {id:'circuit-glitch',vn:'Glitch',f:{angular:1,asym:1,elaborate:.7,motion:.5},conv:{tech:.7,fear:.3,retro:.3}},
+  {id:'circuit-scan',vn:'Scanlines',f:{harmony:1,fine:1},conv:{retro:.6,tech:.6,mystery:.3}}]},
+ {fam:'florals',name:'Flowers',vars:[
+  {id:'florals',vn:'Daisies',f:{curved:1,organic:1,representational:1,elaborate:.4},conv:{natural:.6,joy:.5,playful:.5}},
+  {id:'florals-line',vn:'Line blossoms',f:{curved:1,organic:1,representational:1,fine:1},conv:{beauty:.7,delicate:.7,love:.4}},
+  {id:'florals-bloom',vn:'One big bloom',f:{curved:1,organic:1,representational:1,bold:1,harmony:1},conv:{natural:.5,beauty:.5,joy:.4}}]},
+ {fam:'ornament',name:'Ornament',vars:[
+  {id:'ornament',vn:'Damask',f:{curved:1,harmony:1,elaborate:1},conv:{traditional:.8,sophistication:.6}},
+  {id:'ornament-rose',vn:'Rose window',f:{curved:.8,angular:.3,harmony:1,elaborate:1,fine:.6},conv:{traditional:.7,mystery:.6,awe:.6}},
+  {id:'ornament-thorns',vn:'Thorned vines',f:{curved:.6,angular:.8,organic:1,elaborate:.7,asym:.5},conv:{mystery:.7,fear:.5}}]},
+ {fam:'geo',name:'Geometric',vars:[
+  {id:'geo',vn:'Bauhaus blocks',f:{curved:.5,angular:.5,bold:1,asym:.6},conv:{modern:.7,retro:.4}},
+  {id:'geo-triangles',vn:'Triangle tiles',f:{angular:1,harmony:1,elaborate:.5},conv:{modern:.5,tech:.3}},
+  {id:'geo-lines',vn:'Minimal lines',f:{fine:1,sparse:1,harmony:.4,asym:.4},conv:{modern:.8,sophistication:.4}}]},
+ {fam:'smoke',name:'Mist and grain',vars:[
+  {id:'smoke',vn:'Low fog',f:{curved:1,organic:1,sparse:.5},conv:{mystery:.6,calm:.4,sadness:.3}},
+  {id:'smoke-wisps',vn:'Smoke wisps',f:{curved:1,organic:1,motion:.6,fine:.8},conv:{mystery:.7}},
+  {id:'smoke-grain',vn:'Film grain',f:{elaborate:.4,rough:.8},conv:{retro:.6,human:.3,mystery:.2}}]}
 ];
+const GRAPHICS = [];
+GFAMILIES.forEach(F=>F.vars.forEach(v=>GRAPHICS.push(Object.assign({fam:F.fam,name:F.name},v))));
 
 /* ---------- Platforms, formats and layouts.
    safe: pixels the app covers with its own interface (approximate, SAFE source).

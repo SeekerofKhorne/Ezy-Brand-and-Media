@@ -179,8 +179,16 @@ function tagGraphic(g){const T=newTags(),f=g.f,cautions=[];
   if(f.representational){addTag(T,'sincerity',.35,'Marks that depict familiar objects earn more positive response','HC');addTag(T,'human',.3,'Familiar objects are easier to recognize','HC');}
   if(f.harmony){addTag(T,'competence',.4*f.harmony,'Harmonious, balanced designs earn more positive response','HC');addTag(T,'calm',.3*f.harmony,'Harmonious designs are pleasing','HC');}
   if(f.elaborate){addTag(T,'excitement',.5*f.elaborate,'More elaborate designs hold interest','HC');addTag(T,'interest',.45*f.elaborate,'More elaborate designs hold interest','HC');addTag(T,'energy',.35*f.elaborate,'Busy patterns raise visual activity','CONV');}
+  /* Two further shape findings, then four conventions that let styles of one graphic lean apart. */
+  if(f.asym){addTag(T,'excitement',.65*f.asym,'Asymmetric designs were judged more exciting than symmetric ones','BB');addTag(T,'energy',.35*f.asym,'Asymmetric designs were more arousing to look at','BB');}
+  if(f.motion){addTag(T,'interest',.5*f.motion,'Static images that imply movement drew more engagement','CKE');addTag(T,'energy',.45*f.motion,'Implied movement reads as active','CONV');
+    if(f.motion>=.8)cautions.push({text:'Implied movement draws attention, but can clash with a traditional or conservative brand.',src:'CKE'});}
+  if(f.fine){addTag(T,'sophistication',.5*f.fine,'Fine linework reads as refined','CONV');addTag(T,'delicate',.55*f.fine,'Thin strokes read as light and delicate','CONV');}
+  if(f.bold){addTag(T,'power',.6*f.bold,'Large solid masses read as heavy and commanding','CONV');addTag(T,'ruggedness',.25*f.bold,'Heavy shapes read as sturdy','CONV');}
+  if(f.sparse){addTag(T,'calm',.5*f.sparse,'Generous empty space reads as calm and unhurried','CONV');addTag(T,'sophistication',.35*f.sparse,'Restraint and white space are a premium convention','CONV');addTag(T,'modern',.4*f.sparse,'Open space reads as minimal','CONV');}
+  if(f.rough){addTag(T,'human',.65*f.rough,'Irregular, hand-made marks read as personal','CONV');addTag(T,'sincerity',.3*f.rough,'Hand-made marks read as genuine','CONV');addTag(T,'ruggedness',.25*f.rough,'Rough edges read as unpolished and tough','CONV');}
   for(const c in(g.conv||{}))addTag(T,c,g.conv[c],'Motif used for this theme','CONV');
-  return{tags:finishTags(T),cautions};}
+  return{tags:finishTags(T),cautions:cautions.slice(0,2)};}
 
 /* ---------- keyword index ---------- */
 const CONCEPT_BY_ID={};CONCEPTS.forEach(c=>CONCEPT_BY_ID[c.id]=c);

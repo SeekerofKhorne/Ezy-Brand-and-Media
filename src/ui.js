@@ -32,19 +32,24 @@ const listedTypes=()=>TYPESETS.filter(t=>!t.mine||t.bid===state.bid);
    preference for this browser: it never changes what a post or a brand contains. */
 const DEFAULT_PAL=BRANDS.sample.palette;
 let uiMode=store.get('brandlab.mode.v1')==='advanced'?'advanced':'simple';
+/* Directions on the fingerprint a graphic style can lean toward (see the graphics picker below). */
+const LEANS=[{k:'sincerity',i:0,l:'Sincerity'},{k:'excitement',i:1,l:'Excitement'},{k:'competence',i:2,l:'Competence'},{k:'sophistication',i:3,l:'Sophistication'},{k:'ruggedness',i:4,l:'Ruggedness'},
+ {k:'p+',i:5,d:1,l:'High pleasure'},{k:'p-',i:5,d:-1,l:'Low pleasure'},{k:'a+',i:6,d:1,l:'High arousal'},{k:'a-',i:6,d:-1,l:'Low arousal'},{k:'d+',i:7,d:1,l:'High dominance'},{k:'d-',i:7,d:-1,l:'Low dominance'}];
+const LEAN_MIN=.45;
 const ADV_DEFAULTS={headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};
 const advActive=s=>Object.keys(ADV_DEFAULTS).some(k=>s[k]!==ADV_DEFAULTS[k]);
 function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('brandlab.mode.v1',uiMode);document.body.classList.toggle('mode-simple',uiMode==='simple');document.body.classList.toggle('mode-advanced',uiMode==='advanced');
   document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));setPanel(state.mpanel);if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
-function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true},mpanel:'layouts',
+function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true,graphic:false},mpanel:'layouts',gLean:'',
   headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
-  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false};if(!['layouts','text','photo','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';return o;}
+  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false,graphic:o.shuffle.graphic===true};if(!['layouts','text','photo','graphic','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';
+  if(!LEANS.some(L=>L.k===o.gLean))o.gLean='';return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -64,7 +69,7 @@ function useType(id){ensureType(id).then(()=>{updateReadout.k='';requestPaint(tr
 /* ---------- painting ---------- */
 let paintQ=false,thumbT=0,saveT=0;
 function requestPaint(thumbs){if(!paintQ){paintQ=true;requestAnimationFrame(()=>{paintQ=false;paint();});}
-  if(thumbs){clearTimeout(thumbT);thumbT=setTimeout(()=>{paintLayoutThumbs();paintDrafts();if(state.tab==='graphic')paintGraphicThumbs();},140);}
+  if(thumbs){clearTimeout(thumbT);thumbT=setTimeout(()=>{paintLayoutThumbs();paintDrafts();if(state.tab==='graphic'||state.mpanel==='graphic')paintGraphicThumbs();},140);}
   Lib.touchBrand();clearTimeout(saveT);saveT=setTimeout(()=>{store.set('brandlab.state.v1',state);},400);}
 function sizeStage(){const st=$('#stage'),fmt=FMT[state.format];const narrow=window.matchMedia('(max-width:1060px)').matches;let h;
   if(narrow){const w=st.clientWidth-36;h=Math.min(w*fmt.h/fmt.w,Math.max(360,window.innerHeight*.6))+36;}
@@ -103,13 +108,15 @@ function buildSubbar(){const bar=$('#subbar');bar.textContent='';
   if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Premade palettes'],['build','Build your own']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
   else if(state.tab==='type'){const build=uiMode==='advanced'&&state.typeMode==='build',ts=listedTypes();
     if(uiMode==='advanced')bar.append(el('div',{class:'seg',role:'group','aria-label':'Type mode'},[['sets','Ready-made pairings'],['build','Build a pairing']].map(([v,t])=>el('button',{type:'button','aria-pressed':String((build?'build':'sets')===v),text:t,onclick:()=>{state.typeMode=v;buildResults();}}))));
-    if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));}}
+    if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));}
+  else if(state.tab==='graphic')bar.append(gLeanBar(buildResults));}
 function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>has?res[k].filter(r=>r.score>0).length:res[k].length;
-  $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=count('graphic');
+  $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=has?graphicRows().filter(r=>r.score>0).length:GFAMILIES.length;
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
   const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
   const kind=state.tab;if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;buildColorBuilder();return;}
   if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;buildTypeBuilder();return;}$('#rhead').hidden=false;
+  if(kind==='graphic'){buildGraphicResults();return;}
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
   const matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
   $('#rSummary').textContent=has?(matches.length?`${matches.length} of ${rows.length} match ${kwLabels()}, best first`:`Nothing here is linked to ${kwLabels()}`):`All ${rows.length}. Type keywords to rank them.`;
@@ -123,9 +130,70 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
     box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,ids.length?whyList(tg,ids):null)));});
   if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
-function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
+function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g],#mgPanel canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
 function runSearch(){parsed=parseQuery(liveQuery());buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
 function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palColors(PAL[id]);buildColors();renderLook();}else if(kind==='type'){state.typeId=id;useType(id);}else state.graphicId=id;buildResults();requestPaint(true);}
+
+/* ---------- graphics: families of styles ----------
+   A family (Waves) holds three or four styles (Fine lines, Surf...). Each style is tagged from its own shape
+   features, so styles lean toward different parts of the fingerprint. The picker shows one card per family:
+   select the picture to use it, the arrows or dots (or the arrow keys) to step through its styles. */
+const GFAM={};GFAMILIES.forEach(F=>GFAM[F.fam]=F);
+const gLabel=g=>g.fam==='none'?g.name:g.name+' · '+g.vn;
+/* A style's position on the eight fingerprint axes, from its tags alone, as one score per direction (0 to 1). */
+function leanScores(id){const tg=TAGS.graphic[id].tags,w={};for(const c in tg)w[c]=Math.min(1,tg[c].w);const fp=fingerprint(w),o={};
+  LEANS.forEach(L=>{o[L.k]=!fp?0:L.d?(fp[L.i].set?Math.max(0,(fp[L.i].v-.5)*2*L.d):0):fp[L.i].v;});return o;}
+/* Badges name the two directions where a style leans furthest compared with its family's other styles,
+   so "High pleasure", which most curved shapes share, does not crowd out what sets a style apart. */
+let leanCache=null;
+function leans(id){if(!leanCache){leanCache={};GFAMILIES.forEach(F=>{const S=F.vars.map(v=>leanScores(v.id)),mean={};LEANS.forEach(L=>mean[L.k]=S.reduce((a,o)=>a+o[L.k],0)/S.length);
+    F.vars.forEach((v,i)=>{const o=S[i];leanCache[v.id]={s:o,top:LEANS.filter(L=>o[L.k]>=LEAN_MIN).sort((a,b)=>(o[b.k]*2-mean[b.k])-(o[a.k]*2-mean[a.k])).slice(0,2)};});});}
+  return leanCache[id]||{s:{},top:[]};}
+function leanChips(id){const t=leans(id).top;return t.length?el('div',{class:'glean',title:'Where this style sits on the fingerprint, compared with the other styles of the same graphic'},t.map(L=>el('span',{class:'lean',text:L.l}))):null;}
+/* One row per family: its best keyword score, and which style to show when the family is not in use. */
+function graphicRows(){const has=parsed.concepts.length>0,by={};rank('graphic',GRAPHICS,parsed.cw).forEach(r=>{(by[r.it.fam]=by[r.it.fam]||[]).push(r);});const lean=state.gLean;
+  let rows=GFAMILIES.map((F,i)=>{const best=by[F.fam][0];let pick=has&&best.score>0?best.it.id:F.vars[0].id,leanS=0;
+    if(lean){const L=F.vars.map(v=>[v.id,leans(v.id).s[lean]||0]).sort((a,b)=>b[1]-a[1]);leanS=L[0][1];if(leanS>=LEAN_MIN)pick=L[0][0];}
+    return{F,score:best.score,pick,leanS,i};});
+  if(lean)rows=rows.filter(r=>r.leanS>=LEAN_MIN);
+  return rows.sort((a,b)=>(has?b.score-a.score:0)||(lean?b.leanS-a.leanS:0)||a.i-b.i);}
+function gLeanBar(onChange){return el('div',{class:'sugg glbar',role:'group','aria-label':'Show graphics with a style that leans toward'},el('span',{class:'note',style:'margin:0 4px 0 0',text:'Leans toward:'}),
+  [{k:'',l:'Any'}].concat(LEANS).map(L=>el('button',{type:'button','aria-pressed':String(state.gLean===L.k),text:L.l,onclick:()=>{state.gLean=L.k;onChange();}})));}
+let gRefocus=null;
+function gCard(row,onPick,compact){const F=row.F,g0=GV[state.graphicId],inUse=!!g0&&g0.fam===F.fam,cur=inUse?state.graphicId:row.pick,g=GV[cur],n=F.vars.length,idx=F.vars.findIndex(v=>v.id===cur);
+  const go=(id,key)=>{if(key)gRefocus=F.fam;onPick(id);},step=(d,key)=>go(F.vars[(idx+d+n)%n].id,key);
+  const pickBtn=el('button',{type:'button',class:'gpick','aria-pressed':String(inUse),'aria-label':(inUse?'In use: ':'Use ')+gLabel(g)+(n>1?'. Left and right arrow keys change the style.':''),onclick:()=>go(cur),
+    onkeydown:e=>{if(n>1&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();step(e.key==='ArrowRight'?1:-1,true);}}},el('canvas',{'data-g':cur,width:240,height:150}));
+  const nav=n>1?el('div',{class:'gnav'},el('button',{type:'button',class:'garr','aria-label':'Previous '+F.name.toLowerCase()+' style',text:'‹',onclick:()=>step(-1)}),
+    el('span',{class:'gdots'},F.vars.map(v=>el('button',{type:'button',class:'gdot'+(v.id===cur?' cur':''),'aria-label':F.name+': '+v.vn,title:v.vn,'aria-pressed':String(inUse&&v.id===cur),onclick:()=>go(v.id)}))),
+    el('button',{type:'button',class:'garr','aria-label':'Next '+F.name.toLowerCase()+' style',text:'›',onclick:()=>step(1)})):null;
+  const m=parsed.concepts.length?scoreTags(TAGS.graphic[cur].tags,parsed.cw).matched.slice(0,2):[];
+  return el('div',{class:'gcard'+(inUse?' on':''),'data-fam':F.fam},pickBtn,el('div',{class:'ghead'},el('span',{class:'nm'},F.name,inUse?el('span',{class:'inuse',text:'In use'}):null),
+    n>1?el('span',{class:'gvn',text:g.vn+' · '+(idx+1)+' of '+n}):null),nav,leanChips(cur),!compact&&m.length?whyList(TAGS.graphic[cur].tags,m):null);}
+/* The graphic in use, with every style of its family side by side. */
+function gCurrent(onPick){const g=GV[state.graphicId]||GV.none,F=GFAM[g.fam],box=el('div',{class:'gcur'});
+  box.append(el('div',{class:'bhead'},el('h3',null,'In use: ',el('b',{text:gLabel(g)})),F.vars.length>1?el('span',{class:'meta',text:'Each style leans toward a different part of the fingerprint'}):null));
+  if(F.vars.length>1)box.append(el('div',{class:'gvars',role:'group','aria-label':F.name+' styles'},F.vars.map(v=>el('button',{type:'button',class:'gvar','aria-pressed':String(v.id===g.id),onclick:()=>onPick(v.id)},
+    el('canvas',{'data-g':v.id,width:200,height:130}),el('span',{class:'nm',text:v.vn}),leanChips(v.id)))));
+  else box.append(el('p',{class:'note',text:'No graphic is in use. Pick one below; each has three or four styles.'}));
+  const tg=TAGS.graphic[g.id],m=scoreTags(tg.tags,parsed.cw).matched,ids=(m.length?m:topTags(tg.tags,3)).slice(0,3);if(ids.length)box.append(whyList(tg.tags,ids));
+  tg.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
+function gRefocusNow(){if(!gRefocus)return;const b=document.querySelector('.gcard[data-fam="'+gRefocus+'"] .gpick');gRefocus=null;if(b)b.focus();}
+function buildGraphicResults(){const has=parsed.concepts.length>0,rows=graphicRows(),L=LEANS.find(x=>x.k===state.gLean),matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
+  const nV=GRAPHICS.length-1,nF=GFAMILIES.length-1;
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} graphics match ${kwLabels()}, best first`:`No graphic here is linked to ${kwLabels()}`):`${nF} graphics in ${nV} styles`)+(L?`. Showing graphics with a style that leans toward ${L.l.toLowerCase()}`:'')+'.';
+  const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
+  const box=$('#results');box.textContent='';const pick=id=>apply('graphic',id);box.append(gCurrent(pick),el('div',{class:'ggrid'},show.map(r=>gCard(r,pick))));
+  if(!show.length)box.append(el('p',{class:'empty',text:L?'No style leans that way strongly enough. Choose another direction, or Any.':'Try the other tabs, or choose “Show all”.'}));
+  paintGraphicThumbs();gRefocusNow();}
+/* Media page: the post's graphic. A change here belongs to this post; the brand's graphic is set on the Brand page. */
+function buildMediaGraphic(){const cur=$('#mgCur');if(!cur||$('#mgPanel').hidden)return;const L=Lib.look(),bg=L&&GV[L.graphicId]?L.graphicId:null;
+  const pick=id=>{state.graphicId=id;renderLook();requestPaint(true);};
+  $('#mgNote').textContent='Changes here apply to this post.'+(bg?' The brand’s graphic is '+gLabel(GV[bg])+'.':'')+' Change the brand’s own graphic on the Brand page.';
+  const b=$('#mgBrand');b.hidden=!bg||bg===state.graphicId;b.onclick=()=>pick(bg);
+  cur.textContent='';cur.append(gCurrent(pick));const lb=$('#mgLean');lb.textContent='';lb.append(gLeanBar(buildMediaGraphic));
+  const grid=$('#mgGrid');grid.textContent='';const rows=graphicRows();grid.append(...rows.map(r=>gCard(r,pick,true)));if(!rows.length)grid.append(el('p',{class:'empty',text:'No style leans that way strongly enough.'}));
+  $('#mgStrength').value=Math.round(state.gStrength*100);paintGraphicThumbs();gRefocusNow();}
 
 /* ---------- build color by color ---------- */
 function setRole(role,hex){state.colors[role]=hex.toUpperCase();buildColors();buildResults();requestPaint(true);}
@@ -231,7 +299,7 @@ async function toLayers(){await ensureType(state.typeId);const fmt=FMT[state.for
 /* ---------- advanced options panel ---------- */
 /* Media page tool rail: one panel open at a time, like Canva's side panel. */
 function setPanel(p){if(p==='adjust'&&uiMode!=='advanced')p='layouts';state.mpanel=p;document.querySelectorAll('#rail button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===p)));
-  document.querySelectorAll('#mPanel .mp').forEach(x=>x.hidden=x.dataset.p!==p);if(p==='brand')renderLook();}
+  document.querySelectorAll('#mPanel .mp').forEach(x=>x.hidden=x.dataset.p!==p);if(p==='brand'||p==='graphic')renderLook();}
 function syncAdv(){const pc=v=>Math.round(v*100);$('#aHead').value=pc(state.headScale);$('#aBody').value=pc(state.bodyScale);$('#oHead').textContent=pc(state.headScale)+'%';$('#oBody').textContent=pc(state.bodyScale)+'%';$('#aCaps').value=state.caps;
   $('#aFx').value=pc(state.fx);$('#aFy').value=pc(state.fy);$('#aTint').value=pc(state.tintAmt);$('#aDim').value=pc(state.dim);$('#aMark').checked=state.showMark;$('#aHandle').checked=state.showHandle;
   const n=$('#advNote'),on=advActive(state);n.hidden=!on;if(on){n.textContent='This post uses Advanced settings for text size, photo or brand mark. ';n.append(el('button',{type:'button',class:'link',text:'Reset them',onclick:()=>{Object.assign(state,ADV_DEFAULTS);syncAdv();requestPaint(true);}}),' or switch to Advanced to change them.');}}
@@ -243,13 +311,15 @@ function bootAdv(){const rng=(id,key)=>$(id).addEventListener('input',e=>{state[
   $('#btnHelp').addEventListener('click',()=>{$('#ovWelcome').hidden=false;});}
 
 /* ---------- shuffle ---------- */
-/* Shuffle stays inside the brand: another layout, another color arrangement, or another of the
-   brand's saved palettes. Type and graphic belong to the brand and are changed on the Brand page. */
+/* Shuffle stays inside the brand: another layout, another color arrangement, another of the brand's
+   saved palettes or (when chosen, Advanced) another style of the post's graphic. It never changes the type
+   or the graphic family; those belong to the brand. */
 function shuffle(){const pick=a=>a[Math.floor(Math.random()*a.length)];let changed=false;
   if(state.shuffle.layout){const ls=FMT[state.format].layouts.filter(l=>l!==state.layout);if(ls.length){state.layout=pick(ls);buildLayouts();buildFields();changed=true;}}
   if(state.shuffle.arrangement){state.arrangement=pick(['base','brand','contrast'].filter(a=>a!==state.arrangement));syncSeg();changed=true;}
   if(state.shuffle.colors){const L=Lib.look(),opts=[L?{id:L.paletteId,cols:L.colors}:null].concat(myPalettes.map(p=>({id:p.id,cols:palColors(p)}))).filter(Boolean).filter(o=>!sameColors(o.cols,state.colors));
     if(opts.length){const o=pick(opts);state.paletteId=o.id;state.colors=Object.assign({},o.cols);buildColors();renderLook();changed=true;}}
+  if(state.shuffle.graphic){const os=GFAM[(GV[state.graphicId]||GV.none).fam].vars.filter(v=>v.id!==state.graphicId);if(os.length){state.graphicId=pick(os).id;renderLook();changed=true;}}
   if(changed)requestPaint(true);else say('Nothing to shuffle: choose what Shuffle changes, or save more palettes to the brand.');}
 function syncSeg(){document.querySelectorAll('#arr button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===state.arrangement)));document.querySelectorAll('#shuf button').forEach(b=>b.setAttribute('aria-pressed',String(!!state.shuffle[b.dataset.v])));$('#btnGuides').setAttribute('aria-pressed',String(state.guides));}
 
@@ -262,6 +332,8 @@ function buildSources(){const box=$('#srcBody');box.textContent='';const P=t=>bo
   P('Difficult emotions are included because the spectrum is incomplete without them, and because a memorial post, a warning or a horror release needs them. Few type and graphic options are linked to them; the app says so instead of stretching.');
   H('How colors are scored');
   P('Hue links come from the logo and emotion studies. Brightness and saturation are scored separately: each emotion sits in a corner of pleasure-arousal-dominance space, and a color\u2019s position in that space is estimated from its brightness and saturation with Valdez and Mehrabian\u2019s regression weights. The same rules score a single color and a whole palette, so a color you pick yourself is read the same way as a preloaded one.');
+  H('How graphics are scored');
+  P('Each graphic comes in three or four styles, and each style is described by its shape features: curved or angular, balanced or asymmetric, fine lines or heavy masses, busy or sparse, still or implying movement. The same rules tag every style from those features, so two styles of one graphic can point to different parts of the fingerprint. Curved, angular, balanced, elaborate, asymmetric and moving shapes rest on logo studies; fine, heavy, sparse and hand-made shapes are conventions and say so. The badges on each style name where it leans furthest compared with the other styles of the same graphic.');
   H('How companion colors are chosen');
   P('In Build color by color, partners for your primary are generated around it (same hue, neighboring hues, contrasting hues, tinted neutrals), scored for harmony, and kept only if they also match one of your keywords. Harmony follows two findings: pairs are rated more harmonious the closer their hues, and same-hue pairs with a clear lightness step do best. The popular rule that opposite hues harmonize did not hold up in that research; a contrasting hue is rated less harmonious but stands out more, which is why it can still suit an accent.');
   H('Saving, sharing and import');
@@ -296,6 +368,8 @@ function boot(){
   $('#tint').addEventListener('change',e=>{state.tint=e.target.checked;requestPaint(true);});
   $('#gStrength').addEventListener('input',e=>{state.gStrength=e.target.value/100;requestPaint(true);});
   $('#btnSeed').addEventListener('click',()=>{state.seed=1+Math.floor(Math.random()*9999);requestPaint(true);});
+  $('#mgStrength').addEventListener('input',e=>{state.gStrength=e.target.value/100;$('#gStrength').value=e.target.value;requestPaint(true);});
+  $('#mgSeed').addEventListener('click',()=>{state.seed=1+Math.floor(Math.random()*9999);requestPaint(true);});
   $('#btnSavePal').addEventListener('click',()=>Lib.savePalette($('#palName2').value));
   $('#btnResetPal').addEventListener('click',()=>{state.colors=palColors(PAL[state.paletteId]);buildColors();buildResults();requestPaint(true);});
   $('#btnSources').addEventListener('click',()=>{$('#ovSources').hidden=false;});$('#btnSources2').addEventListener('click',()=>{$('#ovSources').hidden=false;});
