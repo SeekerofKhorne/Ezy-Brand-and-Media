@@ -17,6 +17,7 @@ after(async () => { await browser?.close(); server?.close(); });
 const toMedia = page => page.click('#nav button[data-v=design]');
 const toBrand = page => page.click('#nav button[data-v=brand]');
 /* type a keyword into the chip box and commit it */
+async function setMode(page, m) { await page.click('#btnSettings'); await page.click(`#modeSeg button[data-v=${m}]`); await page.click('#ovSettings [data-close]'); }
 async function addKw(page, w) { await page.click('#q'); await page.keyboard.type(w); await page.keyboard.press('Enter'); }
 
 test('opens in Simple mode with a starter brand and no errors', async () => {
@@ -60,6 +61,11 @@ test('keywords rank the options, and choosing one changes the brand preview', as
   assert.equal(await page.evaluate('state.query'), 'trustworthy, calm');
   assert.equal(await page.locator('#kwChips .chip').count(), 2);
   // the fingerprint draws the keywords on eight axes
+  await addKw(page, 'compassion');
+  await page.waitForSelector('#fpOff:not([hidden])');
+  assert.match(await page.textContent('#fpOff'), /Compassion \(emotion; no pleasure-arousal-dominance position on file\)/);
+  await page.click('#kwChips .chip:has-text("compassion") button');
+  await page.waitForSelector('#fpOff', { state: 'hidden' });
   assert.equal(await page.locator('#radarBig svg text.rl').count(), 8);
   assert.equal(await page.locator('#radarBig svg polygon.rt').count(), 1);
   await page.click('#btnUseKw');
@@ -129,7 +135,8 @@ test('unsaved brand changes are guarded, and a saved post keeps its own look', a
   // the open post keeps its own look on the Media page
   await toMedia(page);
   assert.equal(await page.evaluate('state.colors.primary'), look);
-  // the brand look is one click away
+  // the brand look is one click away, in the Brand panel
+  await page.click('#rail button[data-p=brand]');
   await page.click('#mPals .palpick:has-text("Brand colors")');
   assert.equal(await page.evaluate('state.colors.primary'), brandPrimary);
   // switching brands asks first
@@ -151,11 +158,11 @@ test('unsaved brand changes are guarded, and a saved post keeps its own look', a
 
 test('Advanced mode adds controls; its settings and a custom type pairing are saved', async () => {
   const page = await openApp(browser, url);
-  await page.click('#modeSeg button[data-v=advanced]');
+  await setMode(page, 'advanced');
   await toMedia(page);
+  await page.click('#rail button[data-p=adjust]');
   for (const id of ['#accAdv', '#advBar']) assert.equal(await page.isVisible(id), true, id + ' shows in Advanced mode');
   assert.equal(await page.isVisible('.stepline'), false);
-  await page.click('#accAdv summary');
   await page.evaluate('(()=>{const r=document.getElementById("aHead");r.value=130;r.dispatchEvent(new Event("input"));})()');
   await page.selectOption('#aCaps', 'upper');
   await page.uncheck('#aHandle');
@@ -181,7 +188,7 @@ test('Advanced mode adds controls; its settings and a custom type pairing are sa
   await toMedia(page);
   await page.screenshot({ path: join(out, 'advanced.png') });
   // back in Simple mode the post keeps its settings and says so
-  await page.click('#modeSeg button[data-v=simple]');
+  await setMode(page, 'simple');
   assert.equal(await page.isVisible('#advNote'), true);
   assert.equal(await page.evaluate('state.headScale'), 1.3);
   // save, reload: mode, pairing and post survive
@@ -196,13 +203,108 @@ test('Advanced mode adds controls; its settings and a custom type pairing are sa
   await page.context().close();
 });
 
+test('settings: Neon Noir by default, themes persist, and the preview stays neutral gray', async () => {
+  const page = await openApp(browser, url);
+  assert.equal(await page.evaluate('document.documentElement.dataset.theme'), 'noir');
+  const neutral = async () => page.evaluate('(()=>{const c=getComputedStyle(document.getElementById("pvStage")).backgroundColor.match(/\\d+/g).map(Number);return Math.max(...c.slice(0,3))-Math.min(...c.slice(0,3));})()');
+  assert.ok(await neutral() <= 6, 'the preview stage is neutral in Neon Noir');
+  await page.click('#btnSettings');
+  assert.equal(await page.getAttribute('#themeSeg button[data-v=noir]', 'aria-pressed'), 'true');
+  await page.click('#themeSeg button[data-v=graphite]');
+  assert.equal(await page.evaluate('document.documentElement.dataset.theme'), 'graphite');
+  assert.ok(await neutral() <= 6, 'and in Graphite');
+  // help moved into settings
+  await page.click('#btnHelp');
+  assert.equal(await page.isVisible('#ovWelcome'), true);
+  assert.equal(await page.isVisible('#ovSettings'), false);
+  await page.evaluate('document.getElementById("ovWelcome").hidden=true');
+  await page.reload();
+  await page.waitForFunction('typeof Store !== "undefined" && Store.S.ready && !!state.bid');
+  assert.equal(await page.evaluate('document.documentElement.dataset.theme'), 'graphite');
+  await page.screenshot({ path: join(out, 'theme-graphite.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
+test('Media: the tool rail, and Shuffle stays inside the brand', async () => {
+  const page = await openApp(browser, url);
+  await toMedia(page);
+  assert.equal(await page.isVisible('#plats'), true, 'Layouts is the first panel');
+  await page.click('#rail button[data-p=text]');
+  assert.equal(await page.isVisible('#plats'), false);
+  await page.fill('#fields textarea >> nth=0', 'Rail headline');
+  assert.equal(await page.isVisible('#rail button[data-p=adjust]'), false, 'Adjust is an Advanced panel');
+  const before = await page.evaluate('[state.typeId,state.graphicId]');
+  for (let i = 0; i < 5; i++) await page.click('#btnShuffle');
+  assert.deepEqual(await page.evaluate('[state.typeId,state.graphicId]'), before, 'Shuffle never changes the brand type or graphic');
+  await page.click('#draftCheck summary');
+  assert.match(await page.textContent('#dSum'), /contrast/);
+  // Templates and Layer editor are two modes of the Media page
+  await page.click('#mediaMode button[data-v=free]');
+  assert.equal(await page.evaluate('Lib.view'), 'free');
+  assert.equal(await page.getAttribute('#nav button[data-v=design]', 'aria-pressed'), 'true');
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
+test('Library: folders organize posts, and a post copies to another brand in that brand\'s look', async () => {
+  const page = await openApp(browser, url);
+  await toMedia(page);
+  await page.selectOption('#postFolder', '__new');
+  await page.fill('#askIn', 'Spring launch');
+  await page.click('#askOk');
+  await page.waitForFunction('document.getElementById("postFolder").value === "Spring launch"');
+  await page.fill('#postName', 'Teaser');
+  await page.click('#btnSave');
+  await page.waitForFunction('/^Saved “Teaser”/.test(document.getElementById("status").textContent)');
+  assert.equal(await page.evaluate('Store.all("post")[0].folder'), 'Spring launch');
+  await page.fill('#postName', 'Loose post');
+  await page.selectOption('#postFolder', '');
+  await page.click('#btnSaveNew');
+  await page.waitForFunction('Store.all("post").length === 2');
+  // a second brand with a different look
+  await page.evaluate('Lib.setView("lib")');
+  await page.click('#libBrands button:has-text("New brand")');
+  await page.fill('#askIn', 'Night shop');
+  await page.click('#askOk');
+  await page.waitForFunction('Store.all("brand").length === 2 && Lib.view === "brand"');
+  await page.click('#bStep2');
+  await page.click('#results .opt >> nth=5');
+  await page.click('#btnSaveBrand');
+  await page.waitForFunction('!Lib.isDirty()');
+  const night = await page.evaluate('({id:state.bid,primary:Store.get("brand",state.bid).colors.primary})');
+  // back to the first brand's library page
+  await page.evaluate('Lib.setView("lib")');
+  await page.click('#libBrands .bcard:has-text("Northfield")');
+  await page.click('.fchip:has-text("Spring launch")');
+  assert.equal(await page.locator('#libPanel .pcard').count(), 1, 'the folder shows its one post');
+  await page.click('.fchip:has-text("No folder")');
+  assert.equal(await page.locator('#libPanel .pcard').count(), 1);
+  await page.click('.fchip:has-text("All posts")');
+  await page.selectOption('#libPanel select[aria-label="Copy Teaser to another brand"]', night.id);
+  await page.waitForFunction('Store.all("post").length === 3');
+  const r = await page.evaluate(`(()=>{const ps=Store.all("post");const o=ps.find(p=>p.name==="Teaser"&&p.bid!==${JSON.stringify(night.id)}),c=ps.find(p=>p.bid===${JSON.stringify(night.id)});return {orig:o.s.colors.primary,origFolder:o.folder,copy:c.s.colors.primary,name:c.s.brandName,folder:c.folder};})()`);
+  assert.equal(r.copy, night.primary, 'the copy takes the other brand\'s colors');
+  assert.notEqual(r.orig, night.primary, 'the original keeps its own');
+  assert.deepEqual([r.name, r.folder, r.origFolder], ['Night shop', '', 'Spring launch'], JSON.stringify(r));
+  // deleting a folder keeps its posts
+  await page.click('.fchip:has-text("Spring launch")');
+  await page.click('#libPanel button:has-text("Delete folder")');
+  await page.click('#libPanel button:has-text("Confirm delete")');
+  await page.waitForFunction('!(Store.get("brand",state.bid).folders||[]).length');
+  assert.equal(await page.evaluate('Store.all("post").filter(p=>p.name==="Teaser").length'), 2);
+  await page.screenshot({ path: join(out, 'library-folders.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
 test('exports are real files at the platform size', async () => {
   const page = await openApp(browser, url);
   await toMedia(page);
   const png = await download(page, () => page.click('#btnExport'));
   assert.match(png.name, /facebook-feed-post-4-5-1080x1350\.png$/);
   assert.deepEqual(pngSize(png.data), { png: true, w: 1080, h: 1350 });
-  await page.click('#modeSeg button[data-v=advanced]');
+  await setMode(page, 'advanced');
   const jpg = await download(page, () => page.click('#btnJpg'));
   assert.match(jpg.name, /\.jpg$/);
   assert.equal(jpg.data.subarray(0, 2).toString('hex'), 'ffd8');
@@ -218,7 +320,7 @@ test('exports are real files at the platform size', async () => {
 
 test('a template post opens as editable layers', async () => {
   const page = await openApp(browser, url);
-  await page.click('#modeSeg button[data-v=advanced]');
+  await setMode(page, 'advanced');
   await toMedia(page);
   await page.setInputFiles('#inLogo', fixture('logo.png'));
   await page.waitForFunction('!!logoImg');
@@ -255,7 +357,8 @@ test('a template post opens as editable layers', async () => {
 
 test('a PDF is imported as separate text, image and shape layers', async () => {
   const page = await openApp(browser, url);
-  await page.click('#nav button[data-v=free]');
+  await toMedia(page);
+  await page.click('#mediaMode button[data-v=free]');
   await page.setInputFiles('#fImport', fixture('sample.pdf'));
   await page.waitForFunction('Free.doc && document.getElementById("fBusy").hidden && Free.doc.layers.length > 0', null, { timeout: 90000 });
   const d = await page.evaluate('({w:Free.doc.w,h:Free.doc.h,text:Free.doc.layers.filter(l=>l.t==="text").map(l=>[l.text,l.family]),imgs:Free.doc.layers.filter(l=>l.t==="img").length})');

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* the theme is set before first paint, so the page never flashes the wrong colors */try{var t=localStorage.getItem('brandlab.theme.v1');document.documentElement.dataset.theme=['noir','light','dark','graphite'].indexOf(t)>=0?t:'noir';}catch(e){document.documentElement.dataset.theme='noir';}</script>
 <title>Ezy Brand and Media</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -92,23 +93,29 @@
 /* Layout idea: a neutral gray workbench (the convention for judging color) with three
    columns: template picker, live canvas, keyword search. Chrome stays colorless so the
    only color on screen is the draft being judged. */
+/* Themes. The preview stage stays neutral gray in every theme so the app's own colors never
+   shift how a brand's colors are judged. --sel is the color of selected controls. */
 :root{
   --bg:#F2F2F3; --panel:#FFFFFF; --stage:#D3D3D7; --ink:#1B1B20; --ink-2:#5A5A64; --line:#DADADF;
-  --chip:#ECECEF; --accent:#3443B8; --accent-ink:#FFFFFF; --focus:#3443B8;
+  --chip:#ECECEF; --accent:#3443B8; --accent-ink:#FFFFFF; --focus:#3443B8; --sel:#1B1B20; --sel-ink:#FFFFFF; --pick:#8A5B00;
   --t-r:#1B6E45; --t-s:#1F5A9E; --t-c:#8A5B00; --bad:#B3261E; --ok:#1B6E45;
-  --font-display:"Fraunces", Georgia, serif; --font-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display:"Fraunces", Georgia, serif; --font-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --font-mark:var(--font-display);
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#151517; --panel:#1E1E22; --stage:#2C2C31; --ink:#EDEDF0; --ink-2:#A3A3AD; --line:#35353B;
-    --chip:#2A2A30; --accent:#97A2F7; --accent-ink:#12131C; --focus:#97A2F7;
-    --t-r:#63C592; --t-s:#79AEEB; --t-c:#DDAA4A; --bad:#F2867E; --ok:#63C592; color-scheme:dark;
-  }
+:root[data-theme="noir"]{
+  --bg:#0D0B10; --panel:#16131C; --stage:#2B2B2F; --ink:#EEE8F4; --ink-2:#A99FB8; --line:#2E2738;
+  --chip:#241D2C; --accent:#FF4FA3; --accent-ink:#12091A; --focus:#3BE3E3; --sel:#FF4FA3; --sel-ink:#12091A; --pick:#3BE3E3;
+  --t-r:#63C592; --t-s:#79AEEB; --t-c:#E5B45A; --bad:#F2867E; --ok:#63C592;
+  --font-display:"Cinzel", Georgia, serif; --font-mark:"Pirata One", Georgia, serif; color-scheme:dark;
 }
 :root[data-theme="dark"]{
   --bg:#151517; --panel:#1E1E22; --stage:#2C2C31; --ink:#EDEDF0; --ink-2:#A3A3AD; --line:#35353B;
-  --chip:#2A2A30; --accent:#97A2F7; --accent-ink:#12131C; --focus:#97A2F7;
+  --chip:#2A2A30; --accent:#97A2F7; --accent-ink:#12131C; --focus:#97A2F7; --sel:#EDEDF0; --sel-ink:#151517; --pick:#DDAA4A;
+  --t-r:#63C592; --t-s:#79AEEB; --t-c:#DDAA4A; --bad:#F2867E; --ok:#63C592; color-scheme:dark;
+}
+:root[data-theme="graphite"]{
+  --bg:#111416; --panel:#1A1E21; --stage:#2B2B2E; --ink:#E8EEF0; --ink-2:#9AA6AC; --line:#2C3337;
+  --chip:#232A2E; --accent:#3BE3E3; --accent-ink:#071416; --focus:#3BE3E3; --sel:#3BE3E3; --sel-ink:#071416; --pick:#E5B45A;
   --t-r:#63C592; --t-s:#79AEEB; --t-c:#DDAA4A; --bad:#F2867E; --ok:#63C592; color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -121,6 +128,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .app{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%}
 .top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
 .top h1{font:600 20px/1.1 var(--font-display);letter-spacing:-.01em}
+:root[data-theme="noir"] .top h1{font:400 30px/1 var(--font-mark);color:var(--accent);letter-spacing:0}
 .top .sub{color:var(--ink-2);font-size:13px;flex:1 1 220px;min-width:0}
 .top label{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px}
 .main{display:grid;grid-template-columns:264px minmax(0,1fr) 396px;min-height:0}
@@ -138,30 +146,30 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .h:first-child{margin-top:0}
 .btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;font-weight:500;white-space:nowrap}
 .btn:hover{border-color:var(--ink-2)}
-.btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.primary{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
 .btn.small{padding:4px 9px;font-size:12.5px}
-.btn[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
 select,input[type=text],textarea{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 10px;width:100%}
 textarea{resize:vertical;min-height:58px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
 .seg button{border:0;background:transparent;padding:6px 11px;font-weight:500;border-left:1px solid var(--line)}
 .seg button:first-child{border-left:0}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink)}
 /* left: templates */
 .plats{display:flex;flex-wrap:wrap;gap:6px}
 .plats button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 11px;font-weight:500}
-.plats button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.plats button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
 .formats{display:flex;flex-direction:column;gap:4px}
 .formats button{display:grid;grid-template-columns:22px 1fr;gap:2px 8px;align-items:center;text-align:left;border:1px solid transparent;background:transparent;border-radius:8px;padding:6px 8px}
 .formats button:hover{background:var(--chip)}
-.formats button[aria-pressed="true"]{border-color:var(--ink);background:var(--chip)}
+.formats button[aria-pressed="true"]{border-color:var(--sel);background:var(--chip)}
 .formats .ratio{grid-row:span 2;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
 .formats .ratio i{display:block;border:1.5px solid var(--ink-2);border-radius:2px}
 .formats .nm{font-weight:500;line-height:1.2}
 .formats .mt{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .layouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .layouts button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 6px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;font-weight:500}
-.layouts button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.layouts button[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .layouts .th{height:92px;display:flex;align-items:center;justify-content:center;width:100%}
 .layouts canvas{max-width:100%;max-height:92px;box-shadow:0 1px 3px rgba(0,0,0,.18);border-radius:2px}
 /* center */
@@ -216,20 +224,20 @@ textarea{resize:vertical;min-height:58px}
 .legend button{border:0;background:none;padding:0;text-decoration:underline;color:var(--ink)}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:14px 0 8px}
 .tabs button{border:0;background:none;padding:8px 10px;font-weight:600;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-1px}
-.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sel)}
 .tabs .n{font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink-2);margin-left:3px}
 .rhead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
 .rhead button{border:0;background:none;padding:0;text-decoration:underline;color:var(--ink);white-space:nowrap}
 .results{display:grid;gap:8px}
 .opt{display:grid;grid-template-columns:88px minmax(0,1fr);gap:10px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:8px;align-items:start;width:100%}
 .opt:hover{border-color:var(--ink-2)}
-.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opt[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .opt .vis{width:88px;height:60px;border-radius:6px;overflow:hidden;border:1px solid var(--line);display:flex;background:var(--bg)}
 .opt .vis.sw i{display:block;height:100%}
 .opt .vis.aa{align-items:center;justify-content:center;font-size:30px;line-height:1;color:var(--ink);background:var(--bg)}
 .opt .vis canvas{width:88px;height:60px;display:block}
 .opt .nm{font-weight:600;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.opt .inuse{font-size:11px;font-weight:600;background:var(--ink);color:var(--panel);border-radius:4px;padding:1px 5px}
+.opt .inuse{font-size:11px;font-weight:600;background:var(--sel);color:var(--sel-ink);border-radius:4px;padding:1px 5px}
 .opt .meta{font-size:12px;color:var(--ink-2)}
 .why{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:3px;font-size:12.5px;color:var(--ink-2)}
 .why li{display:grid;grid-template-columns:auto 1fr;gap:6px;align-items:start}
@@ -277,12 +285,12 @@ input[type=range]{width:100%}
 .subbar:empty{display:none}
 .subbar .seg{display:flex;width:100%}
 .subbar .seg button{flex:1 1 0;padding:7px 6px}
-.sugg button.on,.sugg button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.sugg button.on,.sugg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
 .roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
 .role{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:500;min-width:0}
 .role i{display:block;width:100%;height:30px;border-radius:5px;border:1px solid var(--line)}
 .role code{font-size:10px;color:var(--ink-2);font-family:ui-monospace,Menlo,monospace}
-.role[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.role[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .bhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:14px 0 2px;flex-wrap:wrap}
 .bhead h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .bhead input[type=color]{width:22px;height:22px;border:0;padding:0;background:none;margin-left:6px;vertical-align:middle}
@@ -295,7 +303,7 @@ input[type=range]{width:100%}
 .swgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:5px}
 .swatch{aspect-ratio:1;border-radius:6px;border:1px solid var(--line);padding:0;min-width:0}
 .swatch:hover{transform:scale(1.08)}
-.swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px}
+.swatch[aria-pressed="true"]{outline:2px solid var(--sel);outline-offset:2px}
 .opt .nm .meta{font-weight:400}
 .mine{display:flex;flex-wrap:wrap;gap:6px}
 .mine .term button{border:0;background:none;padding:0 2px;font-size:14px;line-height:1}
@@ -322,7 +330,7 @@ input[type=range]{width:100%}
 .lsel span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lt{font-style:normal;width:20px;height:20px;border:1px solid var(--line);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 auto;background:var(--panel)}
 .lbtn{border:1px solid var(--line);background:var(--panel);border-radius:6px;font-size:11px;padding:3px 6px;color:var(--ink-2)}
-.lbtn[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.lbtn[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
 .crow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .cdot{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);padding:0}
 .crow input[type=color]{width:38px;height:28px;border:1px solid var(--line);border-radius:6px;padding:1px;background:var(--panel)}
@@ -335,7 +343,7 @@ input[type=number]{border:1px solid var(--line);background:var(--panel);border-r
 @media (max-width:860px){.libgrid{grid-template-columns:1fr}}
 .blist{display:grid;gap:8px}
 .bcard{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px}
-.bcard[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.bcard[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .bcard .vis{width:64px;height:40px;border-radius:6px;overflow:hidden;border:1px solid var(--line);display:flex}
 .bcard .vis i,.palchip .vis i{display:block;height:100%}
 .bcard span{display:grid;min-width:0}.bcard b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bcard small{color:var(--ink-2);font-size:12px}
@@ -360,7 +368,7 @@ input[type=number]{border:1px solid var(--line);background:var(--panel);border-r
 body.mode-simple .adv{display:none!important}
 body.mode-advanced .simple-only{display:none!important}
 .stepline{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;font-weight:600;color:var(--ink)}
-.stepline b{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--panel);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.stepline b{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--sel);color:var(--sel-ink);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 .col.right .stepline{margin-top:2px}.col.right details.acc+.stepline,.col.right .results+.stepline{margin-top:16px}
 .col.center>.stepline{margin:0}
 #advBar{border-top:1px dashed var(--line);padding-top:8px;margin-top:2px}
@@ -372,7 +380,7 @@ body.mode-advanced .simple-only{display:none!important}
 .modepick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .modepick button{text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:12px;display:grid;gap:4px;cursor:pointer;color:var(--ink)}
 .modepick button span{font-size:13px;color:var(--ink-2)}
-.modepick button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.modepick button[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 @media (max-width:560px){.modepick{grid-template-columns:1fr}}
 
 /* stacked layout shows the preview first, so the step numbers would read out of order */
@@ -389,7 +397,7 @@ body.mode-advanced .simple-only{display:none!important}
 .steps button{display:inline-flex;align-items:center;gap:8px;border:0;background:none;padding:6px 8px;border-radius:8px;font-weight:600;color:var(--ink-2)}
 .steps button b{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
 .steps button[aria-current="true"]{color:var(--ink)}
-.steps button[aria-current="true"] b{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.steps button[aria-current="true"] b{background:var(--sel);border-color:var(--sel);color:var(--sel-ink)}
 .steps button:hover{background:var(--chip)}
 .stepsep{width:22px;height:1px;background:var(--line)}
 .savestate{font-size:13px;color:var(--ink-2)}
@@ -428,12 +436,12 @@ body.mode-advanced .simple-only{display:none!important}
 .radarsvg .rl{font:12px var(--font-body);fill:var(--ink-2)}
 .radarsvg .rs{stroke-width:2;stroke-linejoin:round}
 .radarsvg .rs.rt{fill:color-mix(in srgb,var(--accent) 18%,transparent);stroke:var(--accent)}
-.radarsvg .rs.rc{fill:color-mix(in srgb,var(--t-c) 12%,transparent);stroke:var(--t-c);stroke-dasharray:6 4}
-.radarsvg .rd.rt{fill:var(--accent)}.radarsvg .rd.rc{fill:var(--t-c)}
+.radarsvg .rs.rc{fill:color-mix(in srgb,var(--pick) 12%,transparent);stroke:var(--pick);stroke-dasharray:6 4}
+.radarsvg .rd.rt{fill:var(--accent)}.radarsvg .rd.rc{fill:var(--pick)}
 .fpkey{display:grid;gap:4px;font-size:12px;color:var(--ink-2)}
 .fpkey span{display:flex;align-items:center;gap:8px}
 .fpkey i{display:inline-block;width:22px;height:0;border-top:2px solid var(--accent)}
-.fpkey i.kc{border-top:2px dashed var(--t-c)}
+.fpkey i.kc{border-top:2px dashed var(--pick)}
 .bbuild{display:grid;grid-template-columns:280px minmax(0,1fr) 380px;gap:16px;padding:16px 20px 40px;align-items:start}
 @media (max-width:1320px){.bbuild{grid-template-columns:250px minmax(0,1fr) 330px}}
 @media (max-width:1060px){.bbuild{grid-template-columns:1fr}.bprev{order:-1}}
@@ -448,12 +456,70 @@ body.mode-advanced .simple-only{display:none!important}
 .palpick{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:5px 10px 5px 5px;font-size:13px;font-weight:500}
 .palpick .vis{width:70px;height:24px;border-radius:5px;overflow:hidden;display:flex;border:1px solid var(--line)}
 .palpick .vis i{display:block;height:100%}
-.palpick[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.palpick[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .bprev{display:flex;flex-direction:column;gap:10px;position:sticky;top:62px}
 .pvstage{height:440px;min-height:0}
 .bprev .seg button{padding:5px 9px;font-size:12.5px}
 .look{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px;background:var(--bg)}
 .look .mpals{margin-top:8px}
+
+.fpoff{margin:4px 0 0;padding:8px 10px;border-radius:8px;background:var(--chip);font-size:12.5px;line-height:1.45}
+.fpoff b{font-weight:600}
+
+/* ---------- header, settings ---------- */
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.iconbtn:hover{border-color:var(--ink-2)}
+.setsec{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+.setsec h3{font-size:15px;margin-bottom:4px}
+.setsec .note{margin:0 0 12px}
+.cards4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cards2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:720px){.cards4{grid-template-columns:repeat(2,minmax(0,1fr))}.cards2{grid-template-columns:1fr}}
+.tcard{display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;color:var(--ink)}
+.tcard[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
+.tcard small{color:var(--ink-2);font-size:12.5px}
+.tsw{display:block;height:64px;border-radius:9px;margin-bottom:6px;border:1px solid var(--line);background:linear-gradient(var(--c),var(--c)) 14px 16px/55% 8px no-repeat,linear-gradient(var(--d),var(--d)) 14px 36px/38% 14px no-repeat,linear-gradient(90deg,var(--a) 30%,var(--b) 30%)}
+.tlist{display:grid;gap:3px;font-size:13px;margin-top:6px;color:var(--ink)}
+.tlist>span::before{content:"+ ";color:var(--ink-2)}
+
+/* ---------- Media page: rail, panel, canvas ---------- */
+.main.media{grid-template-columns:76px 300px minmax(0,1fr)}
+@media (max-width:1320px){.main.media{grid-template-columns:72px 270px minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:4px;padding:10px 6px;background:var(--panel);border-right:1px solid var(--line);overflow:auto}
+.rail button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 2px;min-height:62px;border:0;border-radius:10px;background:transparent;color:var(--ink-2);font-size:11.5px;font-weight:500}
+.rail button:hover{background:var(--chip);color:var(--ink)}
+.rail button[aria-pressed="true"]{background:var(--chip);color:var(--sel)}
+.col.panel{background:var(--panel);border-right:1px solid var(--line)}
+.col.panel .h:first-of-type{margin-top:0}
+.col.panel .stepline{margin-top:0}
+.look{border:0;padding:0;margin:0;background:none}
+label.inl{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
+label.inl select{width:auto;max-width:150px}
+.dcheck{padding:0 16px}
+.dcheck>summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 -16px;padding:12px 16px;cursor:pointer;list-style:none}
+.dcheck>summary::-webkit-details-marker{display:none}
+.dcheck>summary::before{content:"\25B8";color:var(--ink-2)}
+.dcheck[open]>summary::before{content:"\25BE"}
+.dcheck>summary b{font-size:15px}
+.dsum{display:flex;gap:12px;font-size:13px}
+.dsum .pass{color:var(--ok)}.dsum .fail{color:var(--bad);font-weight:600}.dsum .cau{color:var(--t-c)}
+.dcheck>:last-child{margin-bottom:14px}
+@media (max-width:980px){
+  .main.media{display:flex;flex-direction:column}
+  .rail{flex-direction:row;border-right:0;border-bottom:1px solid var(--line);order:0;overflow-x:auto}
+  .rail button{min-width:72px}
+  .main.media .col.center{order:1}.main.media .col.panel{order:2;border-right:0;border-top:1px solid var(--line)}
+}
+
+/* ---------- Library: folders ---------- */
+.fbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px}
+.fchip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:500}
+.fchip small{color:var(--ink-2);font-size:12px}
+.fchip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.fchip[aria-pressed="true"] small{color:inherit;opacity:.8}
+.pmove{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:12.5px;color:var(--ink-2)}
+.pmove label{display:inline-flex;gap:6px;align-items:center}
+.pmove select{width:auto;max-width:150px;padding:4px 6px;font-size:12.5px}
 
 </style>
 </head>
@@ -462,16 +528,17 @@ body.mode-advanced .simple-only{display:none!important}
   <header class="top">
     <h1 id="appName">Ezy Brand and Media</h1>
     <div class="seg" id="nav" role="group" aria-label="Section">
-      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button><button type="button" data-v="lib" aria-pressed="false">Brands and posts</button>
+      <button type="button" data-v="brand" aria-pressed="false">Brand<i class="navdot" id="navDirty" hidden title="Unsaved brand changes"></i></button><button type="button" data-v="design" aria-pressed="true">Media</button><button type="button" data-v="lib" aria-pressed="false">Library</button>
+    </div>
+    <div class="seg" id="mediaMode" role="group" aria-label="Media mode">
+      <button type="button" data-v="design" aria-pressed="true">Templates</button><button type="button" data-v="free" aria-pressed="false">Layer editor</button>
     </div>
     <span class="sp"></span>
-    <div class="seg" id="modeSeg" role="group" aria-label="How much control to show">
-      <button type="button" data-v="simple" aria-pressed="true" title="A guided set of controls. Best for getting a good draft quickly.">Simple</button><button type="button" data-v="advanced" aria-pressed="false" title="Every control: custom type pairings, exact hex values, photo and text adjustments, more export options, and conversion to layers.">Advanced</button>
-    </div>
     <label for="brandSel">Brand <select id="brandSel" style="width:auto;max-width:190px"></select></label>
     <button class="acct" id="acct" type="button"></button>
-    <button class="btn" id="btnHelp" type="button">Quick start</button>
-    <button class="btn" id="btnSources" type="button">Sources and method</button>
+    <button class="iconbtn" id="btnSettings" type="button" aria-label="Settings" title="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9"></path></svg>
+    </button>
   </header>
   <div class="bview" id="viewBrand" hidden>
     <div class="bbar">
@@ -519,7 +586,8 @@ body.mode-advanced .simple-only{display:none!important}
       <aside class="card fp" aria-labelledby="fpH">
         <h2 id="fpH">Brand fingerprint</h2>
         <div class="radar" id="radarBig"></div>
-        <p class="note">Personality runs from none at the centre to strong at the edge. Pleasure, arousal and dominance run from low to high; the dashed ring is neutral.</p>
+        <p class="fpoff" id="fpOff" hidden></p>
+        <p class="note">Personality runs from none at the centre to strong at the edge. Pleasure, arousal and dominance run from low to high; the dashed line is neutral.</p>
         <div class="fplist" id="fpList"></div>
       </aside>
     </section>
@@ -534,6 +602,7 @@ body.mode-advanced .simple-only{display:none!important}
             <span><i class="kc"></i>What your current picks signal</span>
           </div>
           <p class="note" id="fpFit"></p>
+          <p class="fpoff" id="fpOff2" hidden></p>
         </section>
         <section class="card">
           <div class="rowbtns" style="justify-content:space-between"><h2>Keywords</h2><button type="button" class="link" id="btnEditKw">Edit keywords</button></div>
@@ -584,96 +653,47 @@ body.mode-advanced .simple-only{display:none!important}
       </aside>
     </section>
   </div>
-  <div class="main" id="viewDesign">
-    <aside class="col left" aria-label="Templates">
-      <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
-      <div class="h">Platform</div>
-      <div class="plats" id="plats"></div>
-      <div class="h">Format</div>
-      <div class="formats" id="formats"></div>
-      <div class="h">Layout</div>
-      <div class="layouts" id="layouts"></div>
-      <p class="note">Sizes come from 2026 platform guides and change often. Re-check a size before you produce final files.</p>
-    </aside>
+  <div class="main media" id="viewDesign">
+    <nav class="rail" id="rail" aria-label="Media tools">
+      <button type="button" data-p="layouts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg><span>Layouts</span></button>
+      <button type="button" data-p="text"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6V4.5h14V6"></path><path d="M12 4.5v15"></path><path d="M9 19.5h6"></path></svg><span>Text</span></button>
+      <button type="button" data-p="photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"></rect><circle cx="9" cy="10" r="1.8"></circle><path d="M20.5 16l-5-5-8.5 8"></path></svg><span>Photo</span></button>
+      <button type="button" data-p="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 3.5a8.5 8.5 0 0 0 0 17z" fill="currentColor"></path></svg><span>Brand</span></button>
+      <button type="button" data-p="adjust" class="adv"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span>Adjust</span></button>
+      <button type="button" data-p="posts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg><span>Posts</span></button>
+    </nav>
 
-    <main class="col center">
-      <div class="toolbar">
-        <span class="title" id="fmtTitle"></span><span class="dim" id="fmtDim"></span>
-        <span class="sp"></span>
-        <div class="seg" id="arr" role="group" aria-label="Color arrangement">
-          <button type="button" data-v="base" title="Background color fills the post">Default</button>
-          <button type="button" data-v="brand" title="Primary color fills the post">Brand fill</button>
-          <button type="button" data-v="contrast" title="Text color fills the post">Reversed</button>
-        </div>
-        <button class="btn" id="btnGuides" type="button" aria-pressed="true" title="Show the areas each app covers or crops. Guides are never exported.">Platform guides</button>
-      </div>
-      <div class="stage" id="stage"><canvas id="cv" role="img" aria-label="Live preview of the post"></canvas></div>
-      <div class="toolbar">
-        <button class="btn" id="btnPrev" type="button" title="Previous layout">&#8592; Layout</button>
-        <button class="btn" id="btnNext" type="button" title="Next layout">Layout &#8594;</button>
-        <button class="btn" id="btnShuffle" type="button" title="Try another combination from the current matches">Shuffle</button>
-        <span class="sp"></span>
-        <input id="postName" type="text" maxlength="60" placeholder="Name this post" aria-label="Post name" style="width:160px">
-        <button class="btn" id="btnSaveNew" type="button" title="Keep the open post as it is and save this version as another post">Save as new</button>
-        <button class="btn" id="btnSave" type="button">Save post</button>
-        <button class="btn primary" id="btnExport" type="button">Export PNG</button>
-      </div>
-      <div class="toolbar adv" id="advBar" aria-label="More ways to export and edit">
-        <span class="dim">Shuffle changes</span>
-        <div class="seg" id="shuf" role="group" aria-label="What Shuffle changes">
-          <button type="button" data-v="colors">Colors</button><button type="button" data-v="type">Type</button><button type="button" data-v="graphic">Graphic</button><button type="button" data-v="layout">Layout</button>
-        </div>
-        <span class="sp"></span>
-        <button class="btn small" id="btnLayers" type="button" title="Open a copy of this post in the Layer editor, with each piece of text, button and logo on its own layer">Edit as layers</button>
-        <button class="btn small" id="btnJpg" type="button" title="A smaller file than PNG. Good for photo posts.">Export JPG</button>
-        <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
-      </div>
-      <p class="advnote simple-only" id="advNote" hidden></p>
-      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
-      <div class="status" id="status" aria-live="polite"></div>
-
-      <section class="card" aria-labelledby="sigH">
-        <h2 id="sigH">What this draft signals</h2>
-        <p class="lede">The strongest associations of the current colors, type and graphic, with the kind of evidence behind each.</p>
-        <div class="signals" id="signals"></div>
-        <div class="checks" id="checks"></div>
-        <ul class="cautions" id="cautions"></ul>
+    <aside class="col panel" id="mPanel" aria-label="Tool panel">
+      <section class="mp" data-p="layouts" aria-label="Layouts">
+        <p class="stepline simple-only"><b>1</b>Pick where the post will go, then a layout</p>
+        <div class="h">Platform</div>
+        <div class="plats" id="plats"></div>
+        <div class="h">Format</div>
+        <div class="formats" id="formats"></div>
+        <div class="h">Layout</div>
+        <div class="layouts" id="layouts"></div>
+        <p class="note">Sizes come from 2026 platform guides and change often. Re-check a size before you produce final files.</p>
       </section>
-
-      <section class="card" aria-labelledby="drH">
-        <div class="rowbtns" style="justify-content:space-between">
-          <h2 id="drH">Posts in this brand</h2>
-          <div class="rowbtns">
-            <button class="btn small" id="btnCompare" type="button">Compare side by side</button>
-            <button class="btn small" id="btnLib" type="button">Open the library</button>
-          </div>
-        </div>
-        <div class="drafts" id="drafts"></div>
-        <p class="note">Posts save to the brand shown at the top of the page. Select one to reopen it. Share, rename and export them under Brands and posts.</p>
-      </section>
-    </main>
-
-    <aside class="col right" aria-label="Post content">
-      <section class="look" id="mLook" aria-labelledby="mLookH">
-        <div class="rowbtns" style="justify-content:space-between"><h2 id="mLookH">Brand look</h2><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
-        <p class="note" id="mLookNote" style="margin-top:2px"></p>
-        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
-      </section>
-      <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
-      <details class="acc" id="accText" open>
-        <summary>Text on the post</summary>
+      <section class="mp" data-p="text" aria-label="Text on the post" hidden>
+        <p class="stepline simple-only"><b>2</b>Replace the sample words with your own</p>
+        <div class="h">Text on the post</div>
         <div class="fields" id="fields"></div>
-      </details>
-      <details class="acc" id="accImg">
-        <summary>Photo</summary>
+      </section>
+      <section class="mp" data-p="photo" aria-label="Photo" hidden>
+        <div class="h">Photo</div>
         <div class="fields">
           <label>Photo (used by photo layouts)<span class="file"><input id="inPhoto" type="file" accept="image/*"><button class="btn small" id="rmPhoto" type="button">Remove</button></span></label>
           <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="tint" type="checkbox"> Tint the photo with the primary color</label>
           <p class="note">The photo is saved with the post. The logo belongs to the brand: change it on the Brand page, under Identity.</p>
         </div>
-      </details>
-      <details class="acc adv" id="accAdv">
-        <summary>Text size, photo and brand mark</summary>
+      </section>
+      <section class="mp look" data-p="brand" id="mLook" aria-labelledby="mLookH" hidden>
+        <div class="rowbtns" style="justify-content:space-between"><div class="h" id="mLookH" style="margin:0">Brand look</div><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
+        <p class="note" id="mLookNote" style="margin-top:2px"></p>
+        <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
+      </section>
+      <section class="mp adv" data-p="adjust" id="accAdv" aria-label="Text size, photo and brand mark" hidden>
+        <div class="h">Text size, photo and brand mark</div>
         <div class="fields">
           <label>Headline size <output id="oHead"></output><input id="aHead" type="range" min="60" max="150" step="5"></label>
           <label>Supporting text size <output id="oBody"></output><input id="aBody" type="range" min="80" max="130" step="5"></label>
@@ -689,8 +709,60 @@ body.mode-advanced .simple-only{display:none!important}
           <div class="rowbtns"><button class="btn small" id="aReset" type="button">Reset these settings</button></div>
           <p class="note">These settings are saved with the post, not the brand.</p>
         </div>
-      </details>
+      </section>
+      <section class="mp" data-p="posts" aria-labelledby="drH" hidden>
+        <div class="h" id="drH">Posts in this brand</div>
+        <div class="drafts" id="drafts"></div>
+        <div class="rowbtns" style="margin-top:10px"><button class="btn small" id="btnCompare" type="button">Compare side by side</button><button class="btn small" id="btnLib" type="button">Open the library</button></div>
+        <p class="note">Select a post to reopen it. Folders, sharing and copying to another brand are in the Library.</p>
+      </section>
     </aside>
+
+    <main class="col center">
+      <div class="toolbar">
+        <span class="title" id="fmtTitle"></span><span class="dim" id="fmtDim"></span>
+        <span class="sp"></span>
+        <div class="seg" id="arr" role="group" aria-label="Color arrangement">
+          <button type="button" data-v="base" title="Background color fills the post">Default</button>
+          <button type="button" data-v="brand" title="Primary color fills the post">Brand fill</button>
+          <button type="button" data-v="contrast" title="Text color fills the post">Reversed</button>
+        </div>
+        <button class="btn" id="btnShuffle" type="button" title="Try another layout, color arrangement or brand palette">Shuffle</button>
+        <button class="btn" id="btnGuides" type="button" aria-pressed="true" title="Show the areas each app covers or crops. Guides are never exported.">Platform guides</button>
+      </div>
+      <div class="stage" id="stage"><canvas id="cv" role="img" aria-label="Live preview of the post"></canvas></div>
+      <div class="toolbar">
+        <button class="btn" id="btnPrev" type="button" title="Previous layout">&#8592; Layout</button>
+        <button class="btn" id="btnNext" type="button" title="Next layout">Layout &#8594;</button>
+        <span class="sp"></span>
+        <input id="postName" type="text" maxlength="60" placeholder="Name this post" aria-label="Post name" style="width:170px">
+        <label class="inl" for="postFolder">Folder <select id="postFolder"></select></label>
+        <button class="btn" id="btnSaveNew" type="button" title="Keep the open post as it is and save this version as another post">Save as new</button>
+        <button class="btn" id="btnSave" type="button">Save post</button>
+        <button class="btn primary" id="btnExport" type="button">Export PNG</button>
+      </div>
+      <div class="toolbar adv" id="advBar" aria-label="More ways to export and edit">
+        <span class="dim">Shuffle changes</span>
+        <div class="seg" id="shuf" role="group" aria-label="What Shuffle changes">
+          <button type="button" data-v="layout">Layout</button><button type="button" data-v="arrangement">Arrangement</button><button type="button" data-v="colors">Brand palette</button>
+        </div>
+        <span class="sp"></span>
+        <button class="btn small" id="btnLayers" type="button" title="Open a copy of this post in the Layer editor, with each piece of text, button and logo on its own layer">Edit as layers</button>
+        <button class="btn small" id="btnJpg" type="button" title="A smaller file than PNG. Good for photo posts.">Export JPG</button>
+        <button class="btn small" id="btnSet" type="button" title="One PNG for every size of the current platform, in a ZIP. A size keeps this layout where it offers it.">Export all sizes (ZIP)</button>
+      </div>
+      <p class="advnote simple-only" id="advNote" hidden></p>
+      <p class="stepline simple-only"><b>3</b>Name it and save it to the brand, or export the image</p>
+      <div class="status" id="status" aria-live="polite"></div>
+
+      <details class="card dcheck" id="draftCheck">
+        <summary><b id="sigH">Draft check</b><span class="dsum" id="dSum"></span></summary>
+        <p class="lede">The strongest associations of the current colors, type and graphic, with the kind of evidence behind each.</p>
+        <div class="signals" id="signals"></div>
+        <div class="checks" id="checks"></div>
+        <ul class="cautions" id="cautions"></ul>
+      </details>
+    </main>
   </div>
   <div class="main" id="viewFree" hidden>
     <aside class="col left" aria-label="Layers">
@@ -759,6 +831,33 @@ body.mode-advanced .simple-only{display:none!important}
   <header><h2 id="askH">Name</h2><button class="btn" type="button" data-close>Cancel</button></header>
   <div class="savepal"><input id="askIn" type="text" maxlength="40" aria-labelledby="askH"><button class="btn primary" id="askOk" type="button">Save</button></div>
 </div></div>
+<div class="overlay" id="ovSettings" hidden><div class="sheet" style="max-width:860px" role="dialog" aria-modal="true" aria-labelledby="setH">
+  <header><h2 id="setH">Settings</h2><button class="btn small" type="button" data-close>Close</button></header>
+  <section class="setsec" aria-labelledby="thH">
+    <h3 id="thH">Theme</h3>
+    <p class="note">Changes the app around your work. The preview area stays neutral gray in every theme, so the app's colors never shift how you judge a brand's colors.</p>
+    <div class="cards4" id="themeSeg" role="group" aria-label="Theme">
+      <button type="button" data-v="noir" class="tcard"><span class="tsw" style="--a:#0D0B10;--b:#16131C;--c:#EEE8F4;--d:#FF4FA3"></span><b>Neon Noir</b><small>Gothic, cyberpunk. The default.</small></button>
+      <button type="button" data-v="light" class="tcard"><span class="tsw" style="--a:#F2F2F3;--b:#FFFFFF;--c:#1B1B20;--d:#3443B8"></span><b>Clean Light</b><small>Bright, quiet, neutral.</small></button>
+      <button type="button" data-v="dark" class="tcard"><span class="tsw" style="--a:#151517;--b:#1E1E22;--c:#EDEDF0;--d:#97A2F7"></span><b>Clean Dark</b><small>Low glare, no color cast.</small></button>
+      <button type="button" data-v="graphite" class="tcard"><span class="tsw" style="--a:#111416;--b:#1A1E21;--c:#E8EEF0;--d:#3BE3E3"></span><b>Graphite</b><small>Cool steel with a cyan edge.</small></button>
+    </div>
+  </section>
+  <section class="setsec" aria-labelledby="clH">
+    <h3 id="clH">How much control to show</h3>
+    <p class="note">Advanced settings are saved with each post and still apply if you switch back to Simple.</p>
+    <div class="cards2" id="modeSeg" role="group" aria-label="How much control to show">
+      <button type="button" data-v="simple" class="tcard"><b>Simple</b><small>A guided set of controls for getting a good draft quickly.</small>
+        <span class="tlist">You get keyword search and the fingerprint, premade palettes and build-your-own, ready-made type pairings, graphics, every platform template, your text, photo and logo, the three color arrangements, saving to folders, and PNG export. Numbered steps show the order to work in.</span></button>
+      <button type="button" data-v="advanced" class="tcard"><b>Advanced</b><small>Everything in Simple, plus:</small>
+        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all five hex values at once; graphic strength; rearrange the graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
+    </div>
+  </section>
+  <section class="setsec" aria-labelledby="hpH">
+    <h3 id="hpH">Help</h3>
+    <div class="rowbtns"><button class="btn" id="btnHelp" type="button">Quick start</button><button class="btn" id="btnSources" type="button">Sources and method</button></div>
+  </section>
+</div></div>
 <div class="overlay" id="ovUnsaved" hidden><div class="sheet" style="max-width:500px" role="dialog" aria-modal="true" aria-labelledby="unsH">
   <header><h2 id="unsH">Save changes to the brand?</h2></header>
   <p id="unsMsg"></p>
@@ -778,7 +877,7 @@ body.mode-advanced .simple-only{display:none!important}
   </div>
   <p class="note">You can switch at any time at the top of the page. Nothing is lost when you switch.</p>
   <p id="welBody"></p>
-  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Brands and posts. Brand changes are kept only when you choose Save brand.</p>
+  <p>Work is organized as brands. Each brand keeps its colors, named palettes, type pairings, logo and posts. Switch brands at the top of the page; manage, share and export them under Library. Brand changes are kept only when you choose Save brand.</p>
 </div></div>
 
 <script>
@@ -1703,7 +1802,7 @@ const Store=(function(){
     if(db&&uid){try{col=db.collection('data/users/'+uid);const snap=await timeout(col.get(),10000);snap.docs.forEach(d=>{const v=d.data();if(v&&cache[v.kind])cache[v.kind].set(v.id,plain(v));});S.mode='cloud';S.canShare=true;
         if(user.can){const w=await user.can('data.write');if(w===false){S.mode='local';S.canShare=false;S.reason='Your access to this page is view-only, so your work is kept in this browser only. Ask the owner for Contributor access to save to your account.';}}}
       catch(e){S.mode='local';S.reason='Your account storage could not be reached, so your work is kept in this browser for now.';}}
-    else S.reason=!window.claude?'Your work is saved in this browser, on this device. Nothing is uploaded. To keep a copy or move to another computer, use Back up everything under Brands and posts.':'No signed-in account was found for this page, so your work is kept in this browser only.';
+    else S.reason=!window.claude?'Your work is saved in this browser, on this device. Nothing is uploaded. To keep a copy or move to another computer, use Back up everything under Library.':'No signed-in account was found for this page, so your work is kept in this browser only.';
     if(S.mode==='local'){const keys=await kv('keys')||[];for(const k of keys){const m=/^(brand|post):/.exec(k);if(m){const v=await kv('get',k);if(v)cache[m[1]].set(v.id,v);}}}
     S.ready=true;return S;}
   function all(kind){return[...cache[kind].values()].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));}
@@ -1791,16 +1890,16 @@ let uiMode=store.get('brandlab.mode.v1')==='advanced'?'advanced':'simple';
 const ADV_DEFAULTS={headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};
 const advActive=s=>Object.keys(ADV_DEFAULTS).some(k=>s[k]!==ADV_DEFAULTS[k]);
 function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('brandlab.mode.v1',uiMode);document.body.classList.toggle('mode-simple',uiMode==='simple');document.body.classList.toggle('mode-advanced',uiMode==='advanced');
-  document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));if(quiet)return;buildResults();syncAdv();requestPaint(false);}
+  document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));setPanel(state.mpanel);if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
-function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{colors:true,type:true,graphic:true,layout:false},
+function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true},mpanel:'layouts',
   headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
-  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';return o;}
+  if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false};if(!['layouts','text','photo','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -1945,7 +2044,9 @@ function updateReadout(c){const parts=draftParts(),agg=draftAgg(parts);
   const ck=$('#checks');ck.textContent='';[['Headline',c.head,c.bg,3],['Body text',c.fg,c.bg,4.5],['Button text',c.onAccent,c.accent,4.5]].forEach(([nm,fg,bg,min])=>{const r=contrast(fg,bg),ok=r>=min;
     ck.append(el('span',{class:'check',title:`WCAG 2.2 asks for at least ${min}:1 here`},el('span',{class:'sw',style:`background:${bg};color:${fg}`,text:'Aa'}),nm+' ',el('b',{text:r.toFixed(1)+':1'}),el('span',{class:ok?'pass':'fail',text:ok?'Passes':'Below '+min+':1'}),tierEl('WCAG')));});
   const hm=harmonyOf(state.colors.primary,state.colors.accent);ck.append(el('span',{class:'check',title:hm.why},el('span',{class:'sw',style:`background:linear-gradient(90deg,${state.colors.primary} 50%,${state.colors.accent} 50%)`}),'Primary with accent ',el('b',{text:hm.level+' harmony'}),el('span',{text:hm.rel.toLowerCase()}),tierEl(hm.src)));
-  const cu=$('#cautions');cu.textContent='';const cs=[].concat(parts[0][1].cautions,parts[1][1].cautions,parts[2][1].cautions);cs.slice(0,4).forEach(x=>cu.append(el('li',null,el('span',{class:'mk',text:'Note'}),el('span',null,x.text+' ('+SRC[x.src].short+')'))));}
+  const cu=$('#cautions');cu.textContent='';const cs=[].concat(parts[0][1].cautions,parts[1][1].cautions,parts[2][1].cautions);
+  {const pass=ck.querySelectorAll('.pass').length,fail=ck.querySelectorAll('.fail').length,n=Math.min(4,cs.length);const d=$('#dSum');d.textContent='';d.append(el('span',{class:fail?'fail':'pass',text:fail?fail+' contrast '+(fail===1?'check is':'checks are')+' below the minimum':'Text contrast passes ('+pass+' of '+pass+')'}),n?el('span',{class:'cau',text:n+' '+(n===1?'note':'notes')}):null);}
+  cs.slice(0,4).forEach(x=>cu.append(el('li',null,el('span',{class:'mk',text:'Note'}),el('span',null,x.text+' ('+SRC[x.src].short+')'))));}
 
 /* ---------- right column forms ---------- */
 function buildFields(){const box=$('#fields');box.textContent='';const mk=(id,label,val,max,area,on)=>{const inp=area?el('textarea',{id:'f_'+id,maxlength:max,rows:2}):el('input',{id:'f_'+id,type:'text',maxlength:max});inp.value=val||'';inp.addEventListener('input',()=>{on(inp.value);requestPaint(true);});return el('label',{for:'f_'+id},label,inp);};
@@ -1983,6 +2084,9 @@ async function toLayers(){await ensureType(state.typeId);const fmt=FMT[state.for
   Lib.setView('free');Free.say('Opened as '+layers.length+' layers. Save it to keep it with the brand.');}
 
 /* ---------- advanced options panel ---------- */
+/* Media page tool rail: one panel open at a time, like Canva's side panel. */
+function setPanel(p){if(p==='adjust'&&uiMode!=='advanced')p='layouts';state.mpanel=p;document.querySelectorAll('#rail button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===p)));
+  document.querySelectorAll('#mPanel .mp').forEach(x=>x.hidden=x.dataset.p!==p);if(p==='brand')renderLook();}
 function syncAdv(){const pc=v=>Math.round(v*100);$('#aHead').value=pc(state.headScale);$('#aBody').value=pc(state.bodyScale);$('#oHead').textContent=pc(state.headScale)+'%';$('#oBody').textContent=pc(state.bodyScale)+'%';$('#aCaps').value=state.caps;
   $('#aFx').value=pc(state.fx);$('#aFy').value=pc(state.fy);$('#aTint').value=pc(state.tintAmt);$('#aDim').value=pc(state.dim);$('#aMark').checked=state.showMark;$('#aHandle').checked=state.showHandle;
   const n=$('#advNote'),on=advActive(state);n.hidden=!on;if(on){n.textContent='This post uses Advanced settings for text size, photo or brand mark. ';n.append(el('button',{type:'button',class:'link',text:'Reset them',onclick:()=>{Object.assign(state,ADV_DEFAULTS);syncAdv();requestPaint(true);}}),' or switch to Advanced to change them.');}}
@@ -1994,13 +2098,14 @@ function bootAdv(){const rng=(id,key)=>$(id).addEventListener('input',e=>{state[
   $('#btnHelp').addEventListener('click',()=>{$('#ovWelcome').hidden=false;});}
 
 /* ---------- shuffle ---------- */
-function shuffle(){const res=results(),has=parsed.concepts.length>0;const pool=k=>{const m=res[k].filter(r=>r.score>0);const src=has&&m.length>=2?m.slice(0,Math.max(3,Math.ceil(m.length*.6))):res[k];return src[Math.floor(Math.random()*src.length)].it;};
-  if(state.shuffle.colors){const p=pool('colors');state.paletteId=p.id;state.colors=palColors(p);const r=Math.random();state.arrangement=r<.55?'base':r<.82?'brand':'contrast';}
-  if(state.shuffle.type){state.typeId=pool('type').id;useType(state.typeId);}
-  if(state.shuffle.graphic){let g=pool('graphic');if(g.id==='none')g=pool('graphic');state.graphicId=g.id;state.seed=1+Math.floor(Math.random()*9999);}
-  if(state.shuffle.layout){const ls=FMT[state.format].layouts;state.layout=ls[Math.floor(Math.random()*ls.length)];buildLayouts();buildFields();}
-  syncSeg();buildColors();buildResults();requestPaint(true);}
-function stepLayout(d){const ls=FMT[state.format].layouts;state.layout=ls[(ls.indexOf(state.layout)+d+ls.length)%ls.length];buildLayouts();buildFields();requestPaint(true);}
+/* Shuffle stays inside the brand: another layout, another color arrangement, or another of the
+   brand's saved palettes. Type and graphic belong to the brand and are changed on the Brand page. */
+function shuffle(){const pick=a=>a[Math.floor(Math.random()*a.length)];let changed=false;
+  if(state.shuffle.layout){const ls=FMT[state.format].layouts.filter(l=>l!==state.layout);if(ls.length){state.layout=pick(ls);buildLayouts();buildFields();changed=true;}}
+  if(state.shuffle.arrangement){state.arrangement=pick(['base','brand','contrast'].filter(a=>a!==state.arrangement));syncSeg();changed=true;}
+  if(state.shuffle.colors){const L=Lib.look(),opts=[L?{id:L.paletteId,cols:L.colors}:null].concat(myPalettes.map(p=>({id:p.id,cols:palColors(p)}))).filter(Boolean).filter(o=>!sameColors(o.cols,state.colors));
+    if(opts.length){const o=pick(opts);state.paletteId=o.id;state.colors=Object.assign({},o.cols);buildColors();renderLook();changed=true;}}
+  if(changed)requestPaint(true);else say('Nothing to shuffle: choose what Shuffle changes, or save more palettes to the brand.');}
 function syncSeg(){document.querySelectorAll('#arr button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===state.arrangement)));document.querySelectorAll('#shuf button').forEach(b=>b.setAttribute('aria-pressed',String(!!state.shuffle[b.dataset.v])));$('#btnGuides').setAttribute('aria-pressed',String(state.guides));}
 
 /* ---------- sources ---------- */
@@ -2028,7 +2133,7 @@ function closeOverlays(){document.querySelectorAll('.overlay').forEach(o=>o.hidd
 
 /* ---------- wiring ---------- */
 function loadImage(file,cb){if(!file)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>cb(im);im.onerror=()=>say('That file could not be read as an image.');im.src=fr.result;};fr.readAsDataURL(file);}
-function initAll(){$('#q').value='';renderChips();syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
+function initAll(){$('#q').value='';renderChips();setPanel(state.mpanel);syncIdentity();syncPvFmt();setStep(state.bstep);renderLook();syncSeg();syncAdv();setFormat(state.format);buildColors();buildFields();parsed=parseQuery(state.query);buildTerms();buildResults();buildDrafts();requestPaint(true);useType(state.typeId);}
 function boot(){
   $('#appName').textContent=APP_NAME;setMode(uiMode,true);bootAdv();
   bootBrand();
@@ -2037,6 +2142,7 @@ function boot(){
   document.querySelectorAll('#arr button').forEach(b=>b.addEventListener('click',()=>{state.arrangement=b.dataset.v;syncSeg();requestPaint(true);}));
   document.querySelectorAll('#shuf button').forEach(b=>b.addEventListener('click',()=>{state.shuffle[b.dataset.v]=!state.shuffle[b.dataset.v];syncSeg();}));
   $('#btnGuides').addEventListener('click',()=>{state.guides=!state.guides;syncSeg();requestPaint(false);});
+  document.querySelectorAll('#rail button').forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.p);store.set('brandlab.state.v1',state);}));
   $('#btnPrev').addEventListener('click',()=>stepLayout(-1));$('#btnNext').addEventListener('click',()=>stepLayout(1));$('#btnShuffle').addEventListener('click',shuffle);
   $('#btnExport').addEventListener('click',()=>exportPNG());
   $('#inPhoto').addEventListener('change',e=>loadImage(e.target.files[0],im=>{photoImg=im;photoRef=Store.memRef(e.target.files[0]);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);}));
@@ -2102,15 +2208,24 @@ function updateFingerprint(){const tgt=fingerprint(parsed.cw),cur=fingerprint(pi
   const sm=$('#radarSmall');sm.textContent='';sm.append(radarSVG([{fp:cur,cls:'rc'},{fp:tgt,cls:'rt'}],190,'Keywords compared with current picks'+(tgt?'. Keywords: '+fpText(tgt):'')+(cur?'. Picks: '+fpText(cur):'')));
   const list=$('#fpList');list.textContent='';const cw=parsed.cw,ids=Object.keys(cw).sort((a,b)=>cw[b]-cw[a]).slice(0,6);
   if(!ids.length)list.append(el('p',{class:'empty',text:'Add a keyword to see what it asks for.'}));
-  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the chart'}))));
-  $('#fpFit').textContent=fitSentence(tgt,cur);}
+  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the axes'}))));
+  $('#fpFit').textContent=fitSentence(tgt,cur);
+  const off=offAxis(cw);['#fpOff','#fpOff2'].forEach(sel=>{const p=$(sel);p.textContent='';p.hidden=!off.length;if(off.length)p.append(el('b',{text:'Asked for, but not on these axes: '}),off.join('; ')+'.');});}
+/* Say plainly which asked-for ideas the chart cannot show, and why, instead of leaving them out silently.
+   Emotions are off the chart only because no pleasure-arousal-dominance position is on file for them. */
+const OFF_WHY={'Positive emotions':['emotion','emotions'],'Difficult emotions':['emotion','emotions'],Style:['style','styles'],Topic:['topic','topics']};
+function offAxis(cw){const by={};Object.keys(cw).filter(id=>cw[id]>0&&!onChart(id)&&CONCEPT_BY_ID[id]).sort((a,b)=>cw[b]-cw[a]).forEach(id=>{const g=CONCEPT_BY_ID[id].group;(by[g]=by[g]||[]).push(cLabel(id));});
+  return Object.keys(by).map(g=>{const n=by[g],w=OFF_WHY[g]||['idea','ideas'],emo=w[0]==='emotion';
+    return n.join(', ')+' ('+(n.length>1?w[1]:w[0])+(emo?'; no pleasure-arousal-dominance position on file':'')+')';});}
 function fitSentence(t,c){if(!t)return'Add keywords to compare them with your picks.';if(!c)return'';const d=FP_AXES.map((a,i)=>({a,d:c[i].v-t[i].v})).filter(x=>Math.abs(x.d)>=.2).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
   if(!d.length)return'Close fit: your picks signal what your keywords ask for.';const hi=d.filter(x=>x.d>0).slice(0,2).map(x=>x.a.label),lo=d.filter(x=>x.d<0).slice(0,2).map(x=>x.a.label);
   return'Your picks run '+[hi.length?'higher on '+hi.join(' and '):'',lo.length?'lower on '+lo.join(' and '):''].filter(Boolean).join(' and ')+' than your keywords ask for.';}
 
 /* ---------- keywords: committed words are chips; the box holds the word being typed ---------- */
 const kwList=()=>String(state.query||'').split(/[,;\n]+/).map(s=>s.trim()).filter(Boolean);
-function setKw(list){state.query=list.join(', ');renderChips();runSearch();}
+/* A search queued while typing must not run after the word is committed: it would rebuild the panels under the user. */
+let kwT=0;
+function setKw(list){clearTimeout(kwT);state.query=list.join(', ');renderChips();runSearch();}
 function commitKeywords(text){const cur=kwList(),low=cur.map(w=>w.toLowerCase());String(text).split(/[,;\n]+/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean).forEach(w=>{if(!low.includes(w.toLowerCase())){cur.push(w);low.push(w.toLowerCase());}});setKw(cur);}
 function removeKeyword(i){const cur=kwList();cur.splice(i,1);setKw(cur);}
 function replaceKeyword(from,to){const cur=kwList().map(w=>w.toLowerCase()===from.toLowerCase()?to:w);setKw(cur);}
@@ -2167,7 +2282,7 @@ function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
   myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));}
 
-function bootBrand(){const q=$('#q');let qt=0;const live=()=>{clearTimeout(qt);qt=setTimeout(runSearch,120);};
+function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};
   q.addEventListener('input',()=>{const v=q.value;if(/[,;\n]/.test(v)){const parts=v.split(/[,;\n]/),last=parts.pop();if(parts.join('').trim())commitKeywords(parts.join(','));q.value=last.replace(/^\s+/,'');}acRender();live();});
   q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if($('#acList').hidden)acRender();acMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();acMove(-1);}
     /* Enter keeps a known word as typed; a partial word takes the top prefix match. A near spelling is only offered, never taken. */
@@ -2469,13 +2584,13 @@ FONT LICENSE
 })();
 
 /* ============================================================
-   LIB: brands and posts, the Brands and posts tab, named palettes and type
+   LIB: brands and posts, the Library tab, named palettes and type
    pairings, sharing (files everywhere, links when hosted with accounts),
    and the glue between the three views.
    ============================================================ */
 let logoRef=null,photoRef=null;
 const Lib=(function(){
-  let view='design',libBrand=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
+  let view='design',libBrand=null,libFolder=null,sig='',saveT=0,incoming=null,draft=null,postLook=null;
   const clone=o=>JSON.parse(JSON.stringify(o));
   const brandPosts=bid=>Store.all('post').filter(p=>p.bid===bid);
   const postMeta=p=>p.type==='free'?`Layer layout · ${p.doc.w} × ${p.doc.h}`:(()=>{const f=FMT[p.s.format]||FMT['fb-feed'];return PLATFORMS.find(x=>x.id===f.p).name+' · '+f.name;})();
@@ -2507,7 +2622,7 @@ const Lib=(function(){
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
     logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
-    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
+    draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();fillFolderSel('');if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
   /* ---------- named palettes ---------- */
@@ -2523,8 +2638,8 @@ const Lib=(function(){
   /* ---------- posts ---------- */
   async function savePost(asNew){const name=($('#postName').value||'').trim().slice(0,60)||('Post '+(brandPosts(state.bid).length+1));if(photoRef&&photoRef.startsWith('mem:')){const r=await Store.persistRef(photoRef);if(r)photoRef=r;}
     const id=(!asNew&&state.postId&&Store.get('post',state.postId))?state.postId:uidGen();const s=clone(state);delete s.postId;const keepPhoto=LAYOUTS[state.layout].photo&&photoRef&&!photoRef.startsWith('mem:');
-    try{await Store.put('post',{id,bid:state.bid,name,type:'template',s,photo:keepPhoto?photoRef:null});}catch(e){say('The post could not be saved.');return;}state.postId=id;$('#postName').value=name;buildDrafts();acct();
-    say('Saved “'+name+'” to '+state.brandName+'.'+(photoImg&&LAYOUTS[state.layout].photo&&!keepPhoto?' The photo could not be stored with it.':''));}
+    const fv=$('#postFolder').value;try{await Store.put('post',{id,bid:state.bid,name,type:'template',s,photo:keepPhoto?photoRef:null,folder:fv==='__new'?'':fv});}catch(e){say('The post could not be saved.');return;}state.postId=id;$('#postName').value=name;buildDrafts();acct();
+    say('Saved “'+name+'” to '+state.brandName+(/[.!?]$/.test(state.brandName||'')?'':'.')+(photoImg&&LAYOUTS[state.layout].photo&&!keepPhoto?' The photo could not be stored with it.':''));}
   async function saveFree(asNew){const d=Free.doc;if(!d){Free.say('Nothing to save yet.');return;}Free.say('Saving…');const r=await Free.persistable();const id=(!asNew&&d.id&&Store.get('post',d.id))?d.id:uidGen();d.id=id;r.doc.id=id;
     try{await Store.put('post',{id,bid:state.bid,name:(d.name||'').trim()||'Untitled layout',type:'free',doc:r.doc});}catch(e){Free.say(e&&e.code==='too_large'?'This layout holds too much text to save as one post. Remove some layers and try again.':'The layout could not be saved.');return;}
     Free.clean();buildDrafts();acct();Free.say('Saved to '+state.brandName+'.'+(r.lost?' '+r.lost+' image '+(r.lost===1?'layer':'layers')+' could not be stored and will be missing next time.':''));}
@@ -2532,7 +2647,7 @@ const Lib=(function(){
   function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
@@ -2554,9 +2669,9 @@ const Lib=(function(){
   function enterBrand(){postLook=state.postId?LOOK.reduce((o,k)=>(o[k]=clone(state[k]),o),{}):null;if(draft)Object.assign(state,clone(draft));
     $('#q').value='';renderChips();syncIdentity();buildColors();runSearch();setStep(state.bstep);useType(state.typeId);}
   function leaveBrand(){draft=pick(state);if(postLook){Object.assign(state,postLook);postLook=null;}buildColors();buildFields();useType(state.typeId);renderLook();}
-  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
+  function setView(v){const was=view;if(was==='brand'&&v!=='brand')leaveBrand();view=v;$('#viewBrand').hidden=v!=='brand';if(v==='brand'&&was!=='brand')enterBrand();store.set('brandlab.view.v1',v);$('#viewDesign').hidden=v!=='design';$('#viewFree').hidden=v!=='free';$('#viewLib').hidden=v!=='lib';const navV=v==='free'?'design':v;document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===navV)));$('#mediaMode').hidden=navV!=='design';document.querySelectorAll('#mediaMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
     if(v==='design'){renderLook();requestPaint(true);}else if(v==='brand')requestPaint(true);else if(v==='free')Free.paint();else buildLib();}
-  function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Brands and posts are saved to your Claude account on this page.':S.reason;}
+  function acct(){const S=Store.S,box=$('#acct');box.textContent='';if(S.me.avatarUrl)box.append(el('img',{src:S.me.avatarUrl,alt:'',width:22,height:22}));box.append(el('span',null,el('b',{text:S.me.name||'Your workspace'}),el('small',{text:S.mode==='cloud'?'Saved to your account':'Saved in this browser'})));box.title=S.mode==='cloud'?'Library are saved to your Claude account on this page.':S.reason;}
 
   /* ---------- library ---------- */
   function askName(title,value,onOk){$('#askH').textContent=title;const i=$('#askIn');i.value=value||'';$('#ovAsk').hidden=false;setTimeout(()=>{i.focus();i.select();},30);const ok=()=>{$('#ovAsk').hidden=true;onOk(i.value.trim());};$('#askOk').onclick=ok;i.onkeydown=e=>{if(e.key==='Enter')ok();};}
@@ -2564,7 +2679,7 @@ const Lib=(function(){
   function buildLib(){if(view!=='lib')return;const S=Store.S;if(!libBrand||!Store.get('brand',libBrand))libBrand=state.bid;const brands=Store.all('brand'),posts=Store.all('post');
     const a=$('#libAcct');a.textContent='';a.append(el('div',{class:'who'},S.me.avatarUrl?el('img',{src:S.me.avatarUrl,alt:'',width:44,height:44}):null,el('div',null,el('h2',{text:S.me.name||'Your workspace'}),el('p',{class:'lede',style:'margin:0',text:S.mode==='cloud'?'Signed in with your Claude account. Your brands and posts are private to you and follow you to any device.':S.reason}))),
       el('div',{class:'rowbtns'},el('span',{class:'meta',text:`${brands.length} ${brands.length===1?'brand':'brands'} · ${posts.length} ${posts.length===1?'post':'posts'}`}),el('button',{type:'button',class:'btn small',title:'One file with every brand, post and image in this workspace',text:'Back up everything',onclick:async()=>{libSay('Building the backup…');await saveFile('brand-media-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(await Store.exportAll()),false);libSay('Backup saved. Keep the file somewhere safe; open it here to restore.');}}),el('label',{class:'btn small',style:'cursor:pointer',title:'Open a backup, or a brand or post file someone shared with you'},'Open a backup or shared file',el('input',{type:'file',id:'libOpen',accept:'application/json,.json',hidden:true,onchange:openFile}))));
-    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open in the designer':''}`}))));});
+    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;libFolder=null;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open now':''}`}))));});
     bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>guard(makeBrand)}));
     const b=Store.get('brand',libBrand),pn=$('#libPanel');pn.textContent='';if(!b)return;const ps=brandPosts(b.id),t=TYP[b.typeId]||TYP.clear;
     const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;await Store.put('brand',Object.assign({},b,{name:v}));if(b.id===state.bid){state.brandName=v;if(draft)draft.brandName=v;const f=JSON.parse(sig.slice(state.bid.length));f.name=v;sig=state.bid+JSON.stringify(f);syncIdentity();renderLook();requestPaint(true);}fillBrandSelect();buildLib();});
@@ -2576,10 +2691,41 @@ const Lib=(function(){
     const pals=[{name:'Current colors',cols:b.colors}].concat((b.palettes||[]).map(p=>({name:p.name,cols:p})));
     pn.append(el('div',{class:'h',text:'Identity'}),el('div',{class:'ident'},el('div',null,el('small',{text:'Typefaces'}),el('b',{text:t.display.family+(t.body.family!==t.display.family?' with '+t.body.family:'')})),el('div',null,el('small',{text:'Keywords'}),el('b',{text:b.query||'None yet'})),el('div',null,el('small',{text:'Logo'}),el('b',{text:b.logo?'Uploaded':'Text wordmark'}))),
       el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+p.cols[r]}))),el('span',{text:p.name})))));
-    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';buildDrafts();setView('design');})}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
-    const grid=el('div',{class:'pgrid'});if(!ps.length)grid.append(el('p',{class:'empty',text:'No posts in this brand yet.'}));
-    ps.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
-      grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d)));thumb(cv,p,220,200);});pn.append(grid);}
+    const fl=folders(b.id),inF=f=>ps.filter(p=>(p.folder||'')===f).length;if(libFolder!=null&&libFolder!==''&&!fl.includes(libFolder))libFolder=null;
+    const newPost=()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';fillFolderSel(libFolder||'');buildDrafts();setView('design');});
+    pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:newPost}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
+    /* folders */
+    const fb=el('div',{class:'fbar',role:'group','aria-label':'Folders'});const fbtn=(f,label,n)=>el('button',{type:'button',class:'fchip','aria-pressed':String(libFolder===f),onclick:()=>{libFolder=f;buildLib();}},el('span',{text:label}),el('small',{text:String(n)}));
+    fb.append(fbtn(null,'All posts',ps.length));fl.forEach(f=>fb.append(fbtn(f,f,inF(f))));if(fl.length)fb.append(fbtn('','No folder',inF('')));
+    fb.append(el('button',{type:'button',class:'btn small',text:'+ New folder',onclick:()=>askFolder(b.id,n=>{libFolder=n;buildLib();})}));pn.append(fb);
+    if(libFolder){const f=libFolder,rn=el('button',{type:'button',class:'btn small',text:'Rename folder'}),dl=el('button',{type:'button',class:'btn small',text:'Delete folder'});
+      rn.addEventListener('click',()=>askName('Rename the folder',f,async n=>{n=(n||'').trim().slice(0,40);if(!n||n===f)return;for(const p of ps.filter(p=>p.folder===f))await Store.put('post',Object.assign({},p,{folder:n}));await setFolders(b.id,folders(b.id).map(x=>x===f?n:x));libFolder=n;fillFolderSel();buildLib();}));
+      dl.addEventListener('click',()=>sure(dl,async()=>{for(const p of ps.filter(p=>p.folder===f))await Store.put('post',Object.assign({},p,{folder:''}));await setFolders(b.id,folders(b.id).filter(x=>x!==f));libFolder=null;fillFolderSel();libSay('Deleted the folder “'+f+'”. Its posts are kept, with no folder.');buildLib();}));
+      pn.append(el('div',{class:'rowbtns',style:'margin:-2px 0 10px'},el('span',{class:'meta',text:'Folder “'+f+'”'}),rn,dl));}
+    const shown=libFolder==null?ps:ps.filter(p=>(p.folder||'')===libFolder),others=Store.all('brand').filter(x=>x.id!==b.id);
+    const grid=el('div',{class:'pgrid'});if(!shown.length)grid.append(el('p',{class:'empty',text:ps.length?'No posts in this folder.':'No posts in this brand yet.'}));
+    shown.forEach(p=>{const cv=el('canvas'),pnm=el('input',{type:'text',maxlength:60,'aria-label':'Post name'});pnm.value=p.name;pnm.addEventListener('change',async()=>{await Store.put('post',Object.assign({},p,{name:pnm.value.trim()||p.name}));buildDrafts();});const d=el('button',{type:'button',class:'btn small',text:'Delete'});d.addEventListener('click',()=>sure(d,()=>deletePost(p.id)));
+      const mv=el('select',{'aria-label':'Move '+p.name+' to a folder',class:'small'},el('option',{value:'',text:'No folder'}),fl.map(f=>el('option',{value:f,text:f})),el('option',{value:'__new',text:'New folder…'}));mv.value=p.folder&&fl.includes(p.folder)?p.folder:'';
+      mv.addEventListener('change',async()=>{const put=async f=>{await Store.put('post',Object.assign({},p,{folder:f}));if(p.id===state.postId)fillFolderSel(f);buildLib();};if(mv.value==='__new'){mv.value=p.folder||'';askFolder(b.id,put);}else put(mv.value);});
+      const cp=others.length?el('select',{'aria-label':'Copy '+p.name+' to another brand',class:'small'},el('option',{value:'',text:'Copy to brand…'}),others.map(x=>el('option',{value:x.id,text:x.name}))):null;if(cp)cp.addEventListener('change',()=>{if(cp.value)copyToBrand(p.id,cp.value);});
+      grid.append(el('div',{class:'pcard'},el('button',{type:'button',class:'pth',title:'Open '+p.name,onclick:()=>openPost(p.id)},cv),pnm,el('small',{text:postMeta(p)+' · '+ago(p.updatedAt||Date.now())}),
+        el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'Open',onclick:()=>openPost(p.id)}),el('button',{type:'button',class:'btn small',text:'Share',onclick:()=>sharePost(p.id)}),el('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>exportPost(p)}),el('button',{type:'button',class:'btn small',text:'Duplicate',onclick:()=>dupPost(p.id)}),d),
+        el('div',{class:'pmove'},el('label',null,'Folder ',mv),cp)));thumb(cv,p,220,200);});pn.append(grid);}
+  /* Theme: stored per browser; the page head applies it before first paint. */
+  const THEMES=['noir','light','dark','graphite'];
+  function setTheme(t){if(!THEMES.includes(t))t='noir';document.documentElement.dataset.theme=t;try{localStorage.setItem('brandlab.theme.v1',t);}catch(e){}syncTheme();if(view==='brand')requestPaint(false);}
+  function syncTheme(){const t=document.documentElement.dataset.theme||'noir';document.querySelectorAll('#themeSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===t)));}
+  /* Folders: one level per brand. The list lives on the brand record and is written at once:
+     it organizes posts, so it is not part of the brand draft that waits for Save brand. */
+  const folders=bid=>((Store.get('brand',bid)||{}).folders||[]).slice();
+  async function setFolders(bid,list){const b=Store.get('brand',bid);if(!b)return;await Store.put('brand',Object.assign({},b,{folders:[...new Set(list.map(f=>f.trim()).filter(Boolean))]}));}
+  function fillFolderSel(cur){const sel=$('#postFolder');if(!sel)return;const v=cur!=null?cur:sel.value;sel.textContent='';sel.append(el('option',{value:'',text:'No folder'}));folders(state.bid).forEach(f=>sel.append(el('option',{value:f,text:f})));sel.append(el('option',{value:'__new',text:'New folder…'}));sel.value=folders(state.bid).includes(v)?v:'';}
+  function askFolder(bid,then){askName('Name the folder','',async n=>{n=(n||'').trim().slice(0,40);if(!n)return;await setFolders(bid,folders(bid).concat(n));if(then)then(n);});}
+  /* Copy a post into another brand. A template post takes on that brand's look (colors, type, graphic,
+     name and handle); the original is left as it was. A layer layout is copied as it is. */
+  async function copyToBrand(id,bid){const p=Store.get('post',id),b=Store.get('brand',bid);if(!p||!b)return;const c=clone(p);c.id=uidGen();c.bid=bid;c.folder='';
+    if(c.s){Object.assign(c.s,{paletteId:b.paletteId,colors:Object.assign({},b.colors),typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength!=null?b.gStrength:c.s.gStrength,brandName:b.name,handle:b.handle||'',query:b.query||''});}
+    if(c.doc)c.doc.id=c.id;await Store.put('post',c);libSay('Copied \u201C'+p.name+'\u201D to '+b.name+(c.s?', in that brand\u2019s look.':'. Layer layouts are copied as they are.'));buildLib();acct();}
   function guardIf(bid,fn){if(bid!==state.bid)guard(fn);else fn();}
   function libSay(t){const m=$('#libMsg');if(m)m.textContent=t;}
   async function exportKit(id,kind){const b=Store.get('brand',id);if(!b)return;libSay('Building the '+(kind==='zip'?'brand kit':'guidelines PDF')+'…');try{const ps=brandPosts(id);const blob=kind==='zip'?await Kit.zip(b,ps):await Kit.guidelines(b,ps);await saveFile(slug(b.name)+(kind==='zip'?'-brand-kit.zip':'-brand-guidelines.pdf'),blob,false);libSay(kind==='zip'?'Brand kit ready. Unzip it first: Canva takes the PDF, logo and font files one at a time, not the ZIP.':'Guidelines PDF ready. In Canva, open an empty Brand Kit and upload it to Brand Kit Builder.');}catch(e){console.error(e);libSay('The export could not be built. Try again.');}}
@@ -2592,7 +2738,7 @@ const Lib=(function(){
   /* ---------- sharing ---------- */
   function showLink(title,url,note){$('#shareH').textContent=title;$('#shareLinkRow').hidden=false;const i=$('#shareUrl');i.value=url;$('#shareNote').textContent=note;$('#shareCopied').textContent='';$('#ovShare').hidden=false;setTimeout(()=>{i.focus();i.select();},30);}
   async function shareFile(kind,data,name){libSay('Preparing the file…');try{const r=await Store.pack(kind,data),fn=slug(name)+'.'+kind+'.json';await saveFile(fn,JSON.stringify(r.file),false);libSay('');
-      $('#shareH').textContent='Shared as a file';$('#shareLinkRow').hidden=true;$('#shareCopied').textContent='';$('#shareNote').textContent='“'+fn+'” was saved to your downloads. Send it by email or any file-sharing service. The other person opens their copy of the app, goes to Brands and posts, and chooses Open a backup or shared file. They get their own copy, images included; later changes need a new file.'+(r.lost?' '+r.lost+' '+(r.lost===1?'image':'images')+' could not be read and '+(r.lost===1?'is':'are')+' not in the file.':'');$('#ovShare').hidden=false;}
+      $('#shareH').textContent='Shared as a file';$('#shareLinkRow').hidden=true;$('#shareCopied').textContent='';$('#shareNote').textContent='“'+fn+'” was saved to your downloads. Send it by email or any file-sharing service. The other person opens their copy of the app, goes to Library, and chooses Open a backup or shared file. They get their own copy, images included; later changes need a new file.'+(r.lost?' '+r.lost+' '+(r.lost===1?'image':'images')+' could not be read and '+(r.lost===1?'is':'are')+' not in the file.':'');$('#ovShare').hidden=false;}
     catch(e){console.error(e);libSay('The file could not be created.');}}
   const SHARE_NOTE='Anyone who can open this page can use the link to copy this into their own account. Give them access to the page first, from its Share menu in Claude. The link carries a snapshot: later changes need a new link.';
   async function shareBrand(id){const b=Store.get('brand',id);if(!b)return;if(id===state.bid)await saveBrandNow();if(!Store.S.canShare){await shareFile('brand',{brand:clone(Store.get('brand',id)),posts:brandPosts(id).map(clone)},b.name);return;}const data={brand:clone(Store.get('brand',id)),posts:[]};let size=JSON.stringify(data).length;for(const p of brandPosts(id)){const n=JSON.stringify(p).length;if(size+n>200000)break;data.posts.push(clone(p));size+=n;}
@@ -2614,10 +2760,15 @@ const Lib=(function(){
 
   /* ---------- start ---------- */
   async function start(){boot();Free.boot();acct();
-    document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));$('#acct').addEventListener('click',()=>setView('lib'));
+    document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v==='design'&&view==='free'?'free':b.dataset.v)));
+    document.querySelectorAll('#mediaMode button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));
+    $('#btnSettings').addEventListener('click',()=>{syncTheme();$('#ovSettings').hidden=false;});
+    document.querySelectorAll('#themeSeg button').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.v)));
+    ['#btnHelp','#btnSources'].forEach(id=>$(id).addEventListener('click',()=>{$('#ovSettings').hidden=true;}));syncTheme();$('#acct').addEventListener('click',()=>setView('lib'));
     $('#brandSel').addEventListener('change',e=>{const v=e.target.value;e.target.value=state.bid;if(v==='__lib')setView('lib');else if(v==='__new')guard(makeBrand);else if(v!==state.bid)guard(()=>activate(v));});
     $('#btnSaveBrand').addEventListener('click',()=>saveBrandNow());$('#btnDiscard').addEventListener('click',discard);
     window.addEventListener('beforeunload',e=>{if(isDirty()){e.preventDefault();e.returnValue='';}});
+    $('#postFolder').addEventListener('change',e=>{if(e.target.value==='__new'){e.target.value='';askFolder(state.bid,n=>fillFolderSel(n));}});
     $('#btnSave').addEventListener('click',()=>savePost(false));$('#btnSaveNew').addEventListener('click',()=>savePost(true));$('#btnCompare').addEventListener('click',compare);$('#btnLib').addEventListener('click',()=>setView('lib'));
     $('#fSave').addEventListener('click',()=>saveFree(false));$('#fSaveNew').addEventListener('click',()=>saveFree(true));
     $('#shareCopy').addEventListener('click',()=>{const v=$('#shareUrl').value;if(!v)return;const done=()=>{$('#shareCopied').textContent='Link copied.';};try{navigator.clipboard.writeText(v).then(done,()=>{$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';});}catch(e){$('#shareUrl').select();$('#shareCopied').textContent='Press Ctrl or Cmd + C to copy the selected link.';}});

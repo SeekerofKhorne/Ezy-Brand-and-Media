@@ -4,6 +4,7 @@ Nothing here is promised. It records what is known to be missing or unverified, 
 
 ## Not yet verified
 
+- **Fingerprint positions for four emotions.** Compassion, Love, Amusement and Admiration have no pleasure-arousal-dominance position, so they do not move the fingerprint or the color scoring that uses positions. The consistent source is Russell & Mehrabian (1977), *Evidence for a three-factor theory of emotions*, Journal of Research in Personality 11(3), 273–294, which rates emotion terms on the same three axes as Mehrabian's model. It is not open access; positions should be entered from its table, not estimated.
 - **PDF import on real exports.** The importer is tested on a generated sample. It needs trying on PDFs downloaded from Canva, Adobe Express, Figma and PowerPoint, with notes on what breaks (grouped shapes, gradients, masked images, rotated text).
 - **Canva Brand Kit Builder.** The guidelines PDF is written to be machine-readable, but how much Canva extracts from it has not been measured.
 - **Browsers.** Tests run in Chromium only. Firefox and Safari need a manual pass, especially letter spacing on canvas, font loading and downloads on iOS.

@@ -45,15 +45,24 @@ function updateFingerprint(){const tgt=fingerprint(parsed.cw),cur=fingerprint(pi
   const sm=$('#radarSmall');sm.textContent='';sm.append(radarSVG([{fp:cur,cls:'rc'},{fp:tgt,cls:'rt'}],190,'Keywords compared with current picks'+(tgt?'. Keywords: '+fpText(tgt):'')+(cur?'. Picks: '+fpText(cur):'')));
   const list=$('#fpList');list.textContent='';const cw=parsed.cw,ids=Object.keys(cw).sort((a,b)=>cw[b]-cw[a]).slice(0,6);
   if(!ids.length)list.append(el('p',{class:'empty',text:'Add a keyword to see what it asks for.'}));
-  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the chart'}))));
-  $('#fpFit').textContent=fitSentence(tgt,cur);}
+  const mx=ids.length?cw[ids[0]]:1;ids.forEach(id=>list.append(el('div',{class:'sig'},el('span',{class:'nm',text:cLabel(id)}),el('span',{class:'bar'},el('i',{style:`width:${Math.round(cw[id]/mx*100)}%`})),el('span',{class:'from',text:onChart(id)?'':'not on the axes'}))));
+  $('#fpFit').textContent=fitSentence(tgt,cur);
+  const off=offAxis(cw);['#fpOff','#fpOff2'].forEach(sel=>{const p=$(sel);p.textContent='';p.hidden=!off.length;if(off.length)p.append(el('b',{text:'Asked for, but not on these axes: '}),off.join('; ')+'.');});}
+/* Say plainly which asked-for ideas the chart cannot show, and why, instead of leaving them out silently.
+   Emotions are off the chart only because no pleasure-arousal-dominance position is on file for them. */
+const OFF_WHY={'Positive emotions':['emotion','emotions'],'Difficult emotions':['emotion','emotions'],Style:['style','styles'],Topic:['topic','topics']};
+function offAxis(cw){const by={};Object.keys(cw).filter(id=>cw[id]>0&&!onChart(id)&&CONCEPT_BY_ID[id]).sort((a,b)=>cw[b]-cw[a]).forEach(id=>{const g=CONCEPT_BY_ID[id].group;(by[g]=by[g]||[]).push(cLabel(id));});
+  return Object.keys(by).map(g=>{const n=by[g],w=OFF_WHY[g]||['idea','ideas'],emo=w[0]==='emotion';
+    return n.join(', ')+' ('+(n.length>1?w[1]:w[0])+(emo?'; no pleasure-arousal-dominance position on file':'')+')';});}
 function fitSentence(t,c){if(!t)return'Add keywords to compare them with your picks.';if(!c)return'';const d=FP_AXES.map((a,i)=>({a,d:c[i].v-t[i].v})).filter(x=>Math.abs(x.d)>=.2).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
   if(!d.length)return'Close fit: your picks signal what your keywords ask for.';const hi=d.filter(x=>x.d>0).slice(0,2).map(x=>x.a.label),lo=d.filter(x=>x.d<0).slice(0,2).map(x=>x.a.label);
   return'Your picks run '+[hi.length?'higher on '+hi.join(' and '):'',lo.length?'lower on '+lo.join(' and '):''].filter(Boolean).join(' and ')+' than your keywords ask for.';}
 
 /* ---------- keywords: committed words are chips; the box holds the word being typed ---------- */
 const kwList=()=>String(state.query||'').split(/[,;\n]+/).map(s=>s.trim()).filter(Boolean);
-function setKw(list){state.query=list.join(', ');renderChips();runSearch();}
+/* A search queued while typing must not run after the word is committed: it would rebuild the panels under the user. */
+let kwT=0;
+function setKw(list){clearTimeout(kwT);state.query=list.join(', ');renderChips();runSearch();}
 function commitKeywords(text){const cur=kwList(),low=cur.map(w=>w.toLowerCase());String(text).split(/[,;\n]+/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean).forEach(w=>{if(!low.includes(w.toLowerCase())){cur.push(w);low.push(w.toLowerCase());}});setKw(cur);}
 function removeKeyword(i){const cur=kwList();cur.splice(i,1);setKw(cur);}
 function replaceKeyword(from,to){const cur=kwList().map(w=>w.toLowerCase()===from.toLowerCase()?to:w);setKw(cur);}
@@ -110,7 +119,7 @@ function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
   myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));}
 
-function bootBrand(){const q=$('#q');let qt=0;const live=()=>{clearTimeout(qt);qt=setTimeout(runSearch,120);};
+function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};
   q.addEventListener('input',()=>{const v=q.value;if(/[,;\n]/.test(v)){const parts=v.split(/[,;\n]/),last=parts.pop();if(parts.join('').trim())commitKeywords(parts.join(','));q.value=last.replace(/^\s+/,'');}acRender();live();});
   q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if($('#acList').hidden)acRender();acMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();acMove(-1);}
     /* Enter keeps a known word as typed; a partial word takes the top prefix match. A near spelling is only offered, never taken. */
