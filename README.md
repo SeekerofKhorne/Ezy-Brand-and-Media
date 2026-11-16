@@ -39,6 +39,7 @@ Nothing goes live until you merge, and every merged change can be undone on GitH
 - **A Brand page** with keyword search over 49 ideas (brand personality, emotions, values, styles, topics), reached through about 2,900 keywords with autocomplete, and a fingerprint chart of what the words ask for. Each idea is linked to colors, type and graphics by a rule with a named source. Brand changes are kept when you choose Save brand.
 - **Color**: 28 ready-made palettes, or build one color at a time with partners that suit your primary and match your keywords. Contrast is checked against WCAG 2.2.
 - **Type**: 52 ready-made pairings from 56 bundled open-licensed typefaces.
+- **Graphics**: 33 procedural graphics in 126 styles, drawn in the brand's colors. Each style leans toward a different part of the fingerprint, and a card per graphic steps through its styles. A post can use its own graphic, set on the Media page.
 - **Library**: save named palettes, pairings, a logo and any number of posts under a brand, sorted into folders. Keep several brands, and copy a post from one brand to another in the new brand's look.
 - **Themes**: Neon Noir (default), Clean Light, Clean Dark and Graphite, in Settings. The preview area stays neutral gray in all of them.
 - **Layer editor** (a mode of the Media page): import a PDF (for example, one downloaded from Canva) or an image and edit it as layers, or start from a blank canvas.

@@ -74,7 +74,8 @@ Sample text must not make result claims. Write labels for someone who has never 
 | A platform format or safe zone | `FORMATS` in `src/data.js` (cite the guide in `SRC`) |
 | A typeface | `npm install -D @fontsource/<name>`, then `scripts/fonts.mjs`, then a pairing in `src/types.js` |
 | A type pairing | `TYPESETS` in `src/types.js` |
-| A graphic | the `G` object in `src/draw.js` and `GRAPHICS` in `src/data.js` |
+| A graphic | a family in `GFAMILIES` in `src/data.js` (at least three styles, each with its own shape features) and a function in the `G` object in `src/draw.js` that draws every style |
+| A style of a graphic | an entry in its family's `vars` in `src/data.js`, and a branch in that family's `G` function. Do not change the first style's drawing: saved posts use it |
 | A layout | the `L` object in `src/draw.js`, `LAYOUTS` and each format's `layouts` list in `src/data.js` |
 | A keyword or idea | `src/concepts.js` |
 | A tagging rule | `src/engine.js` (and its source in `SRC`) |
