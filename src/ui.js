@@ -36,12 +36,13 @@ let uiMode=store.get('brandlab.mode.v1')==='advanced'?'advanced':'simple';
 const LEANS=[{k:'sincerity',i:0,l:'Sincerity'},{k:'excitement',i:1,l:'Excitement'},{k:'competence',i:2,l:'Competence'},{k:'sophistication',i:3,l:'Sophistication'},{k:'ruggedness',i:4,l:'Ruggedness'},
  {k:'p+',i:5,d:1,l:'High pleasure'},{k:'p-',i:5,d:-1,l:'Low pleasure'},{k:'a+',i:6,d:1,l:'High arousal'},{k:'a-',i:6,d:-1,l:'Low arousal'},{k:'d+',i:7,d:1,l:'High dominance'},{k:'d-',i:7,d:-1,l:'Low dominance'}];
 const LEAN_MIN=.45;
+const LEAN_OPP={'p+':'p-','p-':'p+','a+':'a-','a-':'a+','d+':'d-','d-':'d+'};
 const ADV_DEFAULTS={headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true};
 const advActive=s=>Object.keys(ADV_DEFAULTS).some(k=>s[k]!==ADV_DEFAULTS[k]);
 function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('brandlab.mode.v1',uiMode);document.body.classList.toggle('mode-simple',uiMode==='simple');document.body.classList.toggle('mode-advanced',uiMode==='advanced');
   document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));setPanel(state.mpanel);if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
-function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true,graphic:false},mpanel:'layouts',gLean:'',
+function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true,graphic:false},mpanel:'layouts',gLean:'',fpTarget:[],
   headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
@@ -49,7 +50,10 @@ function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s
   if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
   if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false,graphic:o.shuffle.graphic===true};if(!['layouts','text','photo','graphic','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';
-  if(!LEANS.some(L=>L.k===o.gLean))o.gLean='';return o;}
+  if(!LEANS.some(L=>L.k===o.gLean))o.gLean='';
+  /* fpTarget replaced gLean (one direction, graphics only); a state saved before it carries the old choice over. */
+  {const t=Array.isArray(s.fpTarget)?s.fpTarget:o.gLean?[o.gLean]:[];o.fpTarget=[];t.forEach(k=>{if(LEANS.some(L=>L.k===k)&&!o.fpTarget.includes(k)&&!o.fpTarget.includes(LEAN_OPP[k]))o.fpTarget.push(k);});}
+  return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
 
@@ -102,24 +106,33 @@ function buildDirectory(){const box=$('#dirBody');box.textContent='';box.append(
 function results(){const cw=parsed.cw;return{colors:rank('palette',PALETTES,cw),type:rank('type',listedTypes(),cw),graphic:rank('graphic',GRAPHICS,cw)};}
 function whyList(tags,ids,extra){const ul=el('ul',{class:'why'});(extra||[]).forEach(x=>ul.append(x));ids.forEach(c=>{const t=tags[c];ul.append(el('li',null,tierEl(t.src),el('span',null,el('b',{text:cLabel(c)+': '}),t.why+(SRC[t.src].t==='C'?'':' ('+SRC[t.src].short+')'))));});return ul;}
 function kwLabels(){return parsed.concepts.map(cLabel).join(', ');}
+/* Cards: the ideas an option signals as small tier-marked tags (hover or focus a tag for its reason and source),
+   and the strongest reason written out once. The full list stays in the detail panels. */
+function tagChip(tags,c){const t=tags[c];return el('span',{class:'tchip',title:t.why+' ('+SRC[t.src].short+(SRC[t.src].t==='C'?', convention':'')+')'},tierEl(t.src),cLabel(c));}
+function whyCompact(tags,ids,extra){if(!ids.length&&!(extra&&extra.length))return null;const t=ids.length?tags[ids[0]]:null;
+  return el('div',{class:'whyc'},el('div',{class:'tchips'},extra||null,ids.map(c=>tagChip(tags,c))),t?el('p',{class:'why1'},el('b',{text:cLabel(ids[0])+': '}),t.why+(SRC[t.src].t==='C'?'':' ('+SRC[t.src].short+')')):null);}
 
 /* ---------- results ---------- */
 function buildSubbar(){const bar=$('#subbar');bar.textContent='';
   if(state.tab==='colors'){bar.append(el('div',{class:'seg',role:'group','aria-label':'Color mode'},[['palettes','Premade palettes'],['build','Build your own']].map(([v,t])=>el('button',{type:'button','aria-pressed':String(state.colorMode===v),text:t,onclick:()=>{state.colorMode=v;buildResults();}}))));}
   else if(state.tab==='type'){const build=uiMode==='advanced'&&state.typeMode==='build',ts=listedTypes();
     if(uiMode==='advanced')bar.append(el('div',{class:'seg',role:'group','aria-label':'Type mode'},[['sets','Ready-made pairings'],['build','Build a pairing']].map(([v,t])=>el('button',{type:'button','aria-pressed':String((build?'build':'sets')===v),text:t,onclick:()=>{state.typeMode=v;buildResults();}}))));
-    if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));}
-  else if(state.tab==='graphic')bar.append(gLeanBar(buildResults));}
-function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>has?res[k].filter(r=>r.score>0).length:res[k].length;
+    if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));
+    if(!build)bar.append(tgtBar(buildResults,'pairings'));}
+  else if(state.tab==='graphic')bar.append(tgtBar(buildResults,'graphics'));
+  if(state.tab==='colors')bar.append(tgtBar(buildResults,state.colorMode==='build'?'colors':'palettes'));}
+function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>{const rs=has?res[k].filter(r=>r.score>0):res[k];return tgtOn()?rs.filter(r=>tgtFit(itemLean(k,r.it)).ok).length:rs.length;};
   $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=has?graphicRows().filter(r=>r.score>0).length:GFAMILIES.length;
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
   const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
-  const kind=state.tab;if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;buildColorBuilder();return;}
-  if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;buildTypeBuilder();return;}$('#rhead').hidden=false;
+  const kind=state.tab,rbox=$('#results');rbox.classList.remove('flow');
+  if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;rbox.classList.add('flow');buildColorBuilder();return;}
+  if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;rbox.classList.add('flow');buildTypeBuilder();return;}$('#rhead').hidden=false;
   if(kind==='graphic'){buildGraphicResults();return;}
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
-  const matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
-  $('#rSummary').textContent=has?(matches.length?`${matches.length} of ${rows.length} match ${kwLabels()}, best first`:`Nothing here is linked to ${kwLabels()}`):`All ${rows.length}. Type keywords to rank them.`;
+  const matches=rows.filter(r=>r.score>0);let show=has&&!state.showAll?matches:rows;const tgt=tgtOn();
+  if(tgt)show=show.map(r=>Object.assign({},r,{fit:tgtFit(itemLean(kind,r.it))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} match your keywords`:'None match your keywords'):`${rows.length} ${kind==='colors'?'palettes':'pairings'}`)+(tgt?` \u00B7 ${show.length} fit your aim`:has?'':'. Add keywords to rank them.');
   const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
   const box=$('#results');box.textContent='';const tagKind=kind==='colors'?'palette':kind;
   show.forEach(r=>{const it=r.it;const tg=TAGS[tagKind][it.id].tags;const ids=(r.matched.length?r.matched.filter(c=>tg[c]):topTags(tg,2)).slice(0,3);
@@ -127,8 +140,9 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
     if(kind==='colors'){const widths={bg:30,surface:14,primary:26,accent:16,text:14};vis=el('span',{class:'vis sw'},ROLES.map(([role])=>el('i',{style:`width:${widths[role]}%;background:${it[role]}`})));if(it.mine)meta=el('div',{class:'meta',text:'Your palette'});else if(it.note)meta=el('div',{class:'meta',text:it.note});}
     else if(kind==='type'){const d=it.display;vis=el('span',{class:'vis aa',style:`font-family:"${d.family}",${d.fb};font-weight:${d.weight}`,text:d.upper?'AA':'Aa'});meta=el('div',{class:'meta',text:(it.mine?'Your pairing: ':'')+d.family+(it.body.family!==d.family?' with '+it.body.family:'')});}
     else{vis=el('span',{class:'vis'},el('canvas',{'data-g':it.id,width:176,height:120}));}
-    box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,ids.length?whyList(tg,ids):null)));});
-  if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
+    box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,r.fit?tgtChips(r.fit.s):null,whyCompact(tg,ids))));});
+  if(!show.length&&tgt)box.append(tgtEmpty(kind==='colors'?'palette':'pairing',has&&!state.showAll&&rows.length>matches.length,kind==='colors'));
+  else if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
 function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g],#mgPanel canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
 function runSearch(){parsed=parseQuery(liveQuery());buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
@@ -141,8 +155,9 @@ function apply(kind,id){if(kind==='colors'){state.paletteId=id;state.colors=palC
 const GFAM={};GFAMILIES.forEach(F=>GFAM[F.fam]=F);
 const gLabel=g=>g.fam==='none'?g.name:g.name+' · '+g.vn;
 /* A style's position on the eight fingerprint axes, from its tags alone, as one score per direction (0 to 1). */
-function leanScores(id){const tg=TAGS.graphic[id].tags,w={};for(const c in tg)w[c]=Math.min(1,tg[c].w);const fp=fingerprint(w),o={};
+function leanOf(tags){const w={};for(const c in tags)w[c]=Math.min(1,tags[c].w);const fp=fingerprint(w),o={};
   LEANS.forEach(L=>{o[L.k]=!fp?0:L.d?(fp[L.i].set?Math.max(0,(fp[L.i].v-.5)*2*L.d):0):fp[L.i].v;});return o;}
+function leanScores(id){return leanOf(TAGS.graphic[id].tags);}
 /* Badges name the two directions where a style leans furthest compared with its family's other styles,
    so "High pleasure", which most curved shapes share, does not crowd out what sets a style apart. */
 let leanCache=null;
@@ -151,14 +166,48 @@ function leans(id){if(!leanCache){leanCache={};GFAMILIES.forEach(F=>{const S=F.v
   return leanCache[id]||{s:{},top:[]};}
 function leanChips(id){const t=leans(id).top;return t.length?el('div',{class:'glean',title:'Where this style sits on the fingerprint, compared with the other styles of the same graphic'},t.map(L=>el('span',{class:'lean',text:L.l}))):null;}
 /* One row per family: its best keyword score, and which style to show when the family is not in use. */
-function graphicRows(){const has=parsed.concepts.length>0,by={};rank('graphic',GRAPHICS,parsed.cw).forEach(r=>{(by[r.it.fam]=by[r.it.fam]||[]).push(r);});const lean=state.gLean;
-  let rows=GFAMILIES.map((F,i)=>{const best=by[F.fam][0];let pick=has&&best.score>0?best.it.id:F.vars[0].id,leanS=0;
-    if(lean){const L=F.vars.map(v=>[v.id,leans(v.id).s[lean]||0]).sort((a,b)=>b[1]-a[1]);leanS=L[0][1];if(leanS>=LEAN_MIN)pick=L[0][0];}
-    return{F,score:best.score,pick,leanS,i};});
-  if(lean)rows=rows.filter(r=>r.leanS>=LEAN_MIN);
-  return rows.sort((a,b)=>(has?b.score-a.score:0)||(lean?b.leanS-a.leanS:0)||a.i-b.i);}
-function gLeanBar(onChange){return el('div',{class:'sugg glbar',role:'group','aria-label':'Show graphics with a style that leans toward'},el('span',{class:'note',style:'margin:0 4px 0 0',text:'Leans toward:'}),
-  [{k:'',l:'Any'}].concat(LEANS).map(L=>el('button',{type:'button','aria-pressed':String(state.gLean===L.k),text:L.l,onclick:()=>{state.gLean=L.k;onChange();}})));}
+/* With a fingerprint target, a family shows its style that fits the target best, and families with no fitting style drop out. */
+function graphicRows(){const has=parsed.concepts.length>0,by={},tgt=tgtOn();rank('graphic',GRAPHICS,parsed.cw).forEach(r=>{(by[r.it.fam]=by[r.it.fam]||[]).push(r);});
+  let rows=GFAMILIES.map((F,i)=>{const best=by[F.fam][0];let pick=has&&best.score>0?best.it.id:F.vars[0].id,fit=null;
+    if(tgt){const L=F.vars.map(v=>[v.id,tgtFit(leans(v.id).s)]).sort((a,b)=>(b[1].ok-a[1].ok)||(b[1].mean-a[1].mean));fit=L[0][1];if(fit.ok)pick=L[0][0];}
+    return{F,score:best.score,pick,fit,i};});
+  if(tgt)rows=rows.filter(r=>r.fit.ok);
+  return rows.sort((a,b)=>(tgt?b.fit.mean-a.fit.mean:0)||(has?b.score-a.score:0)||a.i-b.i);}
+
+/* ---------- fingerprint target ("Aim for") ----------
+   Filters and orders options by where they sit on the fingerprint, whatever the keywords. An option's position comes
+   from its own tags through the same fingerprint() the chart draws, so a pick that passes here pulls the chart's
+   picks shape the same way. Several directions can be chosen at once; an option passes only when it reaches
+   LEAN_MIN on every one, and options are ordered by their average across them. Opposite ends of one feeling axis
+   cannot both be chosen. */
+const tgtOn=()=>state.fpTarget.length>0;
+const tgtNames=()=>{const n=state.fpTarget.map(k=>LEANS.find(L=>L.k===k).l.toLowerCase());return n.length>1?n.slice(0,-1).join(', ')+' and '+n[n.length-1]:n[0]||'';};
+const colorLeanCache={};
+function colorLean(hex){hex=hex.toUpperCase();return colorLeanCache[hex]||(colorLeanCache[hex]=leanOf(tagColor(hex).tags));}
+/* kind: 'colors' (a palette), 'type', 'graphic' or 'color' (one hex). Palettes are not cached: a saved palette can be edited. */
+function itemLean(kind,it){return kind==='graphic'?leans(it.id).s:kind==='color'?colorLean(it.hex):leanOf(TAGS[kind==='colors'?'palette':kind][it.id].tags);}
+function tgtFit(s){const v=state.fpTarget.map(k=>s[k]||0),min=Math.min(...v);return{s,min,mean:v.reduce((a,b)=>a+b,0)/v.length,ok:min>=LEAN_MIN};}
+function tgtToggle(k){const on=state.fpTarget.includes(k),t=state.fpTarget.filter(x=>x!==k&&x!==LEAN_OPP[k]);if(!on)t.push(k);state.fpTarget=LEANS.map(L=>L.k).filter(x=>t.includes(x));}
+/* The keywords' own shape, read off the chart: personality axes at half strength or more, feeling axes
+   clearly off neutral. At most three, strongest first, so the filter does not demand more than a few things at once. */
+function tgtFromKeywords(){const fp=fingerprint(parsed.cw);if(!fp)return[];const c=[];
+  FP_AXES.forEach((a,i)=>{const x=fp[i];if(!x.set)return;if(a.pad==null){if(x.v>=.5)c.push([LEANS[i].k,x.v]);return;}
+    const d=(x.v-.5)*2;if(Math.abs(d)>=.3)c.push([LEANS.find(L=>L.i===i&&L.d===Math.sign(d)).k,Math.abs(d)]);});
+  return c.sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);}
+function tgtBar(onChange,what){const has=parsed.concepts.length>0,on=tgtOn();
+  const b=L=>el('button',{type:'button','aria-pressed':String(state.fpTarget.includes(L.k)),'aria-label':L.l,title:L.l,text:L.d?(L.d>0?'High':'Low'):L.l,onclick:()=>{tgtToggle(L.k);onChange();}});
+  const pairs=[[5,'Pleasure'],[6,'Arousal'],[7,'Dominance']].map(([i,l])=>el('span',{class:'tpair',role:'group','aria-label':l},el('span',{class:'tpl',text:l}),LEANS.filter(L=>L.i===i).map(b)));
+  return el('div',{class:'tgtbar',role:'group','aria-label':'Aim for: show '+what+' that lean toward every direction chosen'},
+    el('span',{class:'tgtl',text:'Aim for'}),
+    el('div',{class:'tgtchips'},el('span',{class:'tgrp sugg'},LEANS.filter(L=>!L.d).map(b)),el('span',{class:'tgrp'},pairs)),
+    el('div',{class:'tgtrow'},on?el('span',{text:'Showing '+what+' that lean toward '+tgtNames()+'.'}):el('span',{class:'simple-only',text:'Pick directions on the fingerprint to see only the '+what+' that lean that way.'}),
+      has?el('button',{type:'button',class:'link',text:'Match my keywords',title:'Choose up to three directions where your keyword fingerprint is strongest',onclick:()=>{const t=tgtFromKeywords();state.fpTarget=LEANS.map(L=>L.k).filter(k=>t.includes(k));onChange();if(!t.length)say('Your keywords do not lean clearly toward any direction on the fingerprint.');}}):null,
+      on?el('button',{type:'button',class:'link',text:'Clear',onclick:()=>{state.fpTarget=[];onChange();}}):null));}
+/* How far an option leans toward each chosen direction, 0 to 100%. A direction below the bar is shown faded. */
+function tgtChips(s){return el('div',{class:'glean tfit',title:'How far this leans toward each direction you are aiming for. '+Math.round(LEAN_MIN*100)+'% or more counts.'},
+  state.fpTarget.map(k=>{const L=LEANS.find(x=>x.k===k),v=s[k]||0;return el('span',{class:'lean '+(v>=LEAN_MIN?'hit':'short'),text:L.l+' '+Math.round(v*100)+'%'});}));}
+function tgtEmpty(noun,kwNarrowed,toBuilder){const p=el('p',{class:'empty'},`No ${noun} leans toward ${tgtNames()} strongly enough. `,kwNarrowed?'Choose \u201CShow all\u201D to look beyond your keyword matches, or drop a direction. ':'Drop a direction to widen the search. ');
+  if(toBuilder)p.append('Single colors cover more of the fingerprint than premade palettes: ',el('button',{type:'button',class:'link',text:'build one color by color',onclick:()=>{state.colorMode='build';buildResults();}}),'.');return p;}
 let gRefocus=null;
 function gCard(row,onPick,compact){const F=row.F,g0=GV[state.graphicId],inUse=!!g0&&g0.fam===F.fam,cur=inUse?state.graphicId:row.pick,g=GV[cur],n=F.vars.length,idx=F.vars.findIndex(v=>v.id===cur);
   const go=(id,key)=>{if(key)gRefocus=F.fam;onPick(id);},step=(d,key)=>go(F.vars[(idx+d+n)%n].id,key);
@@ -169,30 +218,30 @@ function gCard(row,onPick,compact){const F=row.F,g0=GV[state.graphicId],inUse=!!
     el('button',{type:'button',class:'garr','aria-label':'Next '+F.name.toLowerCase()+' style',text:'›',onclick:()=>step(1)})):null;
   const m=parsed.concepts.length?scoreTags(TAGS.graphic[cur].tags,parsed.cw).matched.slice(0,2):[];
   return el('div',{class:'gcard'+(inUse?' on':''),'data-fam':F.fam},pickBtn,el('div',{class:'ghead'},el('span',{class:'nm'},F.name,inUse?el('span',{class:'inuse',text:'In use'}):null),
-    n>1?el('span',{class:'gvn',text:g.vn+' · '+(idx+1)+' of '+n}):null),nav,leanChips(cur),!compact&&m.length?whyList(TAGS.graphic[cur].tags,m):null);}
+    n>1?el('span',{class:'gvn',text:g.vn+' · '+(idx+1)+' of '+n}):null),nav,tgtOn()?tgtChips(leans(cur).s):leanChips(cur),!compact&&m.length?el('div',{class:'tchips'},m.map(c=>tagChip(TAGS.graphic[cur].tags,c))):null);}
 /* The graphic in use, with every style of its family side by side. */
-function gCurrent(onPick){const g=GV[state.graphicId]||GV.none,F=GFAM[g.fam],box=el('div',{class:'gcur'});
+function gCurrent(onPick,compact){const g=GV[state.graphicId]||GV.none,F=GFAM[g.fam],box=el('div',{class:'gcur'});
   box.append(el('div',{class:'bhead'},el('h3',null,'In use: ',el('b',{text:gLabel(g)})),F.vars.length>1?el('span',{class:'meta',text:'Each style leans toward a different part of the fingerprint'}):null));
   if(F.vars.length>1)box.append(el('div',{class:'gvars',role:'group','aria-label':F.name+' styles'},F.vars.map(v=>el('button',{type:'button',class:'gvar','aria-pressed':String(v.id===g.id),onclick:()=>onPick(v.id)},
     el('canvas',{'data-g':v.id,width:200,height:130}),el('span',{class:'nm',text:v.vn}),leanChips(v.id)))));
   else box.append(el('p',{class:'note',text:'No graphic is in use. Pick one below; each has three or four styles.'}));
-  const tg=TAGS.graphic[g.id],m=scoreTags(tg.tags,parsed.cw).matched,ids=(m.length?m:topTags(tg.tags,3)).slice(0,3);if(ids.length)box.append(whyList(tg.tags,ids));
+  const tg=TAGS.graphic[g.id],m=scoreTags(tg.tags,parsed.cw).matched,ids=(m.length?m:topTags(tg.tags,3)).slice(0,3);if(ids.length)box.append(compact?whyCompact(tg.tags,ids):whyList(tg.tags,ids));
   tg.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
 function gRefocusNow(){if(!gRefocus)return;const b=document.querySelector('.gcard[data-fam="'+gRefocus+'"] .gpick');gRefocus=null;if(b)b.focus();}
-function buildGraphicResults(){const has=parsed.concepts.length>0,rows=graphicRows(),L=LEANS.find(x=>x.k===state.gLean),matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
+function buildGraphicResults(){const has=parsed.concepts.length>0,rows=graphicRows(),tgt=tgtOn(),matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
   const nV=GRAPHICS.length-1,nF=GFAMILIES.length-1;
-  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} graphics match ${kwLabels()}, best first`:`No graphic here is linked to ${kwLabels()}`):`${nF} graphics in ${nV} styles`)+(L?`. Showing graphics with a style that leans toward ${L.l.toLowerCase()}`:'')+'.';
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${GFAMILIES.length} graphics match your keywords`:'No graphic matches your keywords'):`${nF} graphics in ${nV} styles`)+(tgt?` \u00B7 ${show.length} fit your aim`:'');
   const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
   const box=$('#results');box.textContent='';const pick=id=>apply('graphic',id);box.append(gCurrent(pick),el('div',{class:'ggrid'},show.map(r=>gCard(r,pick))));
-  if(!show.length)box.append(el('p',{class:'empty',text:L?'No style leans that way strongly enough. Choose another direction, or Any.':'Try the other tabs, or choose “Show all”.'}));
+  if(!show.length)box.append(tgt?tgtEmpty('graphic style',has&&!state.showAll,false):el('p',{class:'empty',text:'Try the other tabs, or choose “Show all”.'}));
   paintGraphicThumbs();gRefocusNow();}
 /* Media page: the post's graphic. A change here belongs to this post; the brand's graphic is set on the Brand page. */
 function buildMediaGraphic(){const cur=$('#mgCur');if(!cur||$('#mgPanel').hidden)return;const L=Lib.look(),bg=L&&GV[L.graphicId]?L.graphicId:null;
   const pick=id=>{state.graphicId=id;renderLook();requestPaint(true);};
   $('#mgNote').textContent='Changes here apply to this post.'+(bg?' The brand’s graphic is '+gLabel(GV[bg])+'.':'')+' Change the brand’s own graphic on the Brand page.';
   const b=$('#mgBrand');b.hidden=!bg||bg===state.graphicId;b.onclick=()=>pick(bg);
-  cur.textContent='';cur.append(gCurrent(pick));const lb=$('#mgLean');lb.textContent='';lb.append(gLeanBar(buildMediaGraphic));
-  const grid=$('#mgGrid');grid.textContent='';const rows=graphicRows();grid.append(...rows.map(r=>gCard(r,pick,true)));if(!rows.length)grid.append(el('p',{class:'empty',text:'No style leans that way strongly enough.'}));
+  cur.textContent='';cur.append(gCurrent(pick,true));const lb=$('#mgLean');lb.textContent='';lb.append(tgtBar(buildMediaGraphic,'graphics'));
+  const grid=$('#mgGrid');grid.textContent='';const rows=graphicRows();grid.append(...rows.map(r=>gCard(r,pick,true)));if(!rows.length)grid.append(tgtEmpty('graphic style',false,false));
   $('#mgStrength').value=Math.round(state.gStrength*100);paintGraphicThumbs();gRefocusNow();}
 
 /* ---------- build color by color ---------- */
@@ -200,36 +249,48 @@ function setRole(role,hex){state.colors[role]=hex.toUpperCase();buildColors();bu
 function colorInfo(hex,forRole){const t=tagColor(hex),has=parsed.concepts.length>0;const m=scoreTags(t.tags,parsed.cw).matched;const ids=(m.length?m:topTags(t.tags,2)).slice(0,3);
   const head=el('div',{class:'cihead'},el('i',{class:'dot',style:'background:'+hex}),el('b',{text:hex.toUpperCase()}),el('span',{text:HUE_LABEL[t.fam]+' family'}),has?el('span',{class:m.length?'pass':'fail',text:m.length?'Matches '+m.map(cLabel).join(', '):'No link to your keywords'}):null);
   const box=el('div',{class:'cinfo'},head,ids.length?whyList(t.tags,ids):el('p',{class:'note',text:'No associations on file for this color.'}));
+  if(tgtOn())box.append(tgtChips(colorLean(hex)));
   t.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
-function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary;
-  box.append(el('p',{class:'note',style:'margin-top:0',text:'Pick a role, then choose its color. Start with Primary; the other roles then show partners that suit it.'}));
+function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary,tgt=tgtOn(),rn=ROLE_NAME[role];
+  box.append(el('p',{class:'note simple-only',style:'margin:0 0 8px',text:'Pick a role, then its color. Start with Primary: the other roles then suggest partners for it.'}));
   box.append(el('div',{class:'roles',role:'group','aria-label':'Color role to change'},ROLES.map(([r,l])=>el('button',{type:'button',class:'role','aria-pressed':String(role===r),onclick:()=>{state.buildRole=r;buildResults();}},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))));
-  const pick=el('input',{type:'color',id:'bPick','aria-label':'Custom '+ROLE_NAME[role]+' color'});pick.value=state.colors[role];pick.addEventListener('change',()=>setRole(role,pick.value));
-  const hx=el('input',{type:'text',id:'bHex',maxlength:7,placeholder:'#1A2B3C','aria-label':'Hex code for the '+ROLE_NAME[role]+' color',style:'width:92px'});hx.value=state.colors[role].toUpperCase();
+  const pick=el('input',{type:'color',id:'bPick','aria-label':'Custom '+rn+' color'});pick.value=state.colors[role];pick.addEventListener('change',()=>setRole(role,pick.value));
+  const hx=el('input',{type:'text',id:'bHex',maxlength:7,placeholder:'#1A2B3C','aria-label':'Hex code for the '+rn+' color',style:'width:92px'});hx.value=state.colors[role].toUpperCase();
   const useHex=()=>{let v=hx.value.trim();if(v&&v[0]!=='#')v='#'+v;if(validHex(v))setRole(role,v);else{hx.value=state.colors[role].toUpperCase();say('That is not a hex color. Use six characters, such as #1A2B3C.');}};hx.addEventListener('change',useHex);hx.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();useHex();}});
-  box.append(el('div',{class:'bhead'},el('h3',{text:'Current '+ROLE_NAME[role]}),el('span',{class:'rowbtns'},hx,el('label',{class:'btn small',for:'bPick',style:'cursor:pointer'},'Any color\u2026',pick))));
+  const sec=(title,right)=>el('div',{class:'bhead'},el('h3',null,title),right||null);
+  box.append(sec('Current '+rn,el('span',{class:'rowbtns'},hx,el('label',{class:'btn small',for:'bPick',style:'cursor:pointer'},'Any color…',pick))));
   const info=colorInfo(state.colors[role],role);info.id='cinfo';box.append(info);
 
-  if(role!=='primary'){const rows=companions(anchor,role,ground,parsed.cw);const matched=rows.filter(r=>r.matched.length);const list=(has&&!state.showLoose?matched:rows).slice(0,10);
-    box.append(el('div',{class:'bhead'},el('h3',null,'Goes with your primary ',el('i',{class:'dot',style:'background:'+anchor}),has?' and matches a keyword':''),has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
-    if(!list.length)box.append(el('p',{class:'empty',text:has?`No ${ROLE_NAME[role]} color that suits this primary is linked to ${kwLabels()}. Choose \u201CInclude colors with no keyword link\u201D, or change the primary.`:'No suitable partners for this role.'}));
-    list.forEach(r=>{const hm=r.hm;const extra=[el('li',null,tierEl(hm.src),el('span',null,el('b',{text:hm.level+' harmony: '}),hm.why+' ('+SRC[hm.src].short+')'+(hm.close?'. Lightness is close to the primary, which lowered harmony ratings.':'')))];
-      if(role==='text'||role==='accent')extra.push(el('li',null,tierEl('WCAG'),el('span',null,el('b',{text:'On the ground: '}),r.pop.toFixed(1)+':1 contrast'+(role==='text'?'':r.pop<1.5?', too faint to stand out':r.pop>=3?', stands out':''))));
-      box.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{style:'width:42%;background:'+anchor}),el('i',{style:'width:58%;background:'+r.hex})),el('span',null,el('span',{class:'nm'},r.hex,el('span',{class:'meta',text:hm.rel+', '+r.label})),whyList(r.tags,r.matched.slice(0,2),extra))));});}
-  else box.append(el('p',{class:'note',text:'Partners for this primary appear when you select Ground, Panel, Accent or Text above.'}));
+  if(role!=='primary'){const rows=companions(anchor,role,ground,parsed.cw);const matched=rows.filter(r=>r.matched.length);let list=has&&!state.showLoose?matched:rows;
+    /* Partners keep their order (how well they suit the primary); the target only filters them. */
+    if(tgt)list=list.filter(r=>tgtFit(colorLean(r.hex)).ok);list=list.slice(0,10);
+    const narrowed=has&&!state.showLoose;
+    box.append(sec(['Partners for ',el('i',{class:'dot',style:'background:'+anchor}),' your primary'],has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
+    box.append(el('p',{class:'note',style:'margin:0 0 8px',text:'Ranked by how well they suit the primary'+(narrowed?', among colors that match a keyword':'')+(tgt?', that lean toward '+tgtNames():'')+'.'}));
+    if(!list.length)box.append(el('p',{class:'empty',text:tgt?`None of the partners leans toward ${tgtNames()}. `+(narrowed?'Include colors with no keyword link, drop a direction, or pick from the single colors below.':'Drop a direction, or pick from the single colors below.'):has?`No ${rn} color that suits this primary matches your keywords. Include colors with no keyword link, or change the primary.`:'No suitable partners for this role.'}));
+    const og=el('div',{class:'optgrid'});
+    list.forEach(r=>{const hm=r.hm;
+      const facts=[el('span',{class:'tchip',title:hm.why+' ('+SRC[hm.src].short+')'+(hm.close?'. Lightness is close to the primary, which lowered harmony ratings.':'')},tierEl(hm.src),hm.level+' harmony')];
+      if(role==='text'||role==='accent')facts.push(el('span',{class:'tchip',title:'Contrast against the ground (WCAG 2.2)'+(role==='text'?'':r.pop<1.5?': too faint to stand out':r.pop>=3?': stands out':'')},tierEl('WCAG'),r.pop.toFixed(1)+':1 on ground'));
+      og.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{style:'width:42%;background:'+anchor}),el('i',{style:'width:58%;background:'+r.hex})),
+        el('span',null,el('span',{class:'nm'},r.hex),el('div',{class:'meta',text:hm.rel+', '+r.label}),tgt?tgtChips(colorLean(r.hex)):null,whyCompact(r.tags,r.matched.slice(0,2),facts))));});
+    box.append(og);}
 
   let lib=rankColors(parsed.cw);if(role==='text')lib=lib.filter(r=>contrast(r.it.hex,ground)>=4.5);if(role==='bg')lib=lib.filter(r=>{const L=hexToLch(r.it.hex).L;return L>80||L<28;});
-  const m=lib.filter(r=>r.score>0),show=has?m.slice(0,35):lib;
-  box.append(el('div',{class:'bhead'},el('h3',{text:has?(m.length?`Single colors linked to ${kwLabels()}`:`No single color is linked to ${kwLabels()}`):'All colors'}),el('span',{class:'meta',text:has&&m.length?'Best first':''})));
-  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals. Select it to use it as the '+ROLE_NAME[role]+'.'}));
+  const m=lib.filter(r=>r.score>0);let show=has?m.slice(0,35):lib;
+  /* With a target, every color that fits is listed (keyword matches only, when there are keywords), closest first. */
+  if(tgt)show=(has?m:lib).map(r=>Object.assign({},r,{fit:tgtFit(colorLean(r.it.hex))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
+  box.append(sec('Single colors',el('span',{class:'meta',text:show.length+(tgt?(has?' match your keywords and fit your aim':' fit your aim'):has?' best matches for your keywords':' colors')})));
+  if(!show.length)box.append(el('p',{class:'empty',text:tgt?`No single color${has?' that matches your keywords':''} leans toward ${tgtNames()}. Drop a direction to widen the search.`:'No single color matches your keywords.'}));
+  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals. Select it to use it as the '+rn+'.'}));
   const grid=el('div',{class:'swgrid'});show.forEach(r=>{const b=el('button',{type:'button',class:'swatch',style:'background:'+r.it.hex,title:r.it.name+' '+r.it.hex,'aria-label':r.it.name+' '+r.it.hex,'aria-pressed':String(state.colors[role].toUpperCase()===r.it.hex),onclick:()=>setRole(role,r.it.hex)});
     const showInfo=()=>{live.textContent='';const ci=colorInfo(r.it.hex,role);ci.firstChild.insertBefore(el('span',{text:r.it.name}),ci.firstChild.children[2]);live.append(...ci.childNodes);};b.addEventListener('mouseenter',showInfo);b.addEventListener('focus',showInfo);grid.append(b);});
-  box.append(grid,live);
-  box.append(el('div',{class:'bhead'},el('h3',{text:'Save this combination to the brand'})));
+  if(show.length)box.append(el('div',{class:'swwrap'},grid,live));
+  box.append(sec('Save these colors as a palette'));
   const pn=el('input',{type:'text',id:'palName',maxlength:40,placeholder:'Name this palette','aria-label':'Palette name'});pn.addEventListener('keydown',e=>{if(e.key==='Enter')Lib.savePalette(pn.value);});
   box.append(el('div',{class:'savepal'},pn,el('button',{type:'button',class:'btn small primary',text:'Save palette',onclick:()=>Lib.savePalette(pn.value)})));
   if(myPalettes.length)box.append(el('div',{class:'mine'},myPalettes.map(p=>{const i=el('input',{type:'text',maxlength:40,'aria-label':'Rename '+p.name});i.value=p.name;i.addEventListener('change',()=>Lib.renamePalette(p.id,i.value));
-    return el('span',{class:'term'},el('i',{class:'dot',style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'\u00D7',onclick:()=>Lib.deletePalette(p.id)}));})));}
+    return el('span',{class:'term'},el('i',{class:'dot',style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'×',onclick:()=>Lib.deletePalette(p.id)}));})));}
 
 /* ---------- build a type pairing (Advanced) ---------- */
 function buildTypeBuilder(){const box=$('#results');box.textContent='';const cur=TYP[state.typeId]||TYP.clear,mine=cur.mine?myTypes.find(m=>m.id===cur.id):null,fams=Object.keys(FONT_FACES).sort();

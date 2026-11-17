@@ -26,7 +26,7 @@ test('opens in Simple mode with a starter brand and no errors', async () => {
   await page.click('#ovWelcome [data-close]');
   const s = await page.evaluate('({mode:Store.S.mode,ui:uiMode,brands:Store.all("brand").length,palettes:PALETTES.length,types:TYPESETS.length,formats:FORMATS.length})');
   assert.deepEqual({ mode: s.mode, ui: s.ui, brands: s.brands }, { mode: 'local', ui: 'simple', brands: 1 });
-  assert.ok(s.palettes >= 28 && s.types >= 52 && s.formats >= 30);
+  assert.ok(s.palettes >= 39 && s.types >= 52 && s.formats >= 30);
   // a first visit starts on the Brand page, at the describe step
   assert.equal(await page.isVisible('#bDescribe'), true);
   assert.equal(await page.evaluate('Lib.view'), 'brand');
@@ -137,7 +137,7 @@ test('graphics: every graphic has styles that lean apart, picked and stepped thr
   await page.click('#btnUseKw');
   await page.click('#tabs button[data-v=graphic]');
   await page.waitForSelector('#results .gcard');
-  assert.match(await page.textContent('#rSummary'), /graphics match Contentment/);
+  assert.match(await page.textContent('#rSummary'), /graphics match your keywords/);
   await page.click('#btnAll');
   assert.equal(await page.locator('#results .gcard').count(), cat.length);
   const card = '#results .gcard[data-fam=waves]';
@@ -158,13 +158,13 @@ test('graphics: every graphic has styles that lean apart, picked and stepped thr
   assert.ok(await page.locator('#results .gcur .lean').count() >= 4);
   await page.click('#results .gcur .gvar >> nth=1');
   assert.equal(await page.evaluate('state.graphicId'), 'waves-line');
-  // the lean filter keeps graphics with a style that leans that way, and shows that style
-  await page.click('#subbar .glbar button:has-text("High dominance")');
+  // the Aim for filter keeps graphics with a style that leans that way, and shows that style
+  await page.click('#subbar .tgtbar button[aria-label="High dominance"]');
   // (the card of the graphic in use keeps showing the style in use)
   const shown = await page.evaluate('[...document.querySelectorAll("#results .gcard:not(.on) .gpick canvas")].map(c=>c.dataset.g)');
   assert.ok(shown.length > 0 && shown.length < cat.length);
   for (const id of shown) assert.ok(await page.evaluate(`leans("${id}").s["d+"] >= LEAN_MIN`), id + ' leans toward high dominance');
-  await page.click('#subbar .glbar button:has-text("Any")');
+  await page.click('#subbar .tgtbar button:has-text("Clear")');
   // the Media page: a graphic chosen for a post leaves the brand's graphic alone
   await page.click('#btnSaveBrand'); await page.waitForFunction('!Lib.isDirty()');
   await toMedia(page);
@@ -186,6 +186,60 @@ test('graphics: every graphic has styles that lean apart, picked and stepped thr
   assert.ok(seen.size >= 2, 'Shuffle changed the style');
   for (const id of seen) assert.equal(await page.evaluate(`GV["${id}"].fam`), 'waves');
   await page.screenshot({ path: join(out, 'graphics-media.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
+test('Aim for: options are filtered by where they sit on the fingerprint', async () => {
+  const page = await openApp(browser, url);
+  await addKw(page, 'powerful'); await addKw(page, 'energetic');
+  await page.click('#btnUseKw');
+  await page.waitForSelector('#bBuild:not([hidden])');
+  if (await page.isVisible('#btnAll')) await page.click('#btnAll');
+  // every direction has premade palettes leaning toward it
+  assert.equal(await page.evaluate('LEANS.filter(L=>PALETTES.filter(p=>itemLean("colors",p)[L.k]>=LEAN_MIN).length<2).map(L=>L.l).join()'), '');
+  // several directions at once; an option must lean toward every one of them
+  await page.click('#subbar .tgtbar button[aria-label="High arousal"]');
+  await page.click('#subbar .tgtbar button[aria-label="High dominance"]');
+  assert.deepEqual(await page.evaluate('state.fpTarget'), ['a+', 'd+']);
+  const pals = await page.evaluate('PALETTES.filter(p=>tgtFit(itemLean("colors",p)).ok).map(p=>p.id)');
+  assert.ok(pals.length >= 2, 'premade palettes reach high arousal and high dominance');
+  assert.equal(await page.locator('#results .opt').count(), pals.length);
+  assert.equal(await page.locator('#results .opt .tfit').count(), pals.length, 'each card shows its fit');
+  // a corner no palette reaches sends the search to single colors
+  await page.click('#subbar .tgtbar button:has-text("Clear")');
+  await page.click('#subbar .tgtbar button[aria-label="High pleasure"]');
+  await page.click('#subbar .tgtbar button[aria-label="High dominance"]');
+  assert.equal(await page.locator('#results .opt').count(), 0);
+  assert.match(await page.textContent('#results .empty'), /No palette leans toward high pleasure and high dominance/);
+  await page.click('#results .empty button:has-text("build one color by color")');
+  assert.equal(await page.evaluate('state.colorMode'), 'build');
+  assert.equal(await page.evaluate('getComputedStyle(document.getElementById("results")).display'), 'block', 'the builder is laid out top to bottom, not in the card grid');
+  const hexes = await page.evaluate('[...document.querySelectorAll("#results .swgrid .swatch")].map(b=>b.title.split(" ").pop())');
+  assert.ok(hexes.length > 0, 'some single colors lean toward high pleasure and high dominance');
+  for (const h of hexes) assert.ok(await page.evaluate(`(()=>{const s=colorLean("${h}");return s["p+"]>=LEAN_MIN&&s["d+"]>=LEAN_MIN;})()`), h + ' fits the target');
+  await page.hover('#results .swgrid .swatch >> nth=0');
+  assert.equal(await page.locator('#clive .tfit .lean').count(), 2, 'the color under the pointer shows how far it leans each way');
+  // the opposite end of a feeling axis replaces the other
+  await page.click('#subbar .tgtbar button[aria-label="Low dominance"]');
+  assert.deepEqual(await page.evaluate('state.fpTarget'), ['p+', 'd-']);
+  // type pairings: filtered the same way, closest first, each card showing its fit
+  await page.click('#tabs button[data-v=type]');
+  const want = await page.evaluate('listedTypes().map(t=>tgtFit(itemLean("type",t))).filter(f=>f.ok).length');
+  assert.ok(want > 0);
+  assert.equal(await page.locator('#results .opt').count(), want);
+  assert.equal(await page.locator('#results .opt .tfit').count(), want);
+  const means = await page.evaluate('[...document.querySelectorAll("#results .opt .tfit")].map(d=>[...d.children].reduce((a,c)=>a+parseInt(c.textContent.match(/(\\d+)%/)[1]),0))');
+  for (let i = 1; i < means.length; i++) assert.ok(means[i] <= means[i - 1] + 2, 'closest first');
+  // the keywords' own strongest directions (powerful, energetic: high dominance and high arousal)
+  await page.click('#subbar .tgtbar button:has-text("Match my keywords")');
+  assert.deepEqual(await page.evaluate('state.fpTarget'), ['a+', 'd+']);
+  await page.click('#subbar .tgtbar button:has-text("Clear")');
+  assert.deepEqual(await page.evaluate('state.fpTarget'), []);
+  // the old one-direction graphics filter carries over from a saved state
+  assert.deepEqual(await page.evaluate('sane({gLean:"d+"}).fpTarget'), ['d+']);
+  assert.deepEqual(await page.evaluate('sane({fpTarget:["a+","a-","zz"]}).fpTarget'), ['a+']);
+  await page.screenshot({ path: join(out, 'aim-for.png') });
   assert.deepEqual(page.errors, []);
   await page.context().close();
 });
