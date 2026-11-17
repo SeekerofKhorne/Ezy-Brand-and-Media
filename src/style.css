@@ -461,7 +461,13 @@ label.inl select{width:auto;max-width:150px}
 .gvar[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .gvar canvas{display:block;width:100%;height:auto;aspect-ratio:200/130;border-radius:5px;border:1px solid var(--line)}
 .gvar .nm{font-size:12.5px;font-weight:600}
-.glbar{margin:0 0 4px}
+.tgtbar{margin:8px 0 4px}
+.tgtbar .sugg{margin-top:0}
+.tgtrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;margin-top:5px}
+.tgtrow .note{margin:0}
+.tfit{margin:4px 0 2px}
+.lean.hit{border-color:var(--sel);color:var(--ink)}
+.lean.short{opacity:.55;border-style:dashed}
 .gpanel .gcard .ghead .gvn{font-size:11px}
 .gpanel .garr{width:22px;height:22px;font-size:15px}
 .gpanel .gdot{width:9px;height:9px}

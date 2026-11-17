@@ -29,6 +29,18 @@ The gear at the top right opens **Settings**:
 - **How much control to show**: Simple or Advanced, each described in full.
 - **Help**: the quick start, and the sources and method behind every association.
 
+## Aim for: filter by the fingerprint
+
+Every list in **Build the kit** (premade palettes, single colors and partners in Build your own, type pairings, graphics, and the Graphic panel on the Media page) has an **Aim for** row. It finds options by where they sit on the fingerprint, not by keyword.
+
+- **Choose one or more directions**: a personality axis (Sincerity, Excitement, Competence, Sophistication, Ruggedness) or high or low pleasure, arousal or dominance. Choosing both ends of one feeling axis is not possible; the second replaces the first.
+- **An option is shown only if it leans toward every direction chosen**, by at least 45%. The list is ordered closest first, and each option shows how far it leans each way. A faded, dashed figure is below the bar.
+- **Keywords still apply.** With keywords, only keyword matches are filtered; choose **Show all** to filter everything.
+- **Use my keywords' strongest directions** picks up to three directions where your keyword fingerprint is strongest. **Clear** removes them all.
+- An option's position comes from the same tags the fingerprint chart reads, so a pick that passes moves the "current picks" shape toward the directions chosen.
+
+Some directions are hard to reach with whole palettes. In this model dominance rises as colors get darker, and most premade palettes have light grounds, so none of them leans toward high dominance. When a palette search comes up empty, the message links to **Build your own**, where single colors cover much more of the fingerprint.
+
 ## Colors
 
 - **Premade palettes** are five colors with roles: ground, panel, primary, accent, text.
@@ -42,7 +54,7 @@ There are 33 graphics, each in three or four styles, 126 in all. On the Brand pa
 - **One card per graphic.** Select the picture to use the style shown. The **‹ ›** arrows and the dots step through the graphic's styles and use each one as you go; with the picture focused, the left and right arrow keys do the same.
 - **In use**, at the top, shows every style of the current graphic side by side, so they can be compared at a glance, with the reasons behind the current one.
 - **Badges** on each style name the fingerprint directions it leans toward most compared with the graphic's other styles: a personality axis (Sincerity, Excitement, Competence, Sophistication, Ruggedness) or high or low pleasure, arousal or dominance. Fine-line styles tend toward sophistication, heavy ones toward dominance, asymmetric and moving ones toward excitement and arousal, sparse ones toward calm.
-- **Leans toward** filters the cards to graphics that have a style leaning that way, and shows that style on each card. The card of the graphic in use keeps showing the style in use.
+- **Aim for** (see above) filters the cards to graphics that have a style leaning toward every direction chosen, and shows the best-fitting style on each card. The card of the graphic in use keeps showing the style in use.
 
 Changing the style also changes what the small fingerprint says your picks signal.
 
