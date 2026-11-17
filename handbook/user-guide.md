@@ -33,18 +33,22 @@ The gear at the top right opens **Settings**:
 
 Every list in **Build the kit** (premade palettes, single colors and partners in Build your own, type pairings, graphics, and the Graphic panel on the Media page) has an **Aim for** row. It finds options by where they sit on the fingerprint, not by keyword.
 
-- **Choose one or more directions**: a personality axis (Sincerity, Excitement, Competence, Sophistication, Ruggedness) or high or low pleasure, arousal or dominance. Choosing both ends of one feeling axis is not possible; the second replaces the first.
+- **Choose one or more directions**: a personality axis (Sincerity, Excitement, Competence, Sophistication, Ruggedness), or **High** or **Low** beside Pleasure, Arousal or Dominance. Choosing both ends of one feeling axis is not possible; the second replaces the first.
 - **An option is shown only if it leans toward every direction chosen**, by at least 45%. The list is ordered closest first, and each option shows how far it leans each way. A faded, dashed figure is below the bar.
 - **Keywords still apply.** With keywords, only keyword matches are filtered; choose **Show all** to filter everything.
-- **Use my keywords' strongest directions** picks up to three directions where your keyword fingerprint is strongest. **Clear** removes them all.
+- **Match my keywords** picks up to three directions where your keyword fingerprint is strongest. **Clear** removes them all.
 - An option's position comes from the same tags the fingerprint chart reads, so a pick that passes moves the "current picks" shape toward the directions chosen.
 
-Some directions are hard to reach with whole palettes. In this model dominance rises as colors get darker, and most premade palettes have light grounds, so none of them leans toward high dominance. When a palette search comes up empty, the message links to **Build your own**, where single colors cover much more of the fingerprint.
+Every direction has at least five premade palettes leaning toward it. Some combinations are still out of reach for whole palettes. In this model pleasure rises as colors get lighter and dominance rises as they get darker, so no palette is high on both. When a palette search comes up empty, the message links to **Build your own**, where single colors cover more of the fingerprint.
+
+## Reading a result card
+
+Each palette, pairing and partner color lists the ideas it signals as small tags. The letter on a tag is its evidence tier (R research, S standard, C convention). Point at a tag to see its reason and source. The strongest reason is written out under the tags, and the full list for the current pick is in the panel above the options.
 
 ## Colors
 
-- **Premade palettes** are five colors with roles: ground, panel, primary, accent, text.
-- **Saved to this brand**, at the top of the Colors tab, lists the brand's own palettes; select one to switch to it, or save the current colors as a new one.
+- **Premade palettes** are five colors with roles: ground, panel, primary, accent, text. There are 39, including a set chosen so every part of the fingerprint is covered: Oxblood, Deep Lagoon, Admiralty, Verdigris, Alarm and Nightshade for high dominance; Overcast and Peat for low pleasure and low arousal; Marigold Market, Fiesta and Tangerine Violet for high arousal on a light ground.
+- **Saved palettes**, at the top of the Colors tab, lists the brand's own palettes; select one to switch to it, or save the current colors as a new one.
 - **Build your own** lets you pick a role and choose its color: from single colors linked to your keywords, from partners that suit your primary and match a keyword, by typing a hex code, or with the color picker. Save the result as a named palette; it is kept with the brand and listed first.
 
 ## Graphics

@@ -106,10 +106,10 @@ function syncPvFmt(){document.querySelectorAll('#pvFmt button').forEach(b=>b.set
 function syncIdentity(){const n=$('#bName'),h=$('#bHandle');if(document.activeElement!==n)n.value=state.brandName||'';if(document.activeElement!==h)h.value=state.handle||'';}
 /* Saved palettes lead the Colors tab: the brand's own set, switched with one click. */
 function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidden=state.tab!=='colors';if(box.hidden)return;
-  box.append(el('div',{class:'h',style:'margin:0 0 6px',text:'Saved to this brand'}));const row=el('div',{class:'mpals'});
+  const row=el('div',{class:'mpals'},el('span',{class:'spl',text:'Saved palettes'}));
   myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
-  row.append(el('button',{type:'button',class:'btn small',text:myPalettes.length?'+ Save current colors':'+ Save current colors as a palette',onclick:()=>Lib.askPalette()}));box.append(row);
-  if(!myPalettes.length)box.append(el('p',{class:'note',text:'Pick a premade palette or build your own, then save it here. Saved palettes can be switched on any post.'}));}
+  if(!myPalettes.length)row.append(el('span',{class:'note',style:'margin:0',text:'None yet.'}));
+  row.append(el('button',{type:'button',class:'btn small',text:'+ Save current colors',title:'Saved palettes can be switched on any post',onclick:()=>Lib.askPalette()}));box.append(row);}
 function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+cols[r]}))),el('span',{text:name}));}
 const sameColors=(a,b)=>ROLES.every(([r])=>String(a[r]).toUpperCase()===String(b[r]).toUpperCase());
 

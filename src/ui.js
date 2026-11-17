@@ -106,6 +106,11 @@ function buildDirectory(){const box=$('#dirBody');box.textContent='';box.append(
 function results(){const cw=parsed.cw;return{colors:rank('palette',PALETTES,cw),type:rank('type',listedTypes(),cw),graphic:rank('graphic',GRAPHICS,cw)};}
 function whyList(tags,ids,extra){const ul=el('ul',{class:'why'});(extra||[]).forEach(x=>ul.append(x));ids.forEach(c=>{const t=tags[c];ul.append(el('li',null,tierEl(t.src),el('span',null,el('b',{text:cLabel(c)+': '}),t.why+(SRC[t.src].t==='C'?'':' ('+SRC[t.src].short+')'))));});return ul;}
 function kwLabels(){return parsed.concepts.map(cLabel).join(', ');}
+/* Cards: the ideas an option signals as small tier-marked tags (hover or focus a tag for its reason and source),
+   and the strongest reason written out once. The full list stays in the detail panels. */
+function tagChip(tags,c){const t=tags[c];return el('span',{class:'tchip',title:t.why+' ('+SRC[t.src].short+(SRC[t.src].t==='C'?', convention':'')+')'},tierEl(t.src),cLabel(c));}
+function whyCompact(tags,ids,extra){if(!ids.length&&!(extra&&extra.length))return null;const t=ids.length?tags[ids[0]]:null;
+  return el('div',{class:'whyc'},el('div',{class:'tchips'},extra||null,ids.map(c=>tagChip(tags,c))),t?el('p',{class:'why1'},el('b',{text:cLabel(ids[0])+': '}),t.why+(SRC[t.src].t==='C'?'':' ('+SRC[t.src].short+')')):null);}
 
 /* ---------- results ---------- */
 function buildSubbar(){const bar=$('#subbar');bar.textContent='';
@@ -120,13 +125,14 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
   $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=has?graphicRows().filter(r=>r.score>0).length:GFAMILIES.length;
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
   const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
-  const kind=state.tab;if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;buildColorBuilder();return;}
-  if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;buildTypeBuilder();return;}$('#rhead').hidden=false;
+  const kind=state.tab,rbox=$('#results');rbox.classList.remove('flow');
+  if(kind==='colors'&&state.colorMode==='build'){$('#rhead').hidden=true;rbox.classList.add('flow');buildColorBuilder();return;}
+  if(kind==='type'&&state.typeMode==='build'&&uiMode==='advanced'){$('#rhead').hidden=true;rbox.classList.add('flow');buildTypeBuilder();return;}$('#rhead').hidden=false;
   if(kind==='graphic'){buildGraphicResults();return;}
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
-  const matches=rows.filter(r=>r.score>0);let show=has&&!state.showAll?matches:rows;const tgt=tgtOn(),pool=show.length;
+  const matches=rows.filter(r=>r.score>0);let show=has&&!state.showAll?matches:rows;const tgt=tgtOn();
   if(tgt)show=show.map(r=>Object.assign({},r,{fit:tgtFit(itemLean(kind,r.it))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
-  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} match ${kwLabels()}, best first`:`Nothing here is linked to ${kwLabels()}`):tgt?`All ${rows.length}`:`All ${rows.length}. Type keywords to rank them.`)+(tgt?`. ${show.length} of ${pool} lean toward ${tgtNames()}, closest first.`:'');
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} match your keywords`:'None match your keywords'):`${rows.length} ${kind==='colors'?'palettes':'pairings'}`)+(tgt?` \u00B7 ${show.length} fit your aim`:has?'':'. Add keywords to rank them.');
   const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
   const box=$('#results');box.textContent='';const tagKind=kind==='colors'?'palette':kind;
   show.forEach(r=>{const it=r.it;const tg=TAGS[tagKind][it.id].tags;const ids=(r.matched.length?r.matched.filter(c=>tg[c]):topTags(tg,2)).slice(0,3);
@@ -134,7 +140,7 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
     if(kind==='colors'){const widths={bg:30,surface:14,primary:26,accent:16,text:14};vis=el('span',{class:'vis sw'},ROLES.map(([role])=>el('i',{style:`width:${widths[role]}%;background:${it[role]}`})));if(it.mine)meta=el('div',{class:'meta',text:'Your palette'});else if(it.note)meta=el('div',{class:'meta',text:it.note});}
     else if(kind==='type'){const d=it.display;vis=el('span',{class:'vis aa',style:`font-family:"${d.family}",${d.fb};font-weight:${d.weight}`,text:d.upper?'AA':'Aa'});meta=el('div',{class:'meta',text:(it.mine?'Your pairing: ':'')+d.family+(it.body.family!==d.family?' with '+it.body.family:'')});}
     else{vis=el('span',{class:'vis'},el('canvas',{'data-g':it.id,width:176,height:120}));}
-    box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,r.fit?tgtChips(r.fit.s):null,ids.length?whyList(tg,ids):null)));});
+    box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,r.fit?tgtChips(r.fit.s):null,whyCompact(tg,ids))));});
   if(!show.length&&tgt)box.append(tgtEmpty(kind==='colors'?'palette':'pairing',has&&!state.showAll&&rows.length>matches.length,kind==='colors'));
   else if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
@@ -189,10 +195,13 @@ function tgtFromKeywords(){const fp=fingerprint(parsed.cw);if(!fp)return[];const
     const d=(x.v-.5)*2;if(Math.abs(d)>=.3)c.push([LEANS.find(L=>L.i===i&&L.d===Math.sign(d)).k,Math.abs(d)]);});
   return c.sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);}
 function tgtBar(onChange,what){const has=parsed.concepts.length>0,on=tgtOn();
-  return el('div',{class:'tgtbar'},el('div',{class:'sugg',role:'group','aria-label':'Aim for: show '+what+' that lean toward every direction chosen'},el('span',{class:'note',style:'margin:0 4px 0 0',text:'Aim for:'}),
-      LEANS.map(L=>el('button',{type:'button','aria-pressed':String(state.fpTarget.includes(L.k)),text:L.l,onclick:()=>{tgtToggle(L.k);onChange();}}))),
-    el('div',{class:'tgtrow'},el('span',{class:'note',text:on?'Showing '+what+' that lean toward '+tgtNames()+'. Select a direction again to drop it.':'Choose one or more directions on the fingerprint to see the '+what+' that lean toward all of them.'}),
-      has?el('button',{type:'button',class:'link',text:'Use my keywords\u2019 strongest directions',title:'Chooses up to three directions where your keyword fingerprint is strongest',onclick:()=>{const t=tgtFromKeywords();state.fpTarget=LEANS.map(L=>L.k).filter(k=>t.includes(k));onChange();if(!t.length)say('Your keywords do not lean clearly toward any direction on the fingerprint.');}}):null,
+  const b=L=>el('button',{type:'button','aria-pressed':String(state.fpTarget.includes(L.k)),'aria-label':L.l,title:L.l,text:L.d?(L.d>0?'High':'Low'):L.l,onclick:()=>{tgtToggle(L.k);onChange();}});
+  const pairs=[[5,'Pleasure'],[6,'Arousal'],[7,'Dominance']].map(([i,l])=>el('span',{class:'tpair',role:'group','aria-label':l},el('span',{class:'tpl',text:l}),LEANS.filter(L=>L.i===i).map(b)));
+  return el('div',{class:'tgtbar',role:'group','aria-label':'Aim for: show '+what+' that lean toward every direction chosen'},
+    el('span',{class:'tgtl',text:'Aim for'}),
+    el('div',{class:'tgtchips'},el('span',{class:'tgrp sugg'},LEANS.filter(L=>!L.d).map(b)),el('span',{class:'tgrp'},pairs)),
+    el('div',{class:'tgtrow'},on?el('span',{text:'Showing '+what+' that lean toward '+tgtNames()+'.'}):el('span',{class:'simple-only',text:'Pick directions on the fingerprint to see only the '+what+' that lean that way.'}),
+      has?el('button',{type:'button',class:'link',text:'Match my keywords',title:'Choose up to three directions where your keyword fingerprint is strongest',onclick:()=>{const t=tgtFromKeywords();state.fpTarget=LEANS.map(L=>L.k).filter(k=>t.includes(k));onChange();if(!t.length)say('Your keywords do not lean clearly toward any direction on the fingerprint.');}}):null,
       on?el('button',{type:'button',class:'link',text:'Clear',onclick:()=>{state.fpTarget=[];onChange();}}):null));}
 /* How far an option leans toward each chosen direction, 0 to 100%. A direction below the bar is shown faded. */
 function tgtChips(s){return el('div',{class:'glean tfit',title:'How far this leans toward each direction you are aiming for. '+Math.round(LEAN_MIN*100)+'% or more counts.'},
@@ -209,20 +218,19 @@ function gCard(row,onPick,compact){const F=row.F,g0=GV[state.graphicId],inUse=!!
     el('button',{type:'button',class:'garr','aria-label':'Next '+F.name.toLowerCase()+' style',text:'›',onclick:()=>step(1)})):null;
   const m=parsed.concepts.length?scoreTags(TAGS.graphic[cur].tags,parsed.cw).matched.slice(0,2):[];
   return el('div',{class:'gcard'+(inUse?' on':''),'data-fam':F.fam},pickBtn,el('div',{class:'ghead'},el('span',{class:'nm'},F.name,inUse?el('span',{class:'inuse',text:'In use'}):null),
-    n>1?el('span',{class:'gvn',text:g.vn+' · '+(idx+1)+' of '+n}):null),nav,tgtOn()?tgtChips(leans(cur).s):leanChips(cur),!compact&&m.length?whyList(TAGS.graphic[cur].tags,m):null);}
+    n>1?el('span',{class:'gvn',text:g.vn+' · '+(idx+1)+' of '+n}):null),nav,tgtOn()?tgtChips(leans(cur).s):leanChips(cur),!compact&&m.length?el('div',{class:'tchips'},m.map(c=>tagChip(TAGS.graphic[cur].tags,c))):null);}
 /* The graphic in use, with every style of its family side by side. */
-function gCurrent(onPick){const g=GV[state.graphicId]||GV.none,F=GFAM[g.fam],box=el('div',{class:'gcur'});
+function gCurrent(onPick,compact){const g=GV[state.graphicId]||GV.none,F=GFAM[g.fam],box=el('div',{class:'gcur'});
   box.append(el('div',{class:'bhead'},el('h3',null,'In use: ',el('b',{text:gLabel(g)})),F.vars.length>1?el('span',{class:'meta',text:'Each style leans toward a different part of the fingerprint'}):null));
   if(F.vars.length>1)box.append(el('div',{class:'gvars',role:'group','aria-label':F.name+' styles'},F.vars.map(v=>el('button',{type:'button',class:'gvar','aria-pressed':String(v.id===g.id),onclick:()=>onPick(v.id)},
     el('canvas',{'data-g':v.id,width:200,height:130}),el('span',{class:'nm',text:v.vn}),leanChips(v.id)))));
   else box.append(el('p',{class:'note',text:'No graphic is in use. Pick one below; each has three or four styles.'}));
-  const tg=TAGS.graphic[g.id],m=scoreTags(tg.tags,parsed.cw).matched,ids=(m.length?m:topTags(tg.tags,3)).slice(0,3);if(ids.length)box.append(whyList(tg.tags,ids));
+  const tg=TAGS.graphic[g.id],m=scoreTags(tg.tags,parsed.cw).matched,ids=(m.length?m:topTags(tg.tags,3)).slice(0,3);if(ids.length)box.append(compact?whyCompact(tg.tags,ids):whyList(tg.tags,ids));
   tg.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
 function gRefocusNow(){if(!gRefocus)return;const b=document.querySelector('.gcard[data-fam="'+gRefocus+'"] .gpick');gRefocus=null;if(b)b.focus();}
 function buildGraphicResults(){const has=parsed.concepts.length>0,rows=graphicRows(),tgt=tgtOn(),matches=rows.filter(r=>r.score>0),show=has&&!state.showAll?matches:rows;
   const nV=GRAPHICS.length-1,nF=GFAMILIES.length-1;
-  $('#rSummary').textContent=tgt?`${show.length} graphic${show.length===1?'':'s'}${has&&!state.showAll?' that match '+kwLabels()+' and':''} with a style that leans toward ${tgtNames()}, closest first.`
-    :(has?(matches.length?`${matches.length} of ${rows.length} graphics match ${kwLabels()}, best first`:`No graphic here is linked to ${kwLabels()}`):`${nF} graphics in ${nV} styles`)+'.';
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${GFAMILIES.length} graphics match your keywords`:'No graphic matches your keywords'):`${nF} graphics in ${nV} styles`)+(tgt?` \u00B7 ${show.length} fit your aim`:'');
   const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
   const box=$('#results');box.textContent='';const pick=id=>apply('graphic',id);box.append(gCurrent(pick),el('div',{class:'ggrid'},show.map(r=>gCard(r,pick))));
   if(!show.length)box.append(tgt?tgtEmpty('graphic style',has&&!state.showAll,false):el('p',{class:'empty',text:'Try the other tabs, or choose “Show all”.'}));
@@ -232,7 +240,7 @@ function buildMediaGraphic(){const cur=$('#mgCur');if(!cur||$('#mgPanel').hidden
   const pick=id=>{state.graphicId=id;renderLook();requestPaint(true);};
   $('#mgNote').textContent='Changes here apply to this post.'+(bg?' The brand’s graphic is '+gLabel(GV[bg])+'.':'')+' Change the brand’s own graphic on the Brand page.';
   const b=$('#mgBrand');b.hidden=!bg||bg===state.graphicId;b.onclick=()=>pick(bg);
-  cur.textContent='';cur.append(gCurrent(pick));const lb=$('#mgLean');lb.textContent='';lb.append(tgtBar(buildMediaGraphic,'graphics'));
+  cur.textContent='';cur.append(gCurrent(pick,true));const lb=$('#mgLean');lb.textContent='';lb.append(tgtBar(buildMediaGraphic,'graphics'));
   const grid=$('#mgGrid');grid.textContent='';const rows=graphicRows();grid.append(...rows.map(r=>gCard(r,pick,true)));if(!rows.length)grid.append(tgtEmpty('graphic style',false,false));
   $('#mgStrength').value=Math.round(state.gStrength*100);paintGraphicThumbs();gRefocusNow();}
 
@@ -243,41 +251,46 @@ function colorInfo(hex,forRole){const t=tagColor(hex),has=parsed.concepts.length
   const box=el('div',{class:'cinfo'},head,ids.length?whyList(t.tags,ids):el('p',{class:'note',text:'No associations on file for this color.'}));
   if(tgtOn())box.append(tgtChips(colorLean(hex)));
   t.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
-function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary;
-  box.append(el('p',{class:'note',style:'margin-top:0',text:'Pick a role, then choose its color. Start with Primary; the other roles then show partners that suit it.'}));
+function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary,tgt=tgtOn(),rn=ROLE_NAME[role];
+  box.append(el('p',{class:'note simple-only',style:'margin:0 0 8px',text:'Pick a role, then its color. Start with Primary: the other roles then suggest partners for it.'}));
   box.append(el('div',{class:'roles',role:'group','aria-label':'Color role to change'},ROLES.map(([r,l])=>el('button',{type:'button',class:'role','aria-pressed':String(role===r),onclick:()=>{state.buildRole=r;buildResults();}},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))));
-  const pick=el('input',{type:'color',id:'bPick','aria-label':'Custom '+ROLE_NAME[role]+' color'});pick.value=state.colors[role];pick.addEventListener('change',()=>setRole(role,pick.value));
-  const hx=el('input',{type:'text',id:'bHex',maxlength:7,placeholder:'#1A2B3C','aria-label':'Hex code for the '+ROLE_NAME[role]+' color',style:'width:92px'});hx.value=state.colors[role].toUpperCase();
+  const pick=el('input',{type:'color',id:'bPick','aria-label':'Custom '+rn+' color'});pick.value=state.colors[role];pick.addEventListener('change',()=>setRole(role,pick.value));
+  const hx=el('input',{type:'text',id:'bHex',maxlength:7,placeholder:'#1A2B3C','aria-label':'Hex code for the '+rn+' color',style:'width:92px'});hx.value=state.colors[role].toUpperCase();
   const useHex=()=>{let v=hx.value.trim();if(v&&v[0]!=='#')v='#'+v;if(validHex(v))setRole(role,v);else{hx.value=state.colors[role].toUpperCase();say('That is not a hex color. Use six characters, such as #1A2B3C.');}};hx.addEventListener('change',useHex);hx.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();useHex();}});
-  box.append(el('div',{class:'bhead'},el('h3',{text:'Current '+ROLE_NAME[role]}),el('span',{class:'rowbtns'},hx,el('label',{class:'btn small',for:'bPick',style:'cursor:pointer'},'Any color\u2026',pick))));
+  const sec=(title,right)=>el('div',{class:'bhead'},el('h3',null,title),right||null);
+  box.append(sec('Current '+rn,el('span',{class:'rowbtns'},hx,el('label',{class:'btn small',for:'bPick',style:'cursor:pointer'},'Any color…',pick))));
   const info=colorInfo(state.colors[role],role);info.id='cinfo';box.append(info);
 
-  const tgt=tgtOn();
   if(role!=='primary'){const rows=companions(anchor,role,ground,parsed.cw);const matched=rows.filter(r=>r.matched.length);let list=has&&!state.showLoose?matched:rows;
     /* Partners keep their order (how well they suit the primary); the target only filters them. */
     if(tgt)list=list.filter(r=>tgtFit(colorLean(r.hex)).ok);list=list.slice(0,10);
-    box.append(el('div',{class:'bhead'},el('h3',null,'Goes with your primary ',el('i',{class:'dot',style:'background:'+anchor}),has?' and matches a keyword':'',tgt?(has?', ':' and ')+'leans toward '+tgtNames():''),has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
-    if(!list.length)box.append(el('p',{class:'empty',text:tgt?`No ${ROLE_NAME[role]} color that suits this primary${has&&!state.showLoose?' and matches a keyword':''} leans toward ${tgtNames()}. `+(has&&!state.showLoose?'Include colors with no keyword link, drop a direction, or pick from the single colors below.':'Drop a direction, or pick from the single colors below.'):has?`No ${ROLE_NAME[role]} color that suits this primary is linked to ${kwLabels()}. Choose \u201CInclude colors with no keyword link\u201D, or change the primary.`:'No suitable partners for this role.'}));
-    list.forEach(r=>{const hm=r.hm;const extra=[el('li',null,tierEl(hm.src),el('span',null,el('b',{text:hm.level+' harmony: '}),hm.why+' ('+SRC[hm.src].short+')'+(hm.close?'. Lightness is close to the primary, which lowered harmony ratings.':'')))];
-      if(role==='text'||role==='accent')extra.push(el('li',null,tierEl('WCAG'),el('span',null,el('b',{text:'On the ground: '}),r.pop.toFixed(1)+':1 contrast'+(role==='text'?'':r.pop<1.5?', too faint to stand out':r.pop>=3?', stands out':''))));
-      box.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{style:'width:42%;background:'+anchor}),el('i',{style:'width:58%;background:'+r.hex})),el('span',null,el('span',{class:'nm'},r.hex,el('span',{class:'meta',text:hm.rel+', '+r.label})),tgt?tgtChips(colorLean(r.hex)):null,whyList(r.tags,r.matched.slice(0,2),extra))));});}
-  else box.append(el('p',{class:'note',text:'Partners for this primary appear when you select Ground, Panel, Accent or Text above.'}));
+    const narrowed=has&&!state.showLoose;
+    box.append(sec(['Partners for ',el('i',{class:'dot',style:'background:'+anchor}),' your primary'],has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
+    box.append(el('p',{class:'note',style:'margin:0 0 8px',text:'Ranked by how well they suit the primary'+(narrowed?', among colors that match a keyword':'')+(tgt?', that lean toward '+tgtNames():'')+'.'}));
+    if(!list.length)box.append(el('p',{class:'empty',text:tgt?`None of the partners leans toward ${tgtNames()}. `+(narrowed?'Include colors with no keyword link, drop a direction, or pick from the single colors below.':'Drop a direction, or pick from the single colors below.'):has?`No ${rn} color that suits this primary matches your keywords. Include colors with no keyword link, or change the primary.`:'No suitable partners for this role.'}));
+    const og=el('div',{class:'optgrid'});
+    list.forEach(r=>{const hm=r.hm;
+      const facts=[el('span',{class:'tchip',title:hm.why+' ('+SRC[hm.src].short+')'+(hm.close?'. Lightness is close to the primary, which lowered harmony ratings.':'')},tierEl(hm.src),hm.level+' harmony')];
+      if(role==='text'||role==='accent')facts.push(el('span',{class:'tchip',title:'Contrast against the ground (WCAG 2.2)'+(role==='text'?'':r.pop<1.5?': too faint to stand out':r.pop>=3?': stands out':'')},tierEl('WCAG'),r.pop.toFixed(1)+':1 on ground'));
+      og.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{style:'width:42%;background:'+anchor}),el('i',{style:'width:58%;background:'+r.hex})),
+        el('span',null,el('span',{class:'nm'},r.hex),el('div',{class:'meta',text:hm.rel+', '+r.label}),tgt?tgtChips(colorLean(r.hex)):null,whyCompact(r.tags,r.matched.slice(0,2),facts))));});
+    box.append(og);}
 
   let lib=rankColors(parsed.cw);if(role==='text')lib=lib.filter(r=>contrast(r.it.hex,ground)>=4.5);if(role==='bg')lib=lib.filter(r=>{const L=hexToLch(r.it.hex).L;return L>80||L<28;});
   const m=lib.filter(r=>r.score>0);let show=has?m.slice(0,35):lib;
   /* With a target, every color that fits is listed (keyword matches only, when there are keywords), closest first. */
   if(tgt)show=(has?m:lib).map(r=>Object.assign({},r,{fit:tgtFit(colorLean(r.it.hex))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
-  const libHead=has?(m.length?`Single colors linked to ${kwLabels()}`:`No single color is linked to ${kwLabels()}`):'All colors';
-  box.append(el('div',{class:'bhead'},el('h3',{text:tgt?(show.length?libHead.replace(/^All colors$/,'Single colors')+` that lean toward ${tgtNames()}`:`No single color${has?' linked to '+kwLabels():''} leans toward ${tgtNames()}`):libHead}),el('span',{class:'meta',text:tgt&&show.length?show.length+', closest first':has&&m.length?'Best first':''})));
-  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals. Select it to use it as the '+ROLE_NAME[role]+'.'}));
+  box.append(sec('Single colors',el('span',{class:'meta',text:show.length+(tgt?(has?' match your keywords and fit your aim':' fit your aim'):has?' best matches for your keywords':' colors')})));
+  if(!show.length)box.append(el('p',{class:'empty',text:tgt?`No single color${has?' that matches your keywords':''} leans toward ${tgtNames()}. Drop a direction to widen the search.`:'No single color matches your keywords.'}));
+  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals. Select it to use it as the '+rn+'.'}));
   const grid=el('div',{class:'swgrid'});show.forEach(r=>{const b=el('button',{type:'button',class:'swatch',style:'background:'+r.it.hex,title:r.it.name+' '+r.it.hex,'aria-label':r.it.name+' '+r.it.hex,'aria-pressed':String(state.colors[role].toUpperCase()===r.it.hex),onclick:()=>setRole(role,r.it.hex)});
     const showInfo=()=>{live.textContent='';const ci=colorInfo(r.it.hex,role);ci.firstChild.insertBefore(el('span',{text:r.it.name}),ci.firstChild.children[2]);live.append(...ci.childNodes);};b.addEventListener('mouseenter',showInfo);b.addEventListener('focus',showInfo);grid.append(b);});
-  box.append(grid,live);
-  box.append(el('div',{class:'bhead'},el('h3',{text:'Save this combination to the brand'})));
+  if(show.length)box.append(el('div',{class:'swwrap'},grid,live));
+  box.append(sec('Save these colors as a palette'));
   const pn=el('input',{type:'text',id:'palName',maxlength:40,placeholder:'Name this palette','aria-label':'Palette name'});pn.addEventListener('keydown',e=>{if(e.key==='Enter')Lib.savePalette(pn.value);});
   box.append(el('div',{class:'savepal'},pn,el('button',{type:'button',class:'btn small primary',text:'Save palette',onclick:()=>Lib.savePalette(pn.value)})));
   if(myPalettes.length)box.append(el('div',{class:'mine'},myPalettes.map(p=>{const i=el('input',{type:'text',maxlength:40,'aria-label':'Rename '+p.name});i.value=p.name;i.addEventListener('change',()=>Lib.renamePalette(p.id,i.value));
-    return el('span',{class:'term'},el('i',{class:'dot',style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'\u00D7',onclick:()=>Lib.deletePalette(p.id)}));})));}
+    return el('span',{class:'term'},el('i',{class:'dot',style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'×',onclick:()=>Lib.deletePalette(p.id)}));})));}
 
 /* ---------- build a type pairing (Advanced) ---------- */
 function buildTypeBuilder(){const box=$('#results');box.textContent='';const cur=TYP[state.typeId]||TYP.clear,mine=cur.mine?myTypes.find(m=>m.id===cur.id):null,fams=Object.keys(FONT_FACES).sort();

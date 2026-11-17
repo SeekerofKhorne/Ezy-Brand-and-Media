@@ -58,7 +58,23 @@ const PALETTES = [
  {id:'slate-tech',name:'Slate Tech',bg:'#F4F6F8',surface:'#DDE3E9',primary:'#334155',accent:'#0EA5E9',text:'#0F172A',conv:{tech:.8,modern:.5}},
  {id:'electric',name:'Electric',bg:'#0E0B1F',surface:'#1B1638',primary:'#8B5CF6',accent:'#22D3EE',text:'#F5F3FF',conv:{tech:.8}},
  {id:'neon-night',name:'Neon Night',bg:'#0B0B0D',surface:'#1A1A1F',primary:'#FF2E88',accent:'#C6FF3D',text:'#FFFFFF',conv:{playful:.3,celebration:.4}},
- {id:'midnight-ocean',name:'Midnight Ocean',bg:'#0C1B2A',surface:'#14293D',primary:'#4FC3D9',accent:'#F2E3C6',text:'#EAF4F8',conv:{water:.9}}
+ {id:'midnight-ocean',name:'Midnight Ocean',bg:'#0C1B2A',surface:'#14293D',primary:'#4FC3D9',accent:'#F2E3C6',text:'#EAF4F8',conv:{water:.9}},
+ /* Fingerprint set: palettes chosen so each part of the fingerprint has premade options. They were picked by
+    running candidates through the same tagging rules as every other palette (no hand tags for the fingerprint axes)
+    and keeping those that lean clearly toward their target, with text, accent and brand-ground contrast at 4.5:1 or
+    better. High dominance needs dark, saturated, colored grounds: black and gray grounds carry the fear and
+    sadness hue links, which pull dominance down. The comment on each names where it lands. */
+ {id:'oxblood',name:'Oxblood',bg:'#2D120D',surface:'#432722',primary:'#8B1417',accent:'#F08A6C',text:'#F7EAE8',conv:{}},                                 // sophistication, high arousal, high dominance
+ {id:'deep-lagoon',name:'Deep Lagoon',bg:'#0D3A39',surface:'#21504E',primary:'#1D6C5D',accent:'#48C6AF',text:'#DCF2F2',conv:{water:.4}},              // high dominance
+ {id:'admiralty',name:'Admiralty',bg:'#101E2C',surface:'#1C2A39',primary:'#8B1B26',accent:'#4A9AD0',text:'#E0ECF7',conv:{traditional:.4}},            // competence, high arousal, high dominance
+ {id:'verdigris',name:'Verdigris',bg:'#3E2A15',surface:'#4C3925',primary:'#1A745E',accent:'#E4844A',text:'#F0E7DE',conv:{human:.3}},                   // ruggedness, high arousal, high dominance
+ {id:'alarm',name:'Alarm',bg:'#2E1C18',surface:'#433230',primary:'#A1252A',accent:'#F25358',text:'#F4E7E4',conv:{}},                                    // excitement, low pleasure, high arousal, high dominance
+ {id:'nightshade',name:'Nightshade',bg:'#301613',surface:'#3F2623',primary:'#92141B',accent:'#7FBF8F',text:'#EDE5E4',conv:{mystery:.4}},               // sophistication, low pleasure, high arousal, high dominance
+ {id:'overcast',name:'Overcast',bg:'#41434D',surface:'#51545F',primary:'#C3B1A4',accent:'#D5D5D5',text:'#EEF0FA',conv:{}},                              // low pleasure, low arousal, low dominance
+ {id:'peat',name:'Peat',bg:'#3B2F25',surface:'#4C4037',primary:'#4E5B59',accent:'#A5AAB6',text:'#FCF9F6',conv:{natural:.3}},                          // ruggedness, low pleasure, low arousal
+ {id:'marigold',name:'Marigold Market',bg:'#FBE6C9',surface:'#EDD5B5',primary:'#D46938',accent:'#8F4F01',text:'#271F14',conv:{food:.5}},             // excitement, high pleasure, high arousal
+ {id:'fiesta',name:'Fiesta',bg:'#F9E5CE',surface:'#EBD3B8',primary:'#BA0A16',accent:'#6E0A8A',text:'#1E1912',conv:{celebration:.6}},                 // excitement, high arousal
+ {id:'tangerine-violet',name:'Tangerine Violet',bg:'#EFD6C4',surface:'#E1C6B2',primary:'#FF5F24',accent:'#3D0D76',text:'#191410',conv:{playful:.3}}  // excitement, high pleasure, high arousal
 ];
 
 /* ---------- Graphics: procedural, drawn in the active palette.

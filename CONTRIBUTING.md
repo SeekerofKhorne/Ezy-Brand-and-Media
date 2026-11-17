@@ -70,7 +70,7 @@ Sample text must not make result claims. Write labels for someone who has never 
 
 | To add | Edit |
 |---|---|
-| A palette | `PALETTES` in `src/data.js` |
+| A palette | `PALETTES` in `src/data.js`. Check where it lands on the fingerprint with `itemLean('colors', palette)` in the browser console; the test suite requires at least two palettes per direction |
 | A platform format or safe zone | `FORMATS` in `src/data.js` (cite the guide in `SRC`) |
 | A typeface | `npm install -D @fontsource/<name>`, then `scripts/fonts.mjs`, then a pairing in `src/types.js` |
 | A type pairing | `TYPESETS` in `src/types.js` |
