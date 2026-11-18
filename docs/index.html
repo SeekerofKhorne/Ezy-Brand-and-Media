@@ -457,6 +457,9 @@ body.mode-advanced .simple-only{display:none!important}
 .palpick .vis{width:70px;height:24px;border-radius:5px;overflow:hidden;display:flex;border:1px solid var(--line)}
 .palpick .vis i{display:block;height:100%}
 .palpick[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
+.palitem{position:relative;display:inline-flex}
+.paldel{position:absolute;top:-7px;right:-7px;width:20px;height:20px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);font-size:14px;line-height:17px;text-align:center;cursor:pointer}
+.paldel:hover,.paldel:focus-visible{color:var(--ink);border-color:var(--ink-2)}
 .bprev{display:flex;flex-direction:column;gap:10px;position:sticky;top:62px}
 .pvstage{height:440px;min-height:0}
 .bprev .seg button{padding:5px 9px;font-size:12.5px}
@@ -754,6 +757,7 @@ label.inl select{width:auto;max-width:150px}
           <button role="tab" type="button" data-v="identity">Identity</button>
         </div>
         <div class="savedpals" id="savedPals"></div>
+        <div class="status" id="bStatus" aria-live="polite"></div>
         <div class="subbar" id="subbar"></div>
         <div class="rhead" id="rhead"><span id="rSummary"></span><button type="button" id="btnAll"></button></div>
         <div class="results" id="results"></div>
@@ -3064,7 +3068,11 @@ function palNote(){const p=PAL[state.paletteId];$('#palNote').textContent=(isCus
 
 /* ---------- export ---------- */
 const dlReady=(window.claude&&typeof window.claude.use==='function')?Promise.resolve().then(()=>window.claude.use('downloads')).catch(()=>null):Promise.resolve(null);
-function say(t){$('#status').textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{$('#status').textContent='';},6000);}
+/* Messages go to the status line of the page in view: the Brand page has its own. */
+function statusEl(){const b=$('#viewBrand'),bs=$('#bStatus');return b&&!b.hidden&&bs?bs:$('#status');}
+function say(t){const s=statusEl();document.querySelectorAll('#status,#bStatus').forEach(x=>x.textContent='');s.textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{s.textContent='';},6000);}
+/* A status message with one button, such as Undo. It stays a little longer than a plain message. */
+function sayAction(t,label,fn){const s=statusEl();document.querySelectorAll('#status,#bStatus').forEach(x=>x.textContent='');s.textContent=t+' ';s.append(el('button',{type:'button',class:'link',text:label,onclick:()=>{s.textContent='';fn();}}));clearTimeout(say.t);say.t=setTimeout(()=>{s.textContent='';},12000);}
 function slug(t){return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'draft';}
 async function saveFile(filename,data,isImage){const dl=await dlReady;if(dl){try{await dl.save({filename,data});say('Saved '+filename+'.');return;}catch(e){if(e&&e.code==='declined'){say('Export cancelled.');return;}if(e&&e.code==='rate_limited'){say('A save prompt is already open. Answer it, then try again.');return;}}}
   if(!window.claude){try{const u=URL.createObjectURL(data instanceof Blob?data:new Blob([data])),a=el('a',{href:u,download:filename});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);say('Saved '+filename+' to your downloads.');return;}catch(e){}}
@@ -3287,7 +3295,8 @@ function syncIdentity(){const n=$('#bName'),h=$('#bHandle');if(document.activeEl
 /* Saved palettes lead the Colors tab: the brand's own set, switched with one click. */
 function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidden=state.tab!=='colors';if(box.hidden)return;
   const row=el('div',{class:'mpals'},el('span',{class:'spl',text:'Saved palettes'}));
-  myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
+  myPalettes.forEach(p=>row.append(el('span',{class:'palitem'},palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id)),
+    el('button',{type:'button',class:'paldel',text:'\u00D7','aria-label':'Delete palette '+p.name,title:'Delete this palette',onclick:()=>Lib.deletePalette(p.id)}))));
   if(!myPalettes.length)row.append(el('span',{class:'note',style:'margin:0',text:'None yet.'}));
   row.append(el('button',{type:'button',class:'btn small',text:'+ Save current colors',title:'Saved palettes can be switched on any post',onclick:()=>Lib.askPalette()}));box.append(row);}
 function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},swBar(cols,true),el('span',{text:name}));}
@@ -3650,7 +3659,10 @@ const Lib=(function(){
   /* ---------- named palettes ---------- */
   async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the premade palettes.');await saveBrandNow();}
   function renamePalette(id,name){const p=myPalettes.find(x=>x.id===id);if(!p)return;p.name=(name||'').trim().slice(0,40)||p.name;registerPalettes();buildResults();touchBrand();}
-  function deletePalette(id){myPalettes=myPalettes.filter(x=>x.id!==id);if(state.paletteId===id)state.paletteId=DEFAULT_PAL;registerPalettes();buildColors();buildResults();touchBrand();}
+  /* Deleting is an explicit change like saving, so it is written at once; the status line offers Undo. */
+  async function deletePalette(id){const i=myPalettes.findIndex(x=>x.id===id);if(i<0)return;const p=myPalettes[i],was=state.paletteId===id;myPalettes.splice(i,1);if(was)state.paletteId=DEFAULT_PAL;
+    registerPalettes();buildColors();buildResults();await saveBrandNow();
+    sayAction('Deleted \u201C'+p.name+'\u201D from '+state.brandName+(/[.!?]$/.test(state.brandName||'')?'':'.'),'Undo',async()=>{if(myPalettes.some(x=>x.id===p.id))return;myPalettes.splice(Math.min(i,myPalettes.length),0,p);if(was)state.paletteId=p.id;registerPalettes();buildColors();buildResults();await saveBrandNow();say('Restored \u201C'+p.name+'\u201D.');});}
 
   /* ---------- custom type pairings (Advanced) ---------- */
   async function saveType(m){const t={id:'myt-'+uidGen(),name:(m.name||'').trim().slice(0,40)||('My pairing '+(myTypes.length+1)),d:[m.d[0],+m.d[1]],b:[m.b[0],+m.b[1]]};myTypes.unshift(t);if(myTypes.length>24)myTypes.length=24;registerTypes();state.typeId=t.id;state.typeMode='build';useType(t.id);buildResults();say('Started “'+t.name+'”. Change either typeface on the right. It is saved with this brand.');await saveBrandNow();}

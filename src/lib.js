@@ -43,7 +43,10 @@ const Lib=(function(){
   /* ---------- named palettes ---------- */
   async function savePalette(name){name=(name||'').trim().slice(0,40)||('Palette '+(myPalettes.length+1));const p=Object.assign({id:'my-'+uidGen(),name},palColors(state.colors));myPalettes.unshift(p);if(myPalettes.length>40)myPalettes.length=40;registerPalettes();state.paletteId=p.id;buildColors();buildResults();say('Saved “'+name+'” to '+state.brandName+'. It now leads the premade palettes.');await saveBrandNow();}
   function renamePalette(id,name){const p=myPalettes.find(x=>x.id===id);if(!p)return;p.name=(name||'').trim().slice(0,40)||p.name;registerPalettes();buildResults();touchBrand();}
-  function deletePalette(id){myPalettes=myPalettes.filter(x=>x.id!==id);if(state.paletteId===id)state.paletteId=DEFAULT_PAL;registerPalettes();buildColors();buildResults();touchBrand();}
+  /* Deleting is an explicit change like saving, so it is written at once; the status line offers Undo. */
+  async function deletePalette(id){const i=myPalettes.findIndex(x=>x.id===id);if(i<0)return;const p=myPalettes[i],was=state.paletteId===id;myPalettes.splice(i,1);if(was)state.paletteId=DEFAULT_PAL;
+    registerPalettes();buildColors();buildResults();await saveBrandNow();
+    sayAction('Deleted \u201C'+p.name+'\u201D from '+state.brandName+(/[.!?]$/.test(state.brandName||'')?'':'.'),'Undo',async()=>{if(myPalettes.some(x=>x.id===p.id))return;myPalettes.splice(Math.min(i,myPalettes.length),0,p);if(was)state.paletteId=p.id;registerPalettes();buildColors();buildResults();await saveBrandNow();say('Restored \u201C'+p.name+'\u201D.');});}
 
   /* ---------- custom type pairings (Advanced) ---------- */
   async function saveType(m){const t={id:'myt-'+uidGen(),name:(m.name||'').trim().slice(0,40)||('My pairing '+(myTypes.length+1)),d:[m.d[0],+m.d[1]],b:[m.b[0],+m.b[1]]};myTypes.unshift(t);if(myTypes.length>24)myTypes.length=24;registerTypes();state.typeId=t.id;state.typeMode='build';useType(t.id);buildResults();say('Started “'+t.name+'”. Change either typeface on the right. It is saved with this brand.');await saveBrandNow();}

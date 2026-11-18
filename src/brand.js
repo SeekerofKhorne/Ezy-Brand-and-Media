@@ -108,7 +108,8 @@ function syncIdentity(){const n=$('#bName'),h=$('#bHandle');if(document.activeEl
 /* Saved palettes lead the Colors tab: the brand's own set, switched with one click. */
 function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidden=state.tab!=='colors';if(box.hidden)return;
   const row=el('div',{class:'mpals'},el('span',{class:'spl',text:'Saved palettes'}));
-  myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
+  myPalettes.forEach(p=>row.append(el('span',{class:'palitem'},palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id)),
+    el('button',{type:'button',class:'paldel',text:'\u00D7','aria-label':'Delete palette '+p.name,title:'Delete this palette',onclick:()=>Lib.deletePalette(p.id)}))));
   if(!myPalettes.length)row.append(el('span',{class:'note',style:'margin:0',text:'None yet.'}));
   row.append(el('button',{type:'button',class:'btn small',text:'+ Save current colors',title:'Saved palettes can be switched on any post',onclick:()=>Lib.askPalette()}));box.append(row);}
 function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},swBar(cols,true),el('span',{text:name}));}
