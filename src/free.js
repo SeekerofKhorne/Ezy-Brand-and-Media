@@ -75,7 +75,7 @@ const Free=(function(){
   function field(label,input){return el('label',null,label,input);}
   function num(v,min,max,step,on){const i=el('input',{type:'number',min,max,step});i.value=Math.round(v*100)/100;i.addEventListener('input',()=>{const n=parseFloat(i.value);if(!isNaN(n)){on(clamp(n,min,max));touch();}});return i;}
   function colorRow(val,on){const wrap=el('div',{class:'crow'});const pick=el('input',{type:'color','aria-label':'Custom color'});pick.value=validHex(val||'')?val:'#000000';pick.addEventListener('input',()=>{on(pick.value.toUpperCase());touch();});
-    ROLES.forEach(([r,n])=>wrap.append(el('button',{type:'button',class:'cdot',style:'background:'+state.colors[r],title:'Brand '+n.toLowerCase()+' '+state.colors[r],'aria-label':'Use brand '+n.toLowerCase(),onclick:()=>{on(state.colors[r]);pick.value=state.colors[r];touch();buildProps();}})));wrap.append(pick);return wrap;}
+    ROLES.forEach(([r,n])=>wrap.append(el('button',{type:'button',class:'cdot',style:'background:'+state.colors[r],'data-hex':state.colors[r].toUpperCase(),'data-role':'brand '+n.toLowerCase(),'aria-label':'Use brand '+n.toLowerCase()+' '+state.colors[r],onclick:()=>{on(state.colors[r]);pick.value=state.colors[r];touch();buildProps();}})));wrap.append(pick);return wrap;}
   function buildProps(){const box=$f('fProps');if(!box)return;box.textContent='';if(!doc){box.append(el('p',{class:'empty',text:'Import a PDF or start a blank canvas to begin.'}));return;}
     const l=cur();
     if(!l){box.append(el('div',{class:'h',text:'Canvas'}));const sz=el('select',{id:'fSize','aria-label':'Canvas size'});sz.append(el('option',{value:'',text:`${doc.w} × ${doc.h} px (current)`}));

@@ -38,7 +38,7 @@ Nothing goes live until you merge, and every merged change can be undone on GitH
 - **Templates** for 33 formats across seven platforms, with safe-zone guides and ten layouts.
 - **A Brand page** with keyword search over 49 ideas (brand personality, emotions, values, styles, topics), reached through about 2,900 keywords with autocomplete, and a fingerprint chart of what the words ask for. Each idea is linked to colors, type and graphics by a rule with a named source. Brand changes are kept when you choose Save brand.
 - **Aim for**: filter palettes, colors, type and graphics by the part of the fingerprint you want, for example high arousal and high dominance, closest first.
-- **Color**: 39 ready-made palettes, at least five leaning toward each direction on the fingerprint, or build one color at a time with partners that suit your primary and match your keywords. Contrast is checked against WCAG 2.2.
+- **Color**: four-color palettes (ground, primary, accent, text). 101 ready-made, 58 of them from Canva's 100 color combinations, filtered by combination type (monochromatic, analogous, complementary, triadic), ground and fingerprint direction. Or build one color at a time on a color wheel, with partners that suit your primary and match your keywords. Point at any color to see its fingerprint as percentages. Contrast is checked against WCAG 2.2.
 - **Type**: 52 ready-made pairings from 56 bundled open-licensed typefaces.
 - **Graphics**: 33 procedural graphics in 126 styles, drawn in the brand's colors. Each style leans toward a different part of the fingerprint, and a card per graphic steps through its styles. A post can use its own graphic, set on the Media page.
 - **Library**: save named palettes, pairings, a logo and any number of posts under a brand, sorted into folders. Keep several brands, and copy a post from one brand to another in the new brand's look.
@@ -56,7 +56,7 @@ The switch in **Settings** (the gear at the top right) changes how many controls
 | Templates, keywords, palettes, color builder, type pairings, graphics | Yes | Yes |
 | Numbered steps and a shorter toolbar | Yes | |
 | Build your own type pairing from any two bundled faces | | Yes |
-| All five hex values at once, graphic strength | | Yes |
+| All four hex values at once, graphic strength | | Yes |
 | Headline and supporting text size, capitals | | Yes |
 | Photo focal point, tint strength, shade behind text | | Yes |
 | Hide the brand mark or the handle | | Yes |

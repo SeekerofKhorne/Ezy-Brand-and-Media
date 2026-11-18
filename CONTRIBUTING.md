@@ -70,7 +70,8 @@ Sample text must not make result claims. Write labels for someone who has never 
 
 | To add | Edit |
 |---|---|
-| A palette | `PALETTES` in `src/data.js`. Check where it lands on the fingerprint with `itemLean('colors', palette)` in the browser console; the test suite requires at least two palettes per direction |
+| A palette | `PALETTES` in `src/data.js`: four colors (`bg`, `primary`, `accent`, `text`); leave `surface` out and it is worked out. Text must reach 4.5:1 on the ground. Check where it lands on the fingerprint with `itemLean('colors', palette)` and its combination type with `comboOf(palette)` in the browser console; the test suite requires at least two palettes per direction and four per combination type |
+| A published four-color combination | a row in `CANVA_COMBOS` in `src/data.js`, colors in the publisher's order. Do not assign roles by hand: `assignRoles` in `src/engine.js` does it, and drops a combination with no readable text pair |
 | A platform format or safe zone | `FORMATS` in `src/data.js` (cite the guide in `SRC`) |
 | A typeface | `npm install -D @fontsource/<name>`, then `scripts/fonts.mjs`, then a pairing in `src/types.js` |
 | A type pairing | `TYPESETS` in `src/types.js` |
