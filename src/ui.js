@@ -444,7 +444,11 @@ function palNote(){const p=PAL[state.paletteId];$('#palNote').textContent=(isCus
 
 /* ---------- export ---------- */
 const dlReady=(window.claude&&typeof window.claude.use==='function')?Promise.resolve().then(()=>window.claude.use('downloads')).catch(()=>null):Promise.resolve(null);
-function say(t){$('#status').textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{$('#status').textContent='';},6000);}
+/* Messages go to the status line of the page in view: the Brand page has its own. */
+function statusEl(){const b=$('#viewBrand'),bs=$('#bStatus');return b&&!b.hidden&&bs?bs:$('#status');}
+function say(t){const s=statusEl();document.querySelectorAll('#status,#bStatus').forEach(x=>x.textContent='');s.textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{s.textContent='';},6000);}
+/* A status message with one button, such as Undo. It stays a little longer than a plain message. */
+function sayAction(t,label,fn){const s=statusEl();document.querySelectorAll('#status,#bStatus').forEach(x=>x.textContent='');s.textContent=t+' ';s.append(el('button',{type:'button',class:'link',text:label,onclick:()=>{s.textContent='';fn();}}));clearTimeout(say.t);say.t=setTimeout(()=>{s.textContent='';},12000);}
 function slug(t){return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'draft';}
 async function saveFile(filename,data,isImage){const dl=await dlReady;if(dl){try{await dl.save({filename,data});say('Saved '+filename+'.');return;}catch(e){if(e&&e.code==='declined'){say('Export cancelled.');return;}if(e&&e.code==='rate_limited'){say('A save prompt is already open. Answer it, then try again.');return;}}}
   if(!window.claude){try{const u=URL.createObjectURL(data instanceof Blob?data:new Blob([data])),a=el('a',{href:u,download:filename});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);say('Saved '+filename+' to your downloads.');return;}catch(e){}}

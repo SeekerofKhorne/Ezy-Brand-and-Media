@@ -244,6 +244,31 @@ test('Aim for: options are filtered by where they sit on the fingerprint', async
   await page.context().close();
 });
 
+test('a saved palette can be deleted from the Saved palettes row, and the delete can be undone', async () => {
+  const page = await openApp(browser, url);
+  await page.click('#bStep2');
+  await page.waitForSelector('#bBuild:not([hidden])');
+  await page.click('#tabs button[data-v=colors]');
+  await page.evaluate('Lib.savePalette("Keep me")');
+  await page.evaluate('Lib.savePalette("Delete me")');
+  const saved = () => page.evaluate('(Store.get("brand",state.bid).palettes||[]).map(p=>p.name)');
+  assert.deepEqual(await saved(), ['Delete me', 'Keep me']);
+  // the delete is written at once, without Save brand
+  await page.click('#savedPals .paldel[aria-label="Delete palette Delete me"]');
+  await page.waitForFunction('!(Store.get("brand",state.bid).palettes||[]).some(p=>p.name==="Delete me")');
+  assert.deepEqual(await saved(), ['Keep me']);
+  assert.equal(await page.locator('#savedPals .palpick').count(), 1);
+  assert.equal(await page.evaluate('PALETTES.some(p=>p.mine&&p.name==="Delete me")'), false, 'it leaves the palette list too');
+  assert.equal(await page.evaluate('Lib.isDirty()'), false);
+  // Undo puts it back in the same place
+  assert.match(await page.textContent('#bStatus'), /Deleted .Delete me./, 'the message shows on the Brand page');
+  await page.click('#bStatus button:has-text("Undo")');
+  await page.waitForFunction('(Store.get("brand",state.bid).palettes||[]).length === 2');
+  assert.deepEqual(await saved(), ['Delete me', 'Keep me']);
+  assert.equal(await page.locator('#savedPals .palpick').count(), 2);
+  assert.deepEqual(page.errors, []);
+});
+
 test('palettes are four colors: combination filter, Canva palettes, fingerprint percentages and the color wheel', async () => {
   const page = await openApp(browser, url);
   await page.click('#bStep2');
