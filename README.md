@@ -40,7 +40,7 @@ Nothing goes live until you merge, and every merged change can be undone on GitH
 - **Aim for**: filter palettes, colors, type and graphics by the part of the fingerprint you want, for example high arousal and high dominance, closest first.
 - **Color**: four-color palettes (ground, primary, accent, text). 101 ready-made, 58 of them from Canva's 100 color combinations, filtered by combination type (monochromatic, analogous, complementary, triadic), ground and fingerprint direction. Or build one color at a time on a color wheel, with partners that suit your primary and match your keywords. Point at any color to see its fingerprint as percentages. Contrast is checked against WCAG 2.2.
 - **Type**: 52 ready-made pairings from 56 bundled open-licensed typefaces.
-- **Graphics**: 33 procedural graphics in 126 styles, drawn in the brand's colors. Each style leans toward a different part of the fingerprint, and a card per graphic steps through its styles. A post can use its own graphic, set on the Media page.
+- **Graphics**: 36 procedural graphics in 136 styles, drawn in the brand's colors. Each style leans toward a different part of the fingerprint, and a card per graphic steps through its styles. A post can use its own graphic, set on the Media page.
 - **Library**: save named palettes, pairings, a logo and any number of posts under a brand, sorted into folders. Keep several brands, and copy a post from one brand to another in the new brand's look.
 - **Themes**: Neon Noir (default), Clean Light, Clean Dark and Graphite, in Settings. The preview area stays neutral gray in all of them.
 - **Layer editor** (a mode of the Media page): import a PDF (for example, one downloaded from Canva) or an image and edit it as layers, or start from a blank canvas.

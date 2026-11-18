@@ -106,7 +106,7 @@ const CONCEPTS = [
  {id:'playful',label:'Playful',key:'playful',group:'Style',def:'Casual, whimsical, youthful',
   syn:['playful','whimsical','casual','quirky','kids','kid','children','child','toy','game','games','cute','cartoon','lighthearted','informal','party','youthful','young','silly']},
  {id:'tech',label:'Tech',key:'tech',group:'Style',def:'Digital, scientific, engineered',
-  syn:['tech','technology','digital','futuristic','future','data','software','ai','science','scientific','engineering','app','cyber','startup','device','innovation','laser','light therapy','lab','technical','sci-fi','robot','gaming']},
+  syn:['tech','technology','digital','futuristic','future','data','software','ai','science','scientific','engineering','app','cyber','startup','device','innovation','laser','light therapy','lab','technical','sci-fi','robot','gaming','dna','helix','genetics','genetic','genome','molecule','molecular','biology','chemistry']},
  {id:'human',label:'Handmade',key:'handmade',group:'Style',def:'Personal, crafted, hand-drawn',
   syn:['handmade','human','personal','artisanal','artisan','craft','crafted','homemade','hand-drawn','handwritten','signature','story','stories','people','small batch','indie','diy','real people']},
  {id:'delicate',label:'Delicate',key:'delicate',group:'Style',def:'Light, graceful, fine',

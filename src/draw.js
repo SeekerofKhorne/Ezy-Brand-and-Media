@@ -295,6 +295,50 @@ const G={
    if(v==='lines'){ctx.strokeStyle=k.e1s;ctx.lineWidth=Math.max(1,s*.15);ctx.beginPath();ctx.moveTo(w*.62,0);ctx.lineTo(w,h*.48);ctx.moveTo(w*.7,0);ctx.lineTo(w*.7,h);ctx.moveTo(0,h*.82);ctx.lineTo(w,h*.82);ctx.stroke();ctx.beginPath();ctx.arc(w*.7,h*.82,m*.12,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(w*.86,h*.26,s*.9,0,TAU);ctx.fillStyle=k.e1s;ctx.fill();return;}
    ctx.beginPath();ctx.arc(w*.82,h*.2,m*.2,0,TAU);ctx.fillStyle=k.e1l;ctx.fill();ctx.beginPath();ctx.moveTo(0,h);ctx.arc(0,h,m*.32,-Math.PI/2,0);ctx.closePath();ctx.fillStyle=k.t2;ctx.fill();
    ctx.fillStyle=k.e1m;ctx.fillRect(w*.56,h*.42,w*.36,Math.max(2,s*1.3));ctx.beginPath();ctx.arc(w*.22,h*.86,m*.08,Math.PI,0);ctx.fillStyle=k.e1s;ctx.fill();ctx.fillStyle=k.t1;ctx.fillRect(w*.04,h*.04,m*.12,m*.12);},
+ helix(ctx,w,h,s,k,r,v){const m=Math.min(w,h),ph=r()*TAU;
+   /* a strand point: a is the phase, z>0 is the side facing the viewer */
+   if(v==='dots'){const cx=w*.84,A=Math.min(w*.1,m*.16),L=Math.max(h*.42,A*4),dy=L/16,D=[];
+     for(let y=-dy;y<h+dy;y+=dy){const a=y/L*TAU+ph;for(let j=0;j<2;j++){const b=a+j*Math.PI,z=Math.cos(b);D.push([cx+Math.sin(b)*A,y,z,s*(.45+.5*(z+1)),mix(k.e1l,k.e1,(z+1)/2)]);}
+       if(Math.round(y/dy)%2===0){const x0=cx+Math.sin(a)*A,x1=cx-Math.sin(a)*A;for(let q=1;q<4;q++)D.push([x0+(x1-x0)*q/4,y,-1.1,s*.3,k.t1]);}}
+     D.sort((p,q)=>p[2]-q[2]).forEach(([x,y,z,rad,col])=>{ctx.beginPath();ctx.arc(x,y,rad,0,TAU);ctx.fillStyle=col;ctx.fill();});return;}
+   if(v==='strands'){const cy=h*.74,A=Math.min(h*.1,s*8),L=Math.max(w*.55,A*6),n=4;ctx.lineCap='round';
+     ctx.strokeStyle=k.t1;ctx.lineWidth=Math.max(1,s*.12);ctx.beginPath();for(let x=0;x<=w;x+=L/14){ctx.moveTo(x,cy-A*Math.abs(Math.sin(x/L*TAU+ph)));ctx.lineTo(x,cy+A*Math.abs(Math.sin(x/L*TAU+ph)));}ctx.stroke();
+     for(let i=0;i<n;i++){ctx.strokeStyle=i%2?k.e1l:k.e1s;ctx.lineWidth=Math.max(1,s*(i%2?.2:.3));ctx.beginPath();for(let x=0;x<=w;x+=w/120){const y=cy+Math.sin(x/L*TAU+ph+i/n*TAU)*A;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}return;}
+   if(v==='ribbon'){ctx.save();ctx.translate(0,h*.92);ctx.rotate(-Math.atan2(h*.45,w));const len=Math.hypot(w,h*.45),A=Math.min(h*.1,s*9),L=A*6;
+     const node=n=>(n*Math.PI-ph)/TAU*L;let n=Math.floor(ph/Math.PI)-1;
+     for(;node(n)<len+L;n++){const x0=node(n),x1=node(n+1);if(x1<-L)continue;ctx.beginPath();for(let t=0;t<=24;t++){const x=x0+(x1-x0)*t/24;const y=Math.sin(x/L*TAU+ph)*A;t?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+       for(let t=24;t>=0;t--){const x=x0+(x1-x0)*t/24;ctx.lineTo(x,-Math.sin(x/L*TAU+ph)*A);}ctx.closePath();ctx.fillStyle=n%2?k.e1l:k.e1m;ctx.fill();ctx.strokeStyle=k.e1s;ctx.lineWidth=Math.max(1,s*.15);ctx.stroke();}
+     ctx.restore();return;}
+   /* double helix: back halves of the strands, then the base pairs, then the front halves */
+   ctx.save();ctx.translate(0,h*.82);ctx.rotate(-Math.atan2(h*.22,w));const len=Math.hypot(w,h*.22),A=Math.min(h*.09,s*7),L=Math.max(w*.36,A*5),st=L/90;ctx.lineCap='round';
+   const strand=front=>{for(let j=0;j<2;j++)for(let x=-A*2;x<len+A*2;x+=st){const a=x/L*TAU+ph+j*Math.PI,z=Math.cos(a+st/L*Math.PI);if((z>=0)!==front)continue;
+     ctx.beginPath();ctx.moveTo(x,Math.sin(a)*A);ctx.lineTo(x+st,Math.sin(a+st/L*TAU)*A);ctx.strokeStyle=front?k.e1:k.e1l;ctx.lineWidth=s*(front?.9:.6);ctx.stroke();}};
+   strand(false);ctx.lineWidth=Math.max(1,s*.35);
+   for(let x=-A*2;x<len+A*2;x+=L/12){const y=Math.sin(x/L*TAU+ph)*A;if(Math.abs(y)<A*.12)continue;ctx.strokeStyle=k.e1m;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,0);ctx.stroke();ctx.strokeStyle=k.e2s;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,-y);ctx.stroke();}
+   strand(true);ctx.restore();},
+ molecule(ctx,w,h,s,k,r,v){const m=Math.min(w,h);
+   if(v==='network'){const P=[];for(let i=0;i<18;i++)P.push([r()*w,r()*h,s*(1+r()*2.2)]);ctx.strokeStyle=k.e1l;ctx.lineWidth=Math.max(1,s*.3);
+     P.forEach((p,i)=>{P.map((q,j)=>[Math.hypot(p[0]-q[0],p[1]-q[1]),j]).filter(d=>d[1]!==i).sort((a,b)=>a[0]-b[0]).slice(0,2).forEach(([,j])=>{ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(P[j][0],P[j][1]);ctx.stroke();});});
+     P.forEach(([x,y,rad],i)=>{ctx.beginPath();ctx.arc(x,y,rad,0,TAU);ctx.fillStyle=[k.e1s,k.e2s,k.e1m][i%3];ctx.fill();ctx.beginPath();ctx.arc(x-rad*.3,y-rad*.3,rad*.28,0,TAU);ctx.fillStyle=rgba(k.bg,.5);ctx.fill();});return;}
+   if(v==='cells'){const C=[];for(let i=0;i<60&&C.length<8;i++){const rad=m*(.05+r()*.09),x=r()*w,y=r()<.5?r()*h*.28:h*(.72+r()*.28);if(C.some(([cx,cy,cr])=>Math.hypot(x-cx,y-cy)<rad+cr+s))continue;C.push([x,y,rad]);}
+     for(const[x,y,rad]of C){ctx.beginPath();ctx.arc(x,y,rad,0,TAU);ctx.fillStyle=k.t1;ctx.fill();ctx.strokeStyle=k.e1l;ctx.lineWidth=Math.max(1,s*.45);ctx.stroke();
+       const a=r()*TAU;ctx.beginPath();ctx.arc(x+Math.cos(a)*rad*.25,y+Math.sin(a)*rad*.25,rad*.32,0,TAU);ctx.fillStyle=k.e1l;ctx.fill();}return;}
+   /* hexagon rings sharing edges, with atoms at the corners and a few side groups */
+   const rings=(cx,cy,R,cells)=>{ctx.lineJoin='round';cells.forEach(([q,p],c)=>{const x=cx+1.5*R*q,y=cy+Math.sqrt(3)*R*(p+q/2),V=[];for(let i=0;i<6;i++)V.push([x+Math.cos(i*Math.PI/3)*R,y+Math.sin(i*Math.PI/3)*R]);
+       polyline(ctx,V);ctx.closePath();ctx.strokeStyle=k.e1s;ctx.lineWidth=Math.max(1,s*.35);ctx.stroke();ctx.lineWidth=Math.max(1,s*.25);
+       for(let i=c%2;i<6;i+=2){const a=V[i],b=V[(i+1)%6],f=.72;ctx.beginPath();ctx.moveTo(x+(a[0]-x)*f+(b[0]-a[0])*.15,y+(a[1]-y)*f+(b[1]-a[1])*.15);ctx.lineTo(x+(b[0]-x)*f-(b[0]-a[0])*.15,y+(b[1]-y)*f-(b[1]-a[1])*.15);ctx.stroke();}
+       V.forEach(([vx,vy])=>{ctx.beginPath();ctx.arc(vx,vy,s*.6,0,TAU);ctx.fillStyle=k.e1m;ctx.fill();});
+       if(c===cells.length-1){const[vx,vy]=V[0];ctx.strokeStyle=k.e1s;ctx.beginPath();ctx.moveTo(vx,vy);ctx.lineTo(vx+R*.8,vy);ctx.stroke();ctx.beginPath();ctx.arc(vx+R*.8,vy,s*1.3,0,TAU);ctx.fillStyle=k.e1l;ctx.fill();ctx.stroke();}});};
+   rings(w*.64,h*.1,m*.085,[[0,0],[1,0],[1,1],[2,0]]);rings(w*.06,h*.8,m*.07,[[0,0],[1,0]]);},
+ pulse(ctx,w,h,s,k,r,v){
+   if(v==='wave'){const cy=h*.8,H=Math.min(h*.16,s*15),bw=s*2.4,n=Math.floor(w/bw);ctx.lineCap='round';ctx.lineWidth=s*1.1;
+     for(let i=0;i<n;i++){const x=(i+.5)*bw,env=Math.pow(Math.sin(Math.PI*(i+.5)/n),.6),t=env*H*(.25+.75*r());ctx.strokeStyle=t>H*.6?k.e1s:t>H*.3?k.e1l:k.t1;ctx.beginPath();ctx.moveTo(x,cy-t);ctx.lineTo(x,cy+t);ctx.stroke();}return;}
+   if(v==='sine'){const n=5;for(let i=0;i<n;i++){const cy=h*(.56+i*.09),L=w/(1.4+i*1.3),A=Math.min(s*2.6,h*.035);ctx.strokeStyle=mix(k.e1l,k.e1,i/(n-1));ctx.lineWidth=Math.max(1,s*.3);ctx.beginPath();
+       for(let x=0;x<=w;x+=w/160){const y=cy+Math.sin(x/L*TAU+i*.7)*A;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}return;}
+   /* heartbeat trace: flat, P bump, QRS spike, T bump, per beat */
+   const cy=h*.8,A=Math.min(h*.16,s*13),bw=Math.max(w*.3,s*26),B=[[0,0],[.16,0],[.21,-.1],[.27,0],[.36,0],[.39,.12],[.43,-1],[.47,.34],[.51,0],[.62,0],[.7,-.18],[.79,0],[1,0]],x0=-bw*r(),pts=[];
+   for(let x=x0;x<w+bw;x+=bw)B.forEach(([t,y])=>pts.push([x+t*bw,cy+y*A]));ctx.lineJoin='round';ctx.lineCap='round';
+   ctx.strokeStyle=k.e1l;ctx.lineWidth=s*1.4;polyline(ctx,pts);ctx.stroke();ctx.strokeStyle=k.e1;ctx.lineWidth=Math.max(1,s*.45);polyline(ctx,pts);ctx.stroke();},
  smoke(ctx,w,h,s,k,r,v){const c=k.c.head;
    if(v==='wisps'){ctx.lineCap='round';for(let i=0;i<6;i++){const x0=w*(.1+r()*.8),ph=r()*TAU,f=2+r()*2;let px=x0,py=h;for(let j=1;j<=60;j++){const t=j/60,y=h-t*h*.85,x=x0+Math.sin(t*f*Math.PI+ph)*w*.08*t+t*w*.05;ctx.strokeStyle=rgba(c,(.08+.4*k.k)*(1-t*.8));ctx.lineWidth=s*(.7-t*.5);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(x,y);ctx.stroke();px=x;py=y;}}return;}
    if(v==='grain'){const n=9000,q=Math.max(1,s*.22);for(let i=0;i<n;i++){ctx.fillStyle=i%2?rgba(c,.05+.14*k.k):rgba(k.bg,.25);ctx.fillRect(r()*w,r()*h,q,q);}return;}
