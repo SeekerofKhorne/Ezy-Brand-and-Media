@@ -77,7 +77,7 @@ In Build your own, the **Color wheel** button beside the hex field opens a wheel
 
 ## Graphics
 
-There are 33 graphics, each in three or four styles, 126 in all. On the Brand page the **Graphics** tab and on the Media page the **Graphic** panel work the same way:
+There are 36 graphics, each in three or four styles, 136 in all. On the Brand page the **Graphics** tab and on the Media page the **Graphic** panel work the same way:
 
 - **One card per graphic.** Select the picture to use the style shown. The **‹ ›** arrows and the dots step through the graphic's styles and use each one as you go; with the picture focused, the left and right arrow keys do the same.
 - **In use**, at the top, shows every style of the current graphic side by side, so they can be compared at a glance, with the reasons behind the current one.

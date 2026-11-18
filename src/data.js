@@ -359,6 +359,19 @@ const GFAMILIES = [
   {id:'geo',vn:'Bauhaus blocks',f:{curved:.5,angular:.5,bold:1,asym:.6},conv:{modern:.7,retro:.4}},
   {id:'geo-triangles',vn:'Triangle tiles',f:{angular:1,harmony:1,elaborate:.5},conv:{modern:.5,tech:.3}},
   {id:'geo-lines',vn:'Minimal lines',f:{fine:1,sparse:1,harmony:.4,asym:.4},conv:{modern:.8,sophistication:.4}}]},
+ {fam:'helix',name:'DNA helix',vars:[
+  {id:'helix',vn:'Double helix',f:{curved:1,harmony:1,representational:.7,motion:.4},conv:{health:.7,tech:.6,competence:.3}},
+  {id:'helix-strands',vn:'Woven waves',f:{curved:1,harmony:1,fine:1,motion:.5},conv:{health:.5,tech:.4,water:.3,calm:.3}},
+  {id:'helix-ribbon',vn:'Twisted ribbon',f:{curved:1,bold:1,motion:.6,harmony:.6},conv:{health:.5,modern:.5,energy:.4}},
+  {id:'helix-dots',vn:'Particle helix',f:{curved:.7,elaborate:.6,fine:.4,harmony:.8},conv:{tech:.8,health:.4,interest:.3}}]},
+ {fam:'molecule',name:'Molecules',vars:[
+  {id:'molecule',vn:'Hex rings',f:{angular:.6,harmony:1,representational:.5,fine:.4},conv:{tech:.7,health:.5,competence:.4}},
+  {id:'molecule-network',vn:'Atom network',f:{curved:.6,elaborate:.7,asym:.6},conv:{tech:.8,interest:.4,health:.3}},
+  {id:'molecule-cells',vn:'Cells',f:{curved:1,organic:1,representational:.6,sparse:.4},conv:{health:.8,natural:.4,calm:.3}}]},
+ {fam:'pulse',name:'Pulse line',vars:[
+  {id:'pulse',vn:'Heartbeat',f:{angular:.7,fine:.6,motion:.8,representational:.6},conv:{health:1,fitness:.5,energy:.5}},
+  {id:'pulse-wave',vn:'Sound wave',f:{angular:.4,harmony:.8,motion:.6,elaborate:.4},conv:{energy:.6,tech:.6,excitement:.3}},
+  {id:'pulse-sine',vn:'Frequencies',f:{curved:1,fine:.8,harmony:.8,motion:.5},conv:{tech:.7,health:.4,calm:.3}}]},
  {fam:'smoke',name:'Mist and grain',vars:[
   {id:'smoke',vn:'Low fog',f:{curved:1,organic:1,sparse:.5},conv:{mystery:.6,calm:.4,sadness:.3}},
   {id:'smoke-wisps',vn:'Smoke wisps',f:{curved:1,organic:1,motion:.6,fine:.8},conv:{mystery:.7}},
