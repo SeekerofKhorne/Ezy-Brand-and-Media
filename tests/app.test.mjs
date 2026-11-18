@@ -208,21 +208,21 @@ test('Aim for: options are filtered by where they sit on the fingerprint', async
   assert.equal(await page.locator('#results .opt .tfit').count(), pals.length, 'each card shows its fit');
   // a corner no palette reaches sends the search to single colors
   await page.click('#subbar .tgtbar button:has-text("Clear")');
-  await page.click('#subbar .tgtbar button[aria-label="High pleasure"]');
+  await page.click('#subbar .tgtbar button[aria-label="Sincerity"]');
   await page.click('#subbar .tgtbar button[aria-label="High dominance"]');
   assert.equal(await page.locator('#results .opt').count(), 0);
-  assert.match(await page.textContent('#results .empty'), /No palette leans toward high pleasure and high dominance/);
+  assert.match(await page.textContent('#results .empty'), /No palette leans toward sincerity and high dominance/);
   await page.click('#results .empty button:has-text("build one color by color")');
   assert.equal(await page.evaluate('state.colorMode'), 'build');
   assert.equal(await page.evaluate('getComputedStyle(document.getElementById("results")).display'), 'block', 'the builder is laid out top to bottom, not in the card grid');
-  const hexes = await page.evaluate('[...document.querySelectorAll("#results .swgrid .swatch")].map(b=>b.title.split(" ").pop())');
-  assert.ok(hexes.length > 0, 'some single colors lean toward high pleasure and high dominance');
-  for (const h of hexes) assert.ok(await page.evaluate(`(()=>{const s=colorLean("${h}");return s["p+"]>=LEAN_MIN&&s["d+"]>=LEAN_MIN;})()`), h + ' fits the target');
+  const hexes = await page.evaluate('[...document.querySelectorAll("#results .swgrid .swatch")].map(b=>b.dataset.hex)');
+  assert.ok(hexes.length > 0, 'some single colors lean toward sincerity and high dominance');
+  for (const h of hexes) assert.ok(await page.evaluate(`(()=>{const s=colorLean("${h}");return s["sincerity"]>=LEAN_MIN&&s["d+"]>=LEAN_MIN;})()`), h + ' fits the target');
   await page.hover('#results .swgrid .swatch >> nth=0');
   assert.equal(await page.locator('#clive .tfit .lean').count(), 2, 'the color under the pointer shows how far it leans each way');
   // the opposite end of a feeling axis replaces the other
   await page.click('#subbar .tgtbar button[aria-label="Low dominance"]');
-  assert.deepEqual(await page.evaluate('state.fpTarget'), ['p+', 'd-']);
+  assert.deepEqual(await page.evaluate('state.fpTarget'), ['sincerity', 'd-']);
   // type pairings: filtered the same way, closest first, each card showing its fit
   await page.click('#tabs button[data-v=type]');
   const want = await page.evaluate('listedTypes().map(t=>tgtFit(itemLean("type",t))).filter(f=>f.ok).length');
@@ -240,6 +240,127 @@ test('Aim for: options are filtered by where they sit on the fingerprint', async
   assert.deepEqual(await page.evaluate('sane({gLean:"d+"}).fpTarget'), ['d+']);
   assert.deepEqual(await page.evaluate('sane({fpTarget:["a+","a-","zz"]}).fpTarget'), ['a+']);
   await page.screenshot({ path: join(out, 'aim-for.png') });
+  assert.deepEqual(page.errors, []);
+  await page.context().close();
+});
+
+test('palettes are four colors: combination filter, Canva palettes, fingerprint percentages and the color wheel', async () => {
+  const page = await openApp(browser, url);
+  await page.click('#bStep2');
+  await page.waitForSelector('#bBuild:not([hidden])');
+  // four roles; the panel tint is worked out, and every premade palette has readable text
+  assert.deepEqual(await page.evaluate('ROLES.map(r=>r[0])'), ['bg', 'primary', 'accent', 'text']);
+  assert.equal(await page.locator('#results .opt >> nth=0').locator('.vis.sw i').count(), 4);
+  assert.equal(await page.evaluate('PALETTES.filter(p=>contrast(p.text,p.bg)<4.5||!validHex(p.surface)).length'), 0);
+  // Canva's combinations: roles come from the rule, and a combination with no readable text pair is left out
+  assert.ok(await page.evaluate('PALETTES.filter(p=>p.canva).length') >= 50);
+  assert.deepEqual(await page.evaluate('(()=>{const r=assignRoles(["#001A27","#063852","#F0810F","#E6DF44"]);return [r.bg,r.text,r.primary,r.accent];})()'), ['#001A27', '#E6DF44', '#F0810F', '#063852']);
+  assert.equal(await page.evaluate('assignRoles(["#FA8866","#FF420E","#80BD9E","#89DA59"])'), null);
+  assert.equal(await page.evaluate('TAGS.palette["canva-11"]'), undefined, 'a combination without a readable text pair is not listed');
+  assert.equal(await page.evaluate('SRC[TAGS.palette["canva-16"].tags.power.reasons.find(r=>/Canva/.test(r.why)).src].t'), 'C', "Canva's theme is a convention");
+  // combination types are read from hue angles
+  const combo = c => page.evaluate(`comboOf(${JSON.stringify(c)})`);
+  assert.equal(await combo({ bg: '#FFFFFF', primary: '#1F5FA8', accent: '#6FA8E8', text: '#12243A' }), 'mono');
+  assert.equal(await combo({ bg: '#FFFFFF', primary: '#1F5FA8', accent: '#2BB3A3', text: '#111111' }), 'analogous');
+  assert.equal(await combo({ bg: '#FFFFFF', primary: '#1F5FA8', accent: '#E08A1F', text: '#111111' }), 'complementary');
+  assert.equal(await combo({ bg: '#FFFFFF', primary: '#1D4FB8', accent: '#D8262B', text: '#1F4D1B' }), 'triadic');
+  assert.equal(await combo({ bg: '#FFFFFF', primary: '#3D3D3D', accent: '#8C8C8C', text: '#111111' }), 'neutral');
+  // the filter shows only palettes of the chosen type, and every type has some
+  for (const [k, label] of [['mono', 'Monochromatic'], ['analogous', 'Analogous'], ['complementary', 'Complementary'], ['triadic', 'Triadic']]) {
+    await page.click(`#subbar .cmbbar button:has-text("${label}")`);
+    const want = await page.evaluate(`PALETTES.filter(p=>comboKey(p)==="${k}").length`);
+    assert.ok(want >= 4, label + ' has premade palettes');
+    assert.equal(await page.locator('#results .opt').count(), want);
+    assert.deepEqual(await page.evaluate('[...new Set([...document.querySelectorAll("#results .opt .cmb")].map(x=>x.textContent))]'), [label]);
+  }
+  await page.click('#subbar .cmbbar button:has-text("Dark")');
+  const dark = await page.evaluate('PALETTES.filter(p=>comboKey(p)==="triadic"&&groundOf(p)==="dark").map(p=>p.id)');
+  assert.equal(await page.locator('#results .opt').count(), dark.length);
+  assert.match(await page.textContent('#rSummary'), /dark-ground triadic palette/);
+  await page.click('#subbar .cmbbar button:has-text("Clear")');
+  assert.deepEqual(await page.evaluate('[state.combo,state.ground]'), ['all', 'any']);
+  // work saved with a panel color keeps it; work without one gets one; the old Panel role falls back to Primary
+  assert.equal(await page.evaluate('sane({colors:{bg:"#FFFFFF",surface:"#123456",primary:"#1F5FA8",accent:"#2BB3A3",text:"#111111"}}).colors.surface'), '#123456');
+  assert.equal(await page.evaluate('validHex(sane({colors:{bg:"#FFFFFF",primary:"#1F5FA8",accent:"#2BB3A3",text:"#111111"}}).colors.surface)'), true);
+  assert.equal(await page.evaluate('sane({buildRole:"surface"}).buildRole'), 'primary');
+  // pointing at any color shows its fingerprint as percentages
+  await page.hover('#results .opt >> nth=0 >> .vis.sw i >> nth=1');
+  await page.waitForSelector('#ctip:not([hidden])');
+  assert.equal(await page.locator('#ctip .fpb').count(), 8);
+  assert.equal(await page.locator('#ctip .fpmini svg').count(), 1);
+  const tipHex = await page.textContent('#ctip .cihead b');
+  assert.deepEqual(await page.evaluate('[...document.querySelectorAll("#ctip .fpb .fv")].map(x=>x.textContent)'), await page.evaluate(`fpPct(tagColor("${tipHex}").tags).map(fpVal)`));
+  assert.match(await page.textContent('#ctip .cihead'), /family · used as primary/);
+  // the same numbers as the Aim for filter
+  assert.equal(await page.evaluate(`(()=>{const p=fpPct(tagColor("${tipHex}").tags),s=colorLean("${tipHex}");return LEANS.every(L=>{const a=p[L.i],v=L.d?(a.dir===L.d?a.pct:0):a.pct;return Math.abs(v-Math.round(s[L.k]*100))<=1;});})()`), true);
+  await page.mouse.move(5, 5);
+  await page.waitForSelector('#ctip', { state: 'hidden' });
+  // build your own: four roles, the current color's percentages, and the combination the four colors make
+  await page.click('#subbar button:has-text("Build your own")');
+  assert.equal(await page.locator('#results .roles .role').count(), 4);
+  assert.equal(await page.locator('#cinfo .fpb').count(), 8);
+  assert.match(await page.textContent('#cmbNow'), /These four colors make a \w+( \w+)? combination/);
+  // the color wheel: a large button opens it in the page
+  const wb = await page.locator('#bWheel').boundingBox();
+  assert.ok(wb.height >= 44 && wb.width >= 44, 'the wheel button is a comfortable target');
+  await page.click('#bWheel');
+  await page.waitForSelector('#wheelPanel');
+  assert.equal(await page.locator('#wheelFp .fpb').count(), 8);
+  await page.evaluate('(()=>{const r=document.getElementById("wheelV");r.value=90;r.dispatchEvent(new Event("input"));r.dispatchEvent(new Event("change"));})()');
+  assert.ok(Math.abs(await page.evaluate('hexToHsv(state.colors.primary).v') - 0.9) < 0.02, 'brightness applies');
+  const before = await page.evaluate('state.colors.primary');
+  let box = await page.locator('#wheelCv').boundingBox();
+  // pointing previews the color under the pointer without changing the palette
+  await page.mouse.move(box.x + box.width * 0.75, box.y + box.height * 0.3);
+  assert.equal(await page.textContent('#wheelPanel .wwho'), 'Under the pointer');
+  const hov = await page.textContent('#wheelHex');
+  assert.notEqual(hov, before);
+  assert.deepEqual(await page.evaluate('[...document.querySelectorAll("#wheelFp .fpb .fv")].map(x=>x.textContent)'), await page.evaluate(`fpPct(tagColor("${hov}").tags).map(fpVal)`), 'the percentages follow the pointer');
+  assert.equal(await page.evaluate('state.colors.primary'), before);
+  // pressing and dragging chooses; letting go applies it to the role and works out the panel tint again
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.7, { steps: 5 });
+  assert.equal(await page.textContent('#wheelPanel .wwho'), 'Selected');
+  await page.mouse.up();
+  await page.waitForFunction(`state.colors.primary!=="${before}"`);
+  const picked = await page.evaluate('state.colors.primary');
+  assert.equal(await page.textContent('#wheelHex'), picked);
+  assert.equal(await page.evaluate('hueFamily(state.colors.primary)'), 'blue', 'lower left of the wheel is blue');
+  assert.equal(await page.evaluate('state.colors.surface===autoPanel(state.colors.bg,state.colors.primary,state.colors.text)'), true);
+  assert.equal(await page.evaluate('document.activeElement.id'), 'wheelCv', 'the wheel keeps keyboard focus after a pick');
+  // arrow keys move the hue
+  await page.keyboard.press('Shift+ArrowRight');
+  await page.waitForFunction(`state.colors.primary!=="${picked}"`);
+  assert.ok(Math.abs(await page.evaluate(`(()=>{let d=hexToHsv(state.colors.primary).h-hexToHsv("${picked}").h;return (d+360)%360;})()`) - 15) < 3);
+  // partners can be limited to one relationship with the primary
+  await page.click('#results .roles .role >> nth=2');
+  await page.click('#subbar .cmbbar button:has-text("Complementary")');
+  const parts = await page.evaluate('[...document.querySelectorAll("#results .optgrid .opt .nm")].map(x=>x.textContent.trim())');
+  assert.ok(parts.length > 0, 'complementary partners are offered for the accent');
+  for (const h of parts) assert.ok(await page.evaluate(`(()=>{let d=Math.abs(hexToHsv("${h}").h-hexToHsv(state.colors.primary).h);if(d>180)d=360-d;return d>=170;})()`), h + ' is opposite the primary');
+  assert.equal(await page.evaluate('[...document.querySelectorAll("#results .swgrid .swatch")].every(b=>relToPrimary(b.dataset.hex)==="complementary")'), true);
+  await page.click('#subbar .cmbbar button:has-text("Clear")');
+  await page.screenshot({ path: join(out, 'color-wheel.png') });
+  // Advanced: the fine-tune swatches open the same wheel for their role
+  await setMode(page, 'advanced');
+  await page.click('#bWheel');
+  assert.equal(await page.locator('#wheelPanel').count(), 0);
+  assert.equal(await page.locator('#colors .cfield').count(), 4);
+  await page.evaluate('document.getElementById("accFine").open=true');
+  await page.click('#c_text');
+  assert.deepEqual(await page.evaluate('[state.buildRole,!!document.getElementById("wheelPanel")]'), ['text', true]);
+  // Media: the Brand panel shows the post's four colors, each with its percentages
+  await toMedia(page);
+  await page.click('#rail button[data-p=brand]');
+  assert.equal(await page.locator('#mPostCols .pcol').count(), 4);
+  await page.hover('#mPostCols .pcol >> nth=1');
+  await page.waitForSelector('#ctip:not([hidden])');
+  assert.equal(await page.locator('#ctip .fpb').count(), 8);
+  // the graphics count follows Aim for with no keywords
+  await toBrand(page);
+  await page.click('#tabs button[data-v=graphic]');
+  await page.click('#subbar .tgtbar button[aria-label="Ruggedness"]');
+  assert.equal(await page.textContent('#nGraphic'), String(await page.locator('#results .gcard').count()));
   assert.deepEqual(page.errors, []);
   await page.context().close();
 });
@@ -364,6 +485,12 @@ test('Media: the tool rail, and Shuffle stays inside the brand', async () => {
   const before = await page.evaluate('[state.typeId,state.graphicId]');
   for (let i = 0; i < 5; i++) await page.click('#btnShuffle');
   assert.deepEqual(await page.evaluate('[state.typeId,state.graphicId]'), before, 'Shuffle never changes the brand type or graphic');
+  // the Layout arrows under the canvas step through the format's layouts and wrap around
+  const lays = await page.evaluate('FMT[state.format].layouts'), at = await page.evaluate('state.layout');
+  await page.click('#btnNext');
+  assert.equal(await page.evaluate('state.layout'), lays[(lays.indexOf(at) + 1) % lays.length]);
+  await page.click('#btnPrev'); await page.click('#btnPrev');
+  assert.equal(await page.evaluate('state.layout'), lays[(lays.indexOf(at) - 1 + lays.length) % lays.length]);
   await page.click('#draftCheck summary');
   assert.match(await page.textContent('#dSum'), /contrast/);
   // Templates and Layer editor are two modes of the Media page
@@ -405,6 +532,7 @@ test('Library: folders organize posts, and a post copies to another brand in tha
   await page.click('#libBrands .bcard:has-text("Northfield")');
   await page.click('.fchip:has-text("Spring launch")');
   assert.equal(await page.locator('#libPanel .pcard').count(), 1, 'the folder shows its one post');
+  assert.ok((await page.locator('#libPanel .fbar').boundingBox()).height >= 28, 'the folder row is not clipped');
   await page.click('.fchip:has-text("No folder")');
   assert.equal(await page.locator('#libPanel .pcard').count(), 1);
   await page.click('.fchip:has-text("All posts")');
@@ -563,6 +691,8 @@ test('the brand kit holds a guidelines PDF, palette files, a wordmark and fonts'
   const names = Object.keys((await JSZip.loadAsync(kit.data)).files);
   for (const n of ['Brand-guidelines.pdf', 'colors/hex-codes.txt', 'colors/palette.ase', 'colors/tokens.json', 'logo/wordmark-dark.png', 'README.txt']) assert.ok(names.includes(n), n + ' is in the kit');
   assert.ok(names.some(n => /^fonts\/.+\.woff$/.test(n)), 'fonts are in the kit');
+  const zip = await JSZip.loadAsync(kit.data);
+  assert.deepEqual(Object.keys(JSON.parse(await zip.file('colors/tokens.json').async('string')).color), ['background', 'primary', 'accent', 'text'], 'the kit lists the four palette colors');
   assert.deepEqual(page.errors, []);
   await page.context().close();
 });

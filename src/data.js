@@ -24,12 +24,15 @@ const SRC = {
   WCAG:{t:'S',short:'WCAG 2.2',cite:'W3C (2023). Web Content Accessibility Guidelines 2.2, Success Criterion 1.4.3 Contrast (Minimum).',url:'https://www.w3.org/TR/WCAG22/#contrast-minimum',use:'Contrast checks: 4.5:1 for body text, 3:1 for large text.'},
   SPEC:{t:'S',short:'Platform size guides 2026',cite:'Buffer, Social media image sizes in 2026 (May 2026); Sked Social, Social media image sizes for brands and agencies: the 2026 guide.',url:'https://buffer.com/resources/social-media-image-sizes/',use:'Canvas sizes for each format. Platforms change these often; re-check before production.'},
   SAFE:{t:'S',short:'Safe-zone guides 2026',cite:'Hopper HQ, Instagram Reel size in 2026: dimensions, aspect ratio, and safe zones; AdaptlyPost, Social media safe zones 2026.',url:'https://www.hopperhq.com/blog/instagram-reel-size/',use:'Areas the apps cover with their own buttons and captions. Third-party measurements that differ between guides; treated as approximate.'},
+  CANVA:{t:'C',short:'Canva design guides',cite:'Canva (n.d.). 100 color combinations and how to apply them to your designs; Color wheel: color theory and calculator. Canva Design School and Canva Colors.',url:'https://www.canva.com/learn/100-color-combinations/',use:'A design guide, not a study. Used for three things: the four-color combinations listed under Premade palettes as Canva nos. 1 to 100, with the theme Canva gives each; the names of the combination types (monochromatic, analogous, complementary, triadic), read on the RGB wheel as Canva does; and a few color meanings that the studies above did not test, such as brown for wholesome and honest. All carry the Convention label.'},
   CONV:{t:'C',short:'Convention',cite:'Practitioner convention: widely repeated in design and marketing practice, without a controlled study behind it in this index.',url:'',use:'Topic links such as green for nature, a cross for health, or monospace for tech.'}
 };
 const TIER = {R:{label:'Research',long:'Peer-reviewed research'},S:{label:'Standard',long:'Industry standard'},C:{label:'Convention',long:'Practitioner convention'}};
 
-/* ---------- Palettes: five roles each. Tags are DERIVED from the colors by
-   rules in engine.js; `conv` adds topic links that rest on convention only. */
+/* ---------- Palettes: four colors each (ground, primary, accent, text). Tags are DERIVED from the
+   colors by rules in engine.js; `conv` adds topic links that rest on convention only.
+   `surface` is the panel tint. It is not a fifth choice: where a palette does not list one,
+   engine.js works it out from the ground (autoPanel). */
 const PALETTES = [
  {id:'clinic-blue',name:'Clinic Blue',bg:'#FFFFFF',surface:'#EAF2FB',primary:'#1F5FA8',accent:'#2BB3A3',text:'#12243A',conv:{health:.8}},
  {id:'deep-trust',name:'Deep Trust',bg:'#F5F7FA',surface:'#E1E7EF',primary:'#0F2A4A',accent:'#3D7DD8',text:'#0B1B30',conv:{finance:.8,traditional:.3}},
@@ -74,7 +77,122 @@ const PALETTES = [
  {id:'peat',name:'Peat',bg:'#3B2F25',surface:'#4C4037',primary:'#4E5B59',accent:'#A5AAB6',text:'#FCF9F6',conv:{natural:.3}},                          // ruggedness, low pleasure, low arousal
  {id:'marigold',name:'Marigold Market',bg:'#FBE6C9',surface:'#EDD5B5',primary:'#D46938',accent:'#8F4F01',text:'#271F14',conv:{food:.5}},             // excitement, high pleasure, high arousal
  {id:'fiesta',name:'Fiesta',bg:'#F9E5CE',surface:'#EBD3B8',primary:'#BA0A16',accent:'#6E0A8A',text:'#1E1912',conv:{celebration:.6}},                 // excitement, high arousal
- {id:'tangerine-violet',name:'Tangerine Violet',bg:'#EFD6C4',surface:'#E1C6B2',primary:'#FF5F24',accent:'#3D0D76',text:'#191410',conv:{playful:.3}}  // excitement, high pleasure, high arousal
+ {id:'tangerine-violet',name:'Tangerine Violet',bg:'#EFD6C4',surface:'#E1C6B2',primary:'#FF5F24',accent:'#3D0D76',text:'#191410',conv:{playful:.3}},  // excitement, high pleasure, high arousal
+ /* Triadic set: three hues about 120 degrees apart on the RGB wheel, on a near-neutral ground. None of the palettes
+    above, and none of Canva's that pass the text-contrast check, is triadic, so the Triadic filter would be empty
+    without them. Tagged by the same rules as the rest. */
+ {id:'triad-primary',name:'Triad Primary',bg:'#F7F6F2',primary:'#1D4FB8',accent:'#D8262B',text:'#1F4D1B',conv:{}},
+ {id:'triad-carnival',name:'Triad Carnival',bg:'#FFF8EA',primary:'#5B2FA8',accent:'#F08A1C',text:'#0F4A2E',conv:{celebration:.4}},
+ {id:'triad-orchard',name:'Triad Orchard',bg:'#F3F6EC',primary:'#0E8A5F',accent:'#E5701E',text:'#43207A',conv:{}},
+ {id:'triad-arcade',name:'Triad Arcade',bg:'#14161C',primary:'#25C4D8',accent:'#F2D21B',text:'#F7B8E6',conv:{playful:.3}}
+];
+
+/* ---------- Canva's combinations ----------
+   From Canva's "100 color combinations" (SRC.CANVA). Each row: Canva's number and name, its four colors in Canva's
+   order, the theme Canva gives it (as convention links), and a short note in our words. The colors were read from
+   Canva's swatch images, so a value can differ by a step from the code printed on the swatch.
+   Roles are NOT assigned here. engine.js gives each color a role by rule (canvaPalettes), and keeps only the
+   combinations where one of the four colors can be read as text on another at 4.5:1 or better. Nos. 49 and 91
+   are missing because their swatch images do not load on Canva's page. */
+const CANVA_COMBOS = [
+ [1,"Fresh & Bright",'#FA8866','#FF420E','#80BD9E','#89DA59',{playful:.4,energy:.4},"Fresh and youthful; spring and summer events"],
+ [2,"Subdued & Professional",'#90AFC5','#336B87','#2A3132','#763626',{competence:.5,calm:.3},"Muted and businesslike, with a confident red"],
+ [3,"Dark & Earthy",'#46211A','#693D3D','#BA5536','#A43820',{natural:.5,ruggedness:.4},"Desert tones, toned down"],
+ [4,"Crisp & Dramatic",'#505160','#68829E','#AEBD38','#598234',{natural:.5},"Cool landscape greens against warm grays"],
+ [5,"Cool Blues",'#003B46','#06575B','#66A5AD','#C4DFE6',{water:.5,calm:.4},"Versatile blues, close to one hue"],
+ [6,"Outdoorsy & Natural",'#2E4600','#486B00','#A2C523','#7D4427',{natural:.7,ruggedness:.4},"Outdoor and eco-friendly brands"],
+ [7,"Shady Foliage in Blue-Greens",'#021C1E','#004445','#2C7873','#6FB98F',{natural:.5,mystery:.3,sophistication:.3},"Moody greens; quietly refined, eco-minded"],
+ [8,"Primary Colors with a Vibrant Twist",'#375E97','#FB6542','#FFBB00','#3F681C',{playful:.4,energy:.4},"Bright primaries with a sunset cast"],
+ [9,"Refreshing & Pretty",'#98DBC6','#5BC8AC','#E6D72A','#F18D9E',{playful:.5,delicate:.3},"Candy-bright and clean"],
+ [10,"Playful Greens & Blues",'#324851','#86AC41','#34675C','#7DA3A1',{playful:.4,natural:.3},"Lively greens on gray-blue"],
+ [11,"Fresh & Energetic",'#4CB5F5','#B7B8B6','#34675C','#B3C100',{fitness:.6,energy:.5},"Energetic; suggested for fitness brands"],
+ [12,"Surf & Turf",'#F4CC70','#DE7A22','#20948B','#6AB187',{water:.5,calm:.4},"Beach holiday; relaxed"],
+ [13,"Autumn in Vermont",'#8D230F','#1E434C','#9B4F0F','#C99E10',{ruggedness:.4,natural:.4,sincerity:.3},"Rustic, woodsy, down-to-earth"],
+ [14,"Icy Blues & Grays",'#F1F1F2','#BCBABE','#A1D6E2','#1895AD',{modern:.4,competence:.3},"A livelier take on navy and gray"],
+ [15,"Birds & Berries",'#9A9EAB','#5D535E','#EC96A4','#DFE166',{natural:.3,delicate:.3},"Early spring"],
+ [16,"Day & Night",'#001A27','#063852','#F0810F','#E6DF44',{power:.5,energy:.3},"Strong contrast; graphic and forceful"],
+ [17,"Stylish & Retro",'#75B1A9','#D9B44A','#4F6457','#ACD0C0',{retro:.7},"Vintage, mid-century"],
+ [18,"Shades of Citrus",'#EB8A44','#F9DC24','#4B7447','#8EBA43',{food:.5,energy:.4},"Lively, fresh citrus"],
+ [19,"Sunset to Dusk",'#363237','#2D4262','#73605B','#D09683',{sophistication:.5,calm:.3},"Soft and refined"],
+ [20,"Bright & Tropical",'#F52549','#FB6775','#FFD64D','#9BC01C',{playful:.5,celebration:.3},"Warm, youthful, tropical"],
+ [21,"Warm Naturals",'#2E2300','#6E6702','#C05805','#DB9501',{natural:.4,warmth:.4},"Autumn; cozy"],
+ [22,"Bold Berries",'#50312F','#CB0000','#E4EA8C','#3F6C45',{food:.4},"Bright but soothing; fruit tones"],
+ [23,"Summer Sunflower",'#4D85BD','#7CAA2D','#FCD302','#CB6318',{natural:.4,joy:.3},"Outdoor summer"],
+ [24,"Modern & Crisp",'#0F1B07','#FFFFFF','#5C821A','#C6D166',{modern:.6,natural:.3},"Modern and refined without being stiff"],
+ [25,"Timeless & Nautical",'#00293C','#1E656D','#F1F3CE','#F62A00',{traditional:.5,water:.4},"Classic nautical"],
+ [26,"Neutral & Versatile",'#626D71','#CDCDC0','#DDBC95','#B38867',{sophistication:.3,food:.3},"Upscale led by gray, cafe-cozy led by brown"],
+ [27,"Cheerful Brights",'#258039','#F5BE41','#31A9B8','#CF3721',{joy:.4,playful:.3},"Cheery, with some polish"],
+ [28,"Garden Fresh",'#EE693F','#F69454','#FCFDFE','#739F3D',{food:.4,energy:.3,natural:.3},"Energetic and fresh; produce tones"],
+ [29,"Summer Barbeque",'#5C8F22','#752A07','#FBCB7B','#EB5E30',{food:.6,retro:.3},"Nostalgic summer cookout"],
+ [30,"Berry Blues",'#1E1F26','#273655','#4D648D','#D0E2F9',{competence:.5},"Dependable blues"],
+ [31,"Lemonade Stand",'#F70025','#F7EFE2','#F25C00','#F9A603',{food:.6,joy:.4},"Cheerful and juicy; suggested for food ads"],
+ [32,"Serene & Spa-Like",'#A1BE95','#E2DFA2','#92AAC7','#ED5752',{calm:.6,health:.5},"Calm, with one lively accent"],
+ [33,"Fun & Tropical",'#4897D8','#FFDB5C','#FA6E59','#F8A055',{playful:.7},"Playful; summer ads and children's designs"],
+ [34,"Spicy Neutrals",'#AF4425','#662E1C','#EBDCB2','#C9A66B',{food:.4,warmth:.3},"Spice tones from light to dark"],
+ [35,"Pastels",'#C1E1DC','#FFCCAC','#FFEB94','#FDD475',{delicate:.6,playful:.3},"Pretty and delicate; spring, babies, sweets"],
+ [36,"Bold & Cultured",'#4C3F54','#D13525','#F2C057','#486824',{sophistication:.4},"Bright colors, slightly shaded"],
+ [37,"Sunny Citrus",'#FAAF08','#FA812F','#FA4032','#FEF3E2',{food:.6,joy:.3},"Juicy and appetizing"],
+ [38,"Crisp Complementary Colors",'#F5EC6B','#BBCF4A','#E63F0B','#A21F0D',{food:.4,energy:.3},"Red against green, toned down"],
+ [39,"Warm & Rustic",'#FEF2E4','#FD974F','#C60000','#805A3B',{food:.4,human:.3},"Eye-catching reds on warm neutrals"],
+ [40,"Neon Night",'#F77604','#B8D20B','#F56C57','#231B12',{energy:.5,excitement:.4},"Neons on a dark ground"],
+ [41,"Warm Jewel Tones",'#7F152E','#D61800','#EDAE01','#E94F08',{sophistication:.4,food:.3},"Refined jewel tones"],
+ [42,"Polished & Inviting",'#EAE2D6','#D5C3AA','#867666','#E1B80D',{sophistication:.5,calm:.4},"Warm grays with yellow; refined and calming"],
+ [43,"Fresh Greens",'#265C00','#68A225','#B3DE81','#FEFFFF',{natural:.6,health:.4},"One green, with crisp white"],
+ [44,"Wintery Reds",'#A10115','#D72C16','#F0EFEA','#C0B2B5',{celebration:.6,sophistication:.3},"Festive but refined; a holiday alternative"],
+ [45,"Summer Fiesta",'#C7DB00','#7AA802','#F78B2D','#E4B600',{food:.5,retro:.4},"Appetizing and retro"],
+ [46,"Chocolaty Browns",'#301B28','#523634','#B6452C','#DDC5A2',{food:.5,pleasure:.5},"Rich and decadent"],
+ [47,"Naturally Elegant",'#EBDF00','#7E7B15','#563E20','#B38540',{natural:.4,sophistication:.4},"Muted, with a green-tinted yellow"],
+ [48,"Cozy & Warm",'#662225','#B51D0A','#EAD39C','#7D5E3C',{warmth:.6},"Muted red with soft neutrals"],
+ [50,"Strawberries & Cream",'#D84130','#FE7B47','#FCFDFF','#F4CA98',{food:.5,warmth:.3},"Red softened by warm neutrals"],
+ [51,"Grecian Holiday",'#2989BC','#2F496E','#F4EADE','#EE8C73',{water:.5,calm:.4},"Relaxing seaside holiday"],
+ [52,"Bold & Basic",'#000B29','#D70127','#F9F5F2','#EEB83E',{energy:.5,power:.4},"Saturated, bold, eye-catching"],
+ [53,"Vineyard Neutrals",'#1E0000','#4F0804','#9D321E','#BC6D4F',{sophistication:.5,food:.3},"Earthy, warm and refined"],
+ [54,"Modern & Urban",'#F9B931','#426F86','#F8F2E6','#2F3130',{modern:.6},"Softer than black and white, with clear accents"],
+ [55,"Misty Mountain Greens",'#04202C','#304040','#5A7064','#CAD1C9',{natural:.6,ruggedness:.3},"Fog-like greens; soft but strong"],
+ [56,"Sunkissed Village",'#D14136','#EB893E','#EAB581','#795A46',{warmth:.4,joy:.3},"Warm Mediterranean tones; carefree"],
+ [57,"Sun & Sky",'#207CA3','#E29930','#32384E','#221F30',{interest:.3},"Mustard set against cool tones"],
+ [58,"Aqua Blues",'#004D47','#128276','#52968B','#B9C4C8',{water:.6},"Blue-greens, close to one hue"],
+ [59,"Urban Oasis",'#506C2F','#2A2A22','#F3EBDE','#7C5641',{natural:.4,modern:.4},"Neutrals with a touch of green"],
+ [60,"Candy-Coated Brights",'#F57D49','#E1305A','#FEEC5C','#008DCB',{playful:.6,excitement:.4},"Loud and youthful; street-art brights"],
+ [61,"Muted & Antique",'#A4CABB','#EAB363','#B2473D','#ACBD77',{retro:.6},"Faded, antique tints"],
+ [62,"Classy & Timeless",'#16243E','#002C53','#EFB509','#CC7212',{sophistication:.6,traditional:.4},"Classy; pairs with gold foil"],
+ [63,"Cosmopolitan",'#8593AE','#594E4C','#7E675F','#DEA288',{sophistication:.4,beauty:.3},"Soft gray-purples"],
+ [64,"Cheerful & Friendly",'#2B616D','#B2DBD5','#FFFFFF','#FA8D62',{warmth:.4,joy:.4},"Bright and friendly"],
+ [65,"Nightlife Neons",'#00CFF9','#FF0038','#FFCE39','#02050A',{excitement:.5,celebration:.4},"City nightlife; print-ink brights"],
+ [66,"Coastal Sky",'#A5C3CE','#F2D3B7','#E49D5B','#A99F3D',{water:.4,calm:.4},"Powdery coast tones"],
+ [67,"Maritime Brights",'#257984','#5EA8A7','#FFFFFF','#FE4447',{water:.6},"Crisp and fresh; sea air"],
+ [68,"Vintage Charm",'#FCC875','#B9A896','#E6CCB5','#E38B75',{retro:.6,delicate:.3},"Sun-faded vintage"],
+ [69,"Understated & Versatile",'#335352','#D4DDE2','#A94B41','#2C3033',{competence:.5,sophistication:.3},"Classy and serious without being dull"],
+ [70,"Arctic Sunrise",'#FFCCBB','#6FB5BF','#006C83','#E2E8E4',{water:.3,delicate:.3},"Coral against blue-grays"],
+ [71,"Mediterranean Afternoon",'#8C0003','#C8000A','#E8A635','#E1C498',{food:.6,warmth:.3},"Italian afternoon; warm and flavorful"],
+ [72,"Hazy Grays",'#2C4A52','#537173','#8F9B97','#F4EBDA',{calm:.5},"Relaxing and understated"],
+ [73,"City Sights",'#C5001B','#E3E3DB','#113742','#C6BEBB',{modern:.4,energy:.3},"Urban and bold"],
+ [74,"Retro & Relaxing",'#D35B36','#BE9A76','#D6C6B9','#97B7C2',{retro:.5,calm:.4},"Soft, warm and comfortable"],
+ [75,"Green Fields",'#919737','#524B3B','#FFFBE2','#5A5F37',{natural:.6},"Fresh field greens"],
+ [76,"Distinctive & Unexpected",'#B0D7D2','#E4E2C9','#432E33','#E7472F',{interest:.4,excitement:.3},"Attention-getting turquoise and orange-red"],
+ [77,"Sleek & Modern",'#2F2E33','#D5D6D1','#FFFFFF','#3A5099',{modern:.6,competence:.4,tech:.3},"Modern; corporate through trendy"],
+ [78,"Orange Accent",'#766867','#D5D6D1','#343C3F','#FE8D3F',{modern:.3},"A soft base with one orange highlight"],
+ [79,"Beyond Black & White",'#31A1AC','#AE1C1C','#F0EFFD','#2F2F27',{modern:.4},"A twist on black and white"],
+ [80,"Shabby Chic Neutrals",'#6C5E5B','#CCAB80','#DAC3B3','#4F4A46',{retro:.5,human:.3},"Industrial or steampunk neutrals"],
+ [81,"Warm & Cool",'#444B5B','#CD5A57','#78A4A3','#E1B169',{},"Warm and cool tones softened with white"],
+ [82,"Industrial & In-Control",'#20232A','#ACBEBE','#F3F4EE','#A01D25',{competence:.5,ruggedness:.3},"Serious and industrial"],
+ [83,"Autumn Oranges",'#D45447','#FFA578','#FAF9FF','#8A6E6A',{warmth:.6},"Warm, cozy, muted oranges"],
+ [84,"Pool Party",'#344D90','#5BC5EF','#FFB846','#E7552C',{playful:.6,water:.4,celebration:.3},"Fun, playful, energetic"],
+ [85,"Classic Metallics",'#080705','#EFEFEF','#D2B281','#5A4D45',{traditional:.6,sophistication:.5},"Tradition, trust and class"],
+ [86,"Subtle & Versatile",'#5F978E','#C0DCCE','#E05858','#D5C9B1',{retro:.4,water:.3},"Nautical and sun-faded"],
+ [87,"Professional & Traditional",'#962714','#FFFFFF','#1E1E20','#BBC3C6',{competence:.5,traditional:.5},"Warm but professional"],
+ [88,"Light & Natural",'#688A89','#58C8B2','#FAEED4','#A57C66',{natural:.5,calm:.4},"Gentle and fresh"],
+ [89,"Shadowy & Dramatic",'#262F34','#F34B4A','#F1D3BB','#615049',{mystery:.4,energy:.3},"Muted earth tones with a neon red"],
+ [90,"Golden Afternoon",'#882426','#CDBEA7','#323031','#C29544',{sophistication:.6},"Calm luxury in jewel tones"],
+ [92,"Technology Meets Nature",'#FCCD4B','#A3A598','#272622','#88A650',{tech:.5,natural:.4},"Soft natural tones with one bold dark"],
+ [93,"Cheerful Blues + Pink",'#FFBDBE','#FCFCFA','#337AAE','#19405F',{modern:.4,playful:.3},"Hip and modern"],
+ [94,"Wild & High-Impact",'#0F1F38','#8D7970','#F55549','#1B4A5A',{energy:.5,excitement:.3},"High impact, with an orange pop"],
+ [95,"Back to School",'#82715F','#FAAE3E','#E48533','#E5535E',{playful:.5},"Child-friendly and soft"],
+ [96,"Bright & Painterly",'#061184','#FD3D3C','#FFB74B','#138D90',{playful:.4,human:.3},"Quirky and artsy"],
+ [97,"Urban Living",'#DDDFDE','#232122','#A5BF5A','#7BA4A8',{modern:.5},"Fresh and modern grays"],
+ [98,"Retro Kitchen",'#B3DBC0','#FE0000','#FCF6F6','#67BACA',{retro:.6,playful:.3},"Bright, fun retro"],
+ [99,"Smoky Purples",'#A49592','#717076','#EED8CA','#E99887',{sophistication:.3,delicate:.3},"Warm and cool smoky tones"],
+ [100,"Trendy & Metropolitan",'#488A9A','#DBAF58','#4D585A','#B4B4B4',{modern:.5,competence:.3},"Serious but inviting, with gold"]
 ];
 
 /* ---------- Graphics: procedural, drawn in the active palette.

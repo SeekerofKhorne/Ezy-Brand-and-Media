@@ -27,7 +27,8 @@ function picksWeights(){const a=draftAgg(),w={};for(const k in a)w[k]=a[k].w;ret
 const SVGNS='http://www.w3.org/2000/svg';
 function svgEl(tag,attrs){const n=document.createElementNS(SVGNS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);return n;}
 /* series: [{fp, cls}] drawn in order. */
-function radarSVG(series,size,label){const W=size+150,H=size+44,cx=W/2,cy=H/2,r=size/2-4,n=FP_AXES.length;
+/* bare: no axis labels and no margins for them, for the small shape beside a color's percentages. */
+function radarSVG(series,size,label,bare){const W=bare?size:size+150,H=bare?size:size+44,cx=W/2,cy=H/2,r=size/2-4,n=FP_AXES.length;
   const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+r*v*Math.cos(a),cy+r*v*Math.sin(a)];};const pts=vals=>vals.map((v,i)=>pt(i,v).map(x=>x.toFixed(1)).join(',')).join(' ');
   const svg=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':label,class:'radarsvg'});
   [.25,.5,.75,1].forEach(k=>svg.append(svgEl('polygon',{points:pts(Array(n).fill(k)),class:'rg'})));
@@ -35,8 +36,8 @@ function radarSVG(series,size,label){const W=size+150,H=size+44,cx=W/2,cy=H/2,r=
   /* the neutral line on the three bipolar axes */
   const pad=FP_AXES.map((a,i)=>a.pad!=null?i:-1).filter(i=>i>=0);svg.append(svgEl('polyline',{points:pad.map(i=>pt(i,.5).map(x=>x.toFixed(1)).join(',')).join(' '),class:'rn'}));
   series.forEach(s=>{if(!s.fp)return;svg.append(svgEl('polygon',{points:pts(s.fp.map(a=>a.v)),class:'rs '+s.cls}));
-    s.fp.forEach((a,i)=>{if(!a.set)return;const[x,y]=pt(i,a.v);svg.append(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:3,class:'rd '+s.cls}));});});
-  FP_AXES.forEach((a,i)=>{const[x,y]=pt(i,1.1);const deg=i*360/n;const t=svgEl('text',{x:x.toFixed(1),y:(y+(deg===0?-2:deg===180?10:4)).toFixed(1),'text-anchor':deg===0||deg===180?'middle':deg<180?'start':'end',class:'rl'});t.textContent=a.label;svg.append(t);});
+    s.fp.forEach((a,i)=>{if(!a.set)return;const[x,y]=pt(i,a.v);svg.append(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:bare?2:3,class:'rd '+s.cls}));});});
+  if(!bare)FP_AXES.forEach((a,i)=>{const[x,y]=pt(i,1.1);const deg=i*360/n;const t=svgEl('text',{x:x.toFixed(1),y:(y+(deg===0?-2:deg===180?10:4)).toFixed(1),'text-anchor':deg===0||deg===180?'middle':deg<180?'start':'end',class:'rl'});t.textContent=a.label;svg.append(t);});
   const title=svgEl('title',{});title.textContent=label;svg.prepend(title);return svg;}
 function fpText(fp){return FP_AXES.map((a,i)=>a.label+' '+(a.pad==null?Math.round(fp[i].v*100)+'%':fp[i].v>.6?'high':fp[i].v<.4?'low':'neutral')).join(', ');}
 
@@ -110,7 +111,7 @@ function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidd
   myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
   if(!myPalettes.length)row.append(el('span',{class:'note',style:'margin:0',text:'None yet.'}));
   row.append(el('button',{type:'button',class:'btn small',text:'+ Save current colors',title:'Saved palettes can be switched on any post',onclick:()=>Lib.askPalette()}));box.append(row);}
-function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+cols[r]}))),el('span',{text:name}));}
+function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},swBar(cols,true),el('span',{text:name}));}
 const sameColors=(a,b)=>ROLES.every(([r])=>String(a[r]).toUpperCase()===String(b[r]).toUpperCase());
 
 /* ---------- Media page: the brand's look, and switching between its palettes ---------- */
@@ -118,6 +119,10 @@ function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=
   $('#mLookNote').textContent=(state.brandName||'This brand')+': '+t.name+' type, '+(g&&g.fam!=='none'?gLabel(g).toLowerCase():'no')+' graphic. Choose which saved palette this post uses.';
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
   myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));
+  /* The four colors this post is using, by role. Point at one for its fingerprint percentages. */
+  const pc=$('#mPostCols');if(pc){pc.textContent='';const ck=comboOf(state.colors);pc.append(el('div',{class:'h',text:'Colors on this post'}),
+    el('div',{class:'pcols'},ROLES.map(([r,l])=>el('span',{class:'pcol',tabindex:0,role:'group','aria-label':l+' color '+state.colors[r].toUpperCase(),'data-hex':state.colors[r].toUpperCase(),'data-role':ROLE_NAME[r]},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))),
+    el('p',{class:'note'},tierEl('CANVA'),' '+COMBO_LABEL[ck]+' combination. Point at a color to see its fingerprint percentages. Colors are chosen on the Brand page.'));}
   buildMediaGraphic();}
 
 function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};

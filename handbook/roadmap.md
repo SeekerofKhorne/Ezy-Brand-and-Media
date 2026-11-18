@@ -14,6 +14,7 @@ Nothing here is promised. It records what is known to be missing or unverified, 
 ## Decisions for the owner
 
 - **License.** Until one is added, others cannot legally reuse the code. MIT and Apache-2.0 are the usual permissive choices; GPL or AGPL keep derivatives open.
+- **Canva's combinations.** 58 premade palettes use the color values and names from Canva's article, credited in Sources. Color values are facts, but the list is Canva's editorial work and this repository is public. If the app is distributed beyond personal use, check Canva's terms or rename the palettes; removing them is one line (`PALETTES.push(...canvaPalettes())` in `src/engine.js`).
 - **Accounts.** A stand-alone copy has none, by design. Real accounts and link sharing need a backend (a hosted database with sign-in, for example Supabase or Firebase) and someone to own its cost, privacy policy and abuse handling. `src/store.js` is the single place to add it.
 
 ## Ideas, roughly in order of value

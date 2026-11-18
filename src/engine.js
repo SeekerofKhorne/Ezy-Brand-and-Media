@@ -32,18 +32,18 @@ const HUE_LABEL={black:'Black',white:'White',gray:'Gray',brown:'Brown',pink:'Pin
 
 /* Hue rules: [concept, strength, reason, source]. Partly supported findings get lower strengths. */
 const HUE_RULES={
- white:[['sincerity',.9,'White marks were rated more sincere','LM'],['relief',.8,'White pairs with relief across 30 nations','J20'],['calm',.35,'White pairs with relief, a quiet positive emotion','J20'],['modern',.5,'Open white space reads as clean and minimal','CONV']],
- pink:[['sophistication',.7,'Pink marks were rated more sophisticated','LM'],['sincerity',.45,'Pink was linked to sincerity (partly supported)','LM'],['love',.85,'Pink pairs with love across 30 nations','J20'],['joy',.5,'Pink pairs with joy','J20'],['pleasure',.7,'Pink pairs with pleasure across 30 nations','J20'],['delicate',.6,'Pink is used for delicate, feminine-coded brands','CONV'],['beauty',.5,'Common in beauty and skincare','CONV']],
+ white:[['sincerity',.9,'White marks were rated more sincere','LM'],['relief',.8,'White pairs with relief across 30 nations','J20'],['calm',.35,'White pairs with relief, a quiet positive emotion','J20'],['modern',.5,'Open white space reads as clean and minimal','CONV'],['delicate',.3,'Design guides link white with purity and innocence','CANVA']],
+ pink:[['sophistication',.7,'Pink marks were rated more sophisticated','LM'],['sincerity',.45,'Pink was linked to sincerity (partly supported)','LM'],['love',.85,'Pink pairs with love across 30 nations','J20'],['joy',.5,'Pink pairs with joy','J20'],['pleasure',.7,'Pink pairs with pleasure across 30 nations','J20'],['delicate',.6,'Pink is used for delicate, feminine-coded brands','CONV'],['beauty',.5,'Common in beauty and skincare','CONV'],['excitement',.25,'Design guides describe pink as exciting as well as romantic','CANVA']],
  red:[['excitement',1,'Red marks were rated more exciting','LM'],['love',.7,'Red pairs with love across 30 nations','J20'],['anger',.75,'Red pairs with anger across 30 nations','J20'],['energy',.5,'Red is used to signal urgency','CONV'],['fear',.3,'Red is the standard danger and warning color','CONV'],['food',.3,'Common in food and quick-service brands','CONV']],
  darkred:[['traditional',.6,'Burgundy and oxblood read as established','CONV'],['sophistication',.35,'Deep reds are used for formal, premium brands','CONV'],['mystery',.4,'Blood red is a gothic convention','CONV'],['anger',.35,'Dark red keeps red’s link to anger, by convention','CONV']],
- orange:[['joy',.8,'Orange pairs with joy across 30 nations','J20'],['amusement',.8,'Orange pairs with amusement across 30 nations','J20'],['playful',.5,'Orange pairs with amusement','J20'],['excitement',.45,'Orange was expected to raise excitement (partly supported)','LM'],['food',.4,'Common in food brands','CONV']],
- yellow:[['joy',.9,'Yellow pairs with joy across 30 nations','J20'],['sincerity',.4,'Yellow was linked to sincerity (partly supported)','LM'],['energy',.3,'High-visibility yellow is used for attention','CONV'],['fear',.25,'Yellow and black is the hazard convention','CONV'],['interest',.3,'Highlighter yellow is used to draw the eye','CONV']],
- green:[['natural',.9,'Green is the default signal for nature','CONV'],['health',.6,'Common in health and wellness brands','CONV'],['ruggedness',.3,'Green was expected to raise ruggedness (partly supported)','LM'],['finance',.3,'Used for money and growth','CONV'],['relief',.3,'Green is the go and all-clear convention','CONV']],
+ orange:[['joy',.8,'Orange pairs with joy across 30 nations','J20'],['amusement',.8,'Orange pairs with amusement across 30 nations','J20'],['playful',.5,'Orange pairs with amusement','J20'],['excitement',.45,'Orange was expected to raise excitement (partly supported)','LM'],['food',.4,'Common in food brands','CONV'],['energy',.3,'Design guides describe orange as fresh, youthful and adventurous','CANVA'],['warmth',.35,'Warm colors are described as cozy','CANVA']],
+ yellow:[['joy',.9,'Yellow pairs with joy across 30 nations','J20'],['sincerity',.4,'Yellow was linked to sincerity (partly supported)','LM'],['energy',.3,'High-visibility yellow is used for attention','CONV'],['fear',.25,'Yellow and black is the hazard convention','CONV'],['interest',.3,'Highlighter yellow is used to draw the eye','CONV'],['playful',.4,'Design guides describe yellow as cheerful and playful','CANVA'],['warmth',.25,'Warm colors are described as cozy','CANVA']],
+ green:[['natural',.9,'Green is the default signal for nature','CONV'],['health',.6,'Common in health and wellness brands','CONV'],['ruggedness',.3,'Green was expected to raise ruggedness (partly supported)','LM'],['finance',.3,'Used for money and growth','CONV'],['relief',.3,'Green is the go and all-clear convention','CONV'],['admiration',.25,'Design guides link green with prestige and wealth','CANVA'],['calm',.25,'Cool colors are described as serene','CANVA']],
  turquoise:[['water',.8,'Turquoise reads as water','CONV'],['calm',.45,'Aqua tones are a spa and wellness convention','CONV'],['health',.45,'Common in clinics and wellness brands','CONV']],
- blue:[['competence',1,'Blue marks were rated more competent','LM'],['calm',.4,'Blue was among the most pleasant hues, purple-blue among the least arousing','VM'],['water',.5,'Blue reads as water and sky','CONV'],['finance',.4,'Common in banking and insurance','CONV'],['tech',.35,'Common in software brands','CONV'],['admiration',.25,'Royal and navy blues are used for honors and institutions','CONV']],
+ blue:[['competence',1,'Blue marks were rated more competent','LM'],['calm',.4,'Blue was among the most pleasant hues, purple-blue among the least arousing','VM'],['water',.5,'Blue reads as water and sky','CONV'],['finance',.4,'Common in banking and insurance','CONV'],['tech',.35,'Common in software brands','CONV'],['admiration',.25,'Royal and navy blues are used for honors and institutions','CONV'],['sincerity',.25,'Design guides describe blue as trustworthy and communicative','CANVA']],
  purple:[['sophistication',.9,'Purple marks were rated more sophisticated','LM'],['beauty',.3,'Used in beauty and wellness','CONV'],['mystery',.5,'Purple is a magic and occult convention','CONV'],['awe',.35,'Purple is used for the cosmic and magical','CONV'],['admiration',.3,'Purple is a royalty convention','CONV']],
- brown:[['ruggedness',1,'Brown marks were rated more rugged','LM'],['natural',.6,'Earth tones read as natural','CONV'],['human',.45,'Kraft and leather tones read as handmade','CONV'],['traditional',.4,'Brown reads as heritage','CONV'],['retro',.4,'Browns and ochres are a 1970s convention','CONV'],['food',.3,'Common for coffee, bakery and chocolate','CONV']],
- black:[['sophistication',1,'Black marks were rated more sophisticated','LM'],['sadness',.7,'Black pairs with sadness across 30 nations','J20'],['fear',.7,'Black pairs with fear across 30 nations','J20'],['anger',.55,'Black pairs with hate across 30 nations','J20'],['mystery',.8,'Black is the gothic and noir convention','CONV'],['modern',.3,'Black and white reads as minimal','CONV']],
+ brown:[['ruggedness',1,'Brown marks were rated more rugged','LM'],['natural',.6,'Earth tones read as natural','CONV'],['human',.45,'Kraft and leather tones read as handmade','CONV'],['traditional',.4,'Brown reads as heritage','CONV'],['retro',.4,'Browns and ochres are a 1970s convention','CONV'],['food',.3,'Common for coffee, bakery and chocolate','CONV'],['sincerity',.35,'Design guides describe brown as wholesome, simple and honest','CANVA'],['warmth',.3,'Warm earth tones are described as cozy','CANVA']],
+ black:[['sophistication',1,'Black marks were rated more sophisticated','LM'],['sadness',.7,'Black pairs with sadness across 30 nations','J20'],['fear',.7,'Black pairs with fear across 30 nations','J20'],['anger',.55,'Black pairs with hate across 30 nations','J20'],['mystery',.8,'Black is the gothic and noir convention','CONV'],['modern',.3,'Black and white reads as minimal','CONV'],['traditional',.3,'Design guides describe black as formal','CANVA']],
  gray:[['sadness',.7,'Gray pairs with sadness and disappointment across 30 nations','J20'],['modern',.35,'Neutral gray reads as understated','CONV'],['tech',.25,'Common in hardware and software brands','CONV']]
 };
 const HUE_CAUTION={
@@ -53,7 +53,8 @@ const HUE_CAUTION={
  yellow:['Yellow was among the least pleasant hues in controlled tests, and Egypt did not link it with joy.','VM'],
  purple:['Purple had the least consistent meaning across nations; Greece linked it with sadness.','J20'],
  brown:['Brown lowered sophistication ratings and was the least emotional color across nations.','LM'],
- white:['China linked white with sadness as well as relief.','J20']
+ white:['China linked white with sadness as well as relief.','J20'],
+ blue:['Design guides also link blue with low mood (“feeling blue”). That link is a convention and is not scored here.','CANVA']
 };
 
 function newTags(){return{};}
@@ -80,20 +81,76 @@ function tagPalette(p){const T=newTags();const roles=[['primary',.5],['bg',.3],[
   if(pad.B<.5)addTag(T,'ruggedness',(.55-pad.B)*.9,'Darker marks were rated more rugged','LM');
   if(pad.B>.82&&pad.S<.3)addTag(T,'delicate',.4,'Pale tints read as light and airy','CONV');
   if(pad.B<.4&&hueFamily(p.bg)==='black')addTag(T,'sophistication',.3,'Dark grounds are a luxury convention','CONV');
-  for(const c in(p.conv||{}))addTag(T,c,p.conv[c],'Palette built for this use','CONV');
+  for(const c in(p.conv||{}))addTag(T,c,p.conv[c],p.convWhy||'Palette built for this use',p.convSrc||'CONV');
   finishTags(T);const cautions=[];const seen={};
   for(const role of['primary','bg']){const f=fams[role];if(HUE_CAUTION[f]&&!seen[f]){seen[f]=1;cautions.push({text:HUE_CAUTION[f][0],src:HUE_CAUTION[f][1]});}}
   return{tags:T,cautions,pad,fams};}
 
 /* One color on its own: same hue rules, and its own brightness and saturation. */
 const colorTagCache={};
-function tagColor(hex){hex=hex.toUpperCase();if(colorTagCache[hex])return colorTagCache[hex];const T=newTags(),fam=hueFamily(hex),q=hexToHsv(hex);
+/* transient: do not keep the result (the color wheel asks about thousands of colors while it is dragged). */
+function tagColor(hex,transient){hex=hex.toUpperCase();if(colorTagCache[hex])return colorTagCache[hex];const T=newTags(),fam=hueFamily(hex),q=hexToHsv(hex);
   for(const[c,s,why,src]of(HUE_RULES[fam]||[]))addTag(T,c,s,why,src);
   const pad=padFrom(q.v,q.s);tagPad(T,pad,.9);
   if(q.s*q.v>.62)addTag(T,'excitement',(q.s*q.v-.5)*1.2,'High saturation raised excitement ratings','LM');
   if(q.v<.42&&fam!=='black')addTag(T,'ruggedness',.4,'Darker marks were rated more rugged','LM');
   if(q.v>.9&&q.s<.3&&fam!=='white')addTag(T,'delicate',.4,'Pale tints read as light and airy','CONV');
-  finishTags(T);return colorTagCache[hex]={tags:T,fam,pad,cautions:HUE_CAUTION[fam]?[{text:HUE_CAUTION[fam][0],src:HUE_CAUTION[fam][1]}]:[]};}
+  finishTags(T);const out={tags:T,fam,pad,cautions:HUE_CAUTION[fam]?[{text:HUE_CAUTION[fam][0],src:HUE_CAUTION[fam][1]}]:[]};if(!transient)colorTagCache[hex]=out;return out;}
+
+/* ---------- four colors, and the panel tint ----------
+   A palette is four choices: ground, primary, accent, text. The panel tint (the quiet block behind a card or a
+   photo placeholder) is worked out from them: the ground moved a little toward the primary, or toward the text
+   when the primary is too close to the ground to show. */
+function autoPanel(bg,primary,text){let s=mix(bg,primary,.12);if(contrast(s,bg)<1.06)s=mix(bg,text,.1);return s;}
+
+/* ---------- combination types ----------
+   Monochromatic, analogous, complementary and triadic are the color-wheel combinations design guides teach
+   (SRC.CANVA). They are conventions for building a palette, not findings: the pair studies behind harmonyOf()
+   found that near hues are rated more harmonious and opposite hues less, though an opposite hue stands out more.
+   The type is read from the hue angles of a palette's colors on the RGB wheel (the screen wheel Canva uses):
+   - a color counts as a hue only if it is not a near-neutral (saturation and chroma floors below);
+   - all hues within 24 degrees: monochromatic; within 72: analogous (up to three neighbors on a 12-step wheel);
+   - otherwise hues are grouped (a gap over 40 degrees starts a new group): two groups at least 150 degrees apart
+     are complementary, three groups each 90 to 150 degrees from the next are triadic;
+   - anything else is 'other' (four hues, split complements, uneven spacing), and no hue at all is 'neutral'. */
+const COMBOS=[{k:'mono',l:'Monochromatic',d:'One hue in lighter and darker versions. Design guides call it subtle and unified; it can lack contrast.'},
+ {k:'analogous',l:'Analogous',d:'Neighboring hues on the color wheel. Design guides call it smooth and calming; let one color lead.'},
+ {k:'complementary',l:'Complementary',d:'Hues from opposite sides of the color wheel. Design guides use it for contrast and impact.'},
+ {k:'triadic',l:'Triadic',d:'Three hues evenly spaced around the color wheel. Design guides call it bold and vibrant; let one color lead.'},
+ {k:'other',l:'Other',d:'Neutral palettes with no clear hue, and mixed palettes: four hues, split complements or uneven spacing.'}];
+const COMBO_LABEL={mono:'Monochromatic',analogous:'Analogous',complementary:'Complementary',triadic:'Triadic',other:'Mixed hues',neutral:'Neutral'};
+function isHue(hex){const q=hexToHsv(hex);return q.s>=.15&&q.v>=.2&&hexToLch(hex).C>=12;}
+function comboOf(p){const hs=[p.bg,p.primary,p.accent,p.text].filter(isHue).map(h=>hexToHsv(h).h).sort((a,b)=>a-b),n=hs.length;if(!n)return'neutral';
+  let gi=0,gm=-1;for(let i=0;i<n;i++){const g=n===1?360:(hs[(i+1)%n]-hs[i]+360)%360;if(g>gm){gm=g;gi=i;}}
+  const span=n===1?0:360-gm;if(span<=24)return'mono';if(span<=72)return'analogous';
+  const groups=[];for(let i=1;i<=n;i++){const h=hs[(gi+i)%n],g=groups[groups.length-1];if(g&&(h-g[g.length-1]+360)%360<=40)g.push(h);else groups.push([h]);}
+  const mean=g=>{let x=0,y=0;g.forEach(h=>{x+=Math.cos(h*Math.PI/180);y+=Math.sin(h*Math.PI/180);});return(Math.atan2(y,x)*180/Math.PI+360)%360;};
+  const m=groups.map(mean),dist=(a,b)=>{const d=Math.abs(a-b)%360;return d>180?360-d:d;};
+  if(m.length===2&&dist(m[0],m[1])>=150)return'complementary';
+  if(m.length===3&&[dist(m[0],m[1]),dist(m[1],m[2]),dist(m[2],m[0])].every(x=>x>=90&&x<=150))return'triadic';
+  return'other';}
+const comboKey=p=>{const t=comboOf(p);return t==='neutral'?'other':t;};
+/* How a partner color relates to its anchor, in the same terms: its hue offset as generated by companions(). */
+function comboOfOffset(off){if(off==null||off===0)return'mono';const a=Math.abs(off);return a<=45?'analogous':a===120?'triadic':a===180?'complementary':'other';}
+
+/* ---------- roles for a four-color combination ----------
+   A published combination lists four colors without saying which is the ground or the text. The roles are given
+   by rule, so nothing is hand-picked:
+   - the two colors with the highest contrast are the ground-and-text candidates; the ground is the less
+     colorful of the two (the lighter one when they are about equally colorful);
+   - the text is the least colorful of the remaining colors that reaches 4.5:1 on that ground (WCAG);
+   - of the two left, the primary is the one that shows better against the ground; the other is the accent.
+   Returns null when no color can be read as text on another: such a combination cannot make a post legible
+   without a fifth color. */
+function assignRoles(cols){let pair=null,best=0;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){const k=contrast(cols[i],cols[j]);if(k>best){best=k;pair=[i,j];}}
+  if(best<4.5)return null;const A=hexToLch(cols[pair[0]]),B=hexToLch(cols[pair[1]]);const g=(Math.abs(A.C-B.C)<8?B.L>A.L:B.C<A.C)?pair[1]:pair[0],bg=cols[g];
+  const others=[0,1,2,3].filter(i=>i!==g),t=others.filter(i=>contrast(cols[i],bg)>=4.5).sort((x,y)=>hexToLch(cols[x]).C-hexToLch(cols[y]).C)[0];
+  const rest=others.filter(i=>i!==t).sort((x,y)=>contrast(cols[y],bg)-contrast(cols[x],bg));
+  return{bg,text:cols[t],primary:cols[rest[0]],accent:cols[rest[1]]};}
+function canvaPalettes(){const out=[];CANVA_COMBOS.forEach(([n,name,a,b,c,d,conv,note])=>{const r=assignRoles([a,b,c,d]);if(!r)return;
+  out.push(Object.assign({id:'canva-'+n,name,canva:n,note:'Canva no. '+n+'. '+note+'.',conv,convWhy:'Canva’s theme for this combination: '+note.charAt(0).toLowerCase()+note.slice(1),convSrc:'CANVA'},r));});return out;}
+PALETTES.push(...canvaPalettes());
+PALETTES.forEach(p=>{if(!p.surface)p.surface=autoPanel(p.bg,p.primary,p.text);});
 
 /* ---------- single-color library: 15 hues x 7 tones, plus neutrals ---------- */
 const HUES=[['red',356],['vermilion',14],['orange',27],['amber',41],['yellow',53],['lime',82],['green',135],['teal',172],['cyan',189],['sky',205],['blue',222],['indigo',245],['violet',270],['magenta',312],['rose',336]];
@@ -120,7 +177,7 @@ function harmonyOf(a,b){const A=hexToLch(a),B=hexToLch(b);const neutral=A.C<10||
 
 /* Candidate partners for an anchor color, for a given role. */
 function companions(anchor,role,ground,cw){const q=hexToHsv(anchor),out=[],seen={};const cs=Object.keys(cw||{});
-  const push=(hex,label)=>{hex=hex.toUpperCase();if(seen[hex]||hex===anchor.toUpperCase())return;seen[hex]=1;const L=hexToLch(hex).L;
+  const push=(hex,label,off)=>{hex=hex.toUpperCase();if(seen[hex]||hex===anchor.toUpperCase())return;seen[hex]=1;const L=hexToLch(hex).L;
     if(role==='text'&&contrast(hex,ground)<4.5)return;if(role==='bg'&&!(L>80||L<28))return;
     if(role==='surface'){const k=contrast(hex,ground);if(k<1.04||k>1.7)return;}
     const hm=harmonyOf(anchor,hex),tg=tagColor(hex).tags;let kw=0;const matched=[];for(const c of cs){if(tg[c]&&tg[c].w>=.25){kw+=Math.min(1,tg[c].w)*cw[c];matched.push(c);}}
@@ -128,11 +185,11 @@ function companions(anchor,role,ground,cw){const q=hexToHsv(anchor),out=[],seen=
     /* A partner that cannot be told apart from its neighbors is not usable, however harmonious. */
     if(role==='accent'){if(pop<1.5)score*=.3;else if(pop<3)score*=.8;if(sep<1.25)score*=.4;}
     if(role==='bg'&&sep<2.2)score*=sep<1.6?.3:.8;
-    out.push({hex,label,hm,tags:tg,matched,kw,pop,sep,score});};
+    out.push({hex,label,off:off==null?null:off,hm,tags:tg,matched,kw,pop,sep,score});};
   const sat=Math.max(q.s,.25);
   for(const off of[0,25,-25,45,-45,180,150,-150,120,-120]){const h=q.h+off;
-    push(hsvToHex(h,sat*.22,.98),'pale tint');push(hsvToHex(h,sat*.5,.95),'light');push(hsvToHex(h,Math.min(1,sat*1.05),Math.max(.55,Math.min(.95,q.v+.25))),'bright');
-    push(hsvToHex(h,sat,q.v),'same strength');push(hsvToHex(h,sat*.45,.72),'muted');push(hsvToHex(h,Math.min(1,sat*1.05),.5),'deep');push(hsvToHex(h,sat*.8,.22),'dark shade');}
+    push(hsvToHex(h,sat*.22,.98),'pale tint',off);push(hsvToHex(h,sat*.5,.95),'light',off);push(hsvToHex(h,Math.min(1,sat*1.05),Math.max(.55,Math.min(.95,q.v+.25))),'bright',off);
+    push(hsvToHex(h,sat,q.v),'same strength',off);push(hsvToHex(h,sat*.45,.72),'muted',off);push(hsvToHex(h,Math.min(1,sat*1.05),.5),'deep',off);push(hsvToHex(h,sat*.8,.22),'dark shade',off);}
   [[.03,1,'tinted white'],[.06,.96,'tinted off-white'],[.08,.86,'tinted light gray'],[.1,.55,'tinted gray'],[.14,.24,'tinted charcoal'],[.18,.1,'tinted near-black']].forEach(([s,v,l])=>push(hsvToHex(q.h,s,v),l));
   push('#FFFFFF','white');push('#111111','near-black');
   out.sort((x,y)=>y.score-x.score);return out;}

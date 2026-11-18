@@ -39,7 +39,7 @@ Every list in **Build the kit** (premade palettes, single colors and partners in
 - **Match my keywords** picks up to three directions where your keyword fingerprint is strongest. **Clear** removes them all.
 - An option's position comes from the same tags the fingerprint chart reads, so a pick that passes moves the "current picks" shape toward the directions chosen.
 
-Every direction has at least five premade palettes leaning toward it. Some combinations are still out of reach for whole palettes. In this model pleasure rises as colors get lighter and dominance rises as they get darker, so no palette is high on both. When a palette search comes up empty, the message links to **Build your own**, where single colors cover more of the fingerprint.
+Every direction has at least ten premade palettes leaning toward it. A few pairs of directions are still out of reach for whole palettes, such as sincerity with high dominance. When a palette search comes up empty, the message links to **Build your own**, where single colors cover more of the fingerprint.
 
 ## Reading a result card
 
@@ -47,9 +47,33 @@ Each palette, pairing and partner color lists the ideas it signals as small tags
 
 ## Colors
 
-- **Premade palettes** are five colors with roles: ground, panel, primary, accent, text. There are 39, including a set chosen so every part of the fingerprint is covered: Oxblood, Deep Lagoon, Admiralty, Verdigris, Alarm and Nightshade for high dominance; Overcast and Peat for low pleasure and low arousal; Marigold Market, Fiesta and Tangerine Violet for high arousal on a light ground.
+A palette is **four colors**: ground, primary, accent and text. The panel tint behind cards and photo placeholders is worked out from the ground and the primary; it is not a fifth choice. Brands and posts saved before palettes had four colors keep the panel tint they were saved with.
+
+- **Premade palettes**: 101 in all.
+  - 39 of the app's own, including a set chosen so every part of the fingerprint is covered: Oxblood, Deep Lagoon, Admiralty, Verdigris, Alarm and Nightshade for high dominance; Overcast and Peat for low pleasure and low arousal; Marigold Market, Fiesta and Tangerine Violet for high arousal on a light ground.
+  - 4 triadic palettes (Triad Primary, Carnival, Orchard, Arcade).
+  - 58 from [Canva's 100 color combinations](https://www.canva.com/learn/100-color-combinations/), marked "Canva no." with the theme Canva gives each. Canva lists four colors without roles, so the app assigns ground, text, primary and accent by rule. The other combinations are left out because none of their four colors can be read as text on another (WCAG 4.5:1), and two have no swatch image on Canva's page.
+- **Combination** filters the list by how a palette's hues relate on the color wheel: **Monochromatic** (one hue in lighter and darker versions), **Analogous** (neighboring hues), **Complementary** (opposite hues), **Triadic** (three hues evenly spaced) or **Other** (neutral or mixed). Each card names its type. **Ground** narrows to light or dark grounds. Combination, Ground, Aim for and your keywords all apply together; **Clear** removes Combination and Ground.
+  - The types come from design guides. They are conventions for building a palette, so they filter the list but do not change a palette's score. The pair studies the app uses found near hues more harmonious and opposite hues less so, though an opposite hue stands out more.
 - **Saved palettes**, at the top of the Colors tab, lists the brand's own palettes; select one to switch to it, or save the current colors as a new one.
-- **Build your own** lets you pick a role and choose its color: from single colors linked to your keywords, from partners that suit your primary and match a keyword, by typing a hex code, or with the color picker. Save the result as a named palette; it is kept with the brand and listed first.
+- **Build your own** lets you pick a role and choose its color: from single colors linked to your keywords, from partners that suit your primary and match a keyword, by typing a hex code, or on the color wheel. A line under the four roles names the combination they make. In Build your own, **Combination** limits partners and single colors to one relationship with your primary, for example only complementary accents. Save the result as a named palette; it is kept with the brand and listed first.
+
+### Fingerprint percentages
+
+Point at any color (a segment of a palette, a swatch, a role, a color on the Media page's Brand panel) to see a card with its hex code, its hue family and its fingerprint as percentages, beside a small copy of the fingerprint shape. Keyboard focus on a swatch shows the same card.
+
+- Personality axes (Sincerity to Ruggedness) run from 0 to 100%.
+- Feeling axes (Pleasure, Arousal, Dominance) read **High** or **Low** with how far the color sits from neutral, or **Neutral**.
+- **100% is that color's own strongest signal.** The figures compare directions within one color. They are the same numbers Aim for filters on, and they are not an absolute amount: two colors at 100% on one axis are not equally strong.
+
+### The color wheel
+
+In Build your own, the **Color wheel** button beside the hex field opens a wheel in the page. Hue runs around the circle, saturation from the centre to the edge, and **Brightness** is the slider.
+
+- **Point** at the wheel to preview the color under the pointer: the percentages under the wheel follow it, and nothing changes yet.
+- **Click or drag** to choose a color. It becomes the role's color when you let go, and the sample post redraws.
+- With the wheel focused, the left and right arrow keys change the hue and up and down the saturation; hold Shift for larger steps.
+- The wheel is never drawn darker than 40% brightness so it stays readable. Below that, a note says colors come out darker than the wheel shows.
 
 ## Graphics
 
@@ -89,7 +113,7 @@ Use it when a template is not enough.
 Switch in **Settings**. Advanced adds:
 
 - **Build a pairing** (Brand page, Type tab): start from any ready-made pairing, then choose the headline and supporting typefaces and weights yourself. Associations follow the headline face.
-- **Fine-tune hex values and graphic** (Brand page): all five hex values at once, graphic strength, rearrange the graphic.
+- **Fine-tune hex values and graphic** (Brand page): all four hex values at once (select a swatch to open the color wheel for that role), graphic strength, rearrange the graphic.
 - **Text size, photo and brand mark**: headline and supporting text size, headline capitals, which part of a photo stays in view, tint strength, the shade behind text on photo layouts, and whether the brand mark and handle show. These are saved with the post.
 - **Edit as layers**: opens a copy of the template post in the Layer editor. Text, buttons, bars and the logo become separate layers; the ground, photo and graphic become one locked background layer. The original post is unchanged.
 - **Export JPG** and **Export all sizes (ZIP)**: one PNG for every format of the current platform. A format keeps the current layout where it offers it, otherwise it uses its first layout, so check each image.

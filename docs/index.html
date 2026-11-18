@@ -247,9 +247,10 @@ details.acc summary{font-weight:600;padding:8px 0;cursor:pointer}
 .fields{display:grid;gap:10px;padding-bottom:6px}
 .fields label{display:grid;gap:4px;font-size:12.5px;color:var(--ink-2)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.colors{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.colors label{display:grid;gap:3px;font-size:11.5px;color:var(--ink-2);text-align:center}
-.colors input[type=color]{width:100%;height:34px;border:1px solid var(--line);border-radius:6px;padding:2px;background:var(--panel)}
+.colors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.colors .cfield{display:grid;gap:4px;font-size:11.5px;color:var(--ink-2);text-align:center}
+.cwell{width:100%;height:44px;border:1px solid var(--line);border-radius:8px;padding:0}
+.cwell:hover{border-color:var(--ink-2)}
 .colors input[type=text]{padding:3px 2px;font-size:11px;text-align:center;font-family:ui-monospace,Menlo,monospace}
 input[type=range]{width:100%}
 .note{font-size:12.5px;color:var(--ink-2);margin:6px 0 0}
@@ -286,14 +287,13 @@ input[type=range]{width:100%}
 .subbar .seg{display:flex;width:100%}
 .subbar .seg button{flex:1 1 0;padding:7px 6px}
 .sugg button.on,.sugg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
-.roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.roles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .role{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:500;min-width:0}
 .role i{display:block;width:100%;height:30px;border-radius:5px;border:1px solid var(--line)}
 .role code{font-size:10px;color:var(--ink-2);font-family:ui-monospace,Menlo,monospace}
 .role[aria-pressed="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
 .bhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:14px 0 2px;flex-wrap:wrap}
 .bhead h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.bhead input[type=color]{width:22px;height:22px;border:0;padding:0;background:none;margin-left:6px;vertical-align:middle}
 .link{border:0;background:none;padding:0;text-decoration:underline;color:var(--ink);font-size:12.5px}
 .dot{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);flex:0 0 auto}
 .cinfo{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
@@ -596,6 +596,68 @@ label.inl select{width:auto;max-width:150px}
 
 .bhead .dot{box-shadow:0 0 0 1px var(--ink-2)}
 
+/* ---------- four-color palettes: combination filter, fingerprint percentages, color tip, color wheel ---------- */
+.cmbbar{margin-bottom:6px}
+.cmbbar+.tgtbar{margin-top:0}
+.tgtrow .tier{vertical-align:-2px}
+.cmb{display:inline-block;font-size:11px;line-height:1.3;border:1px solid var(--line);border-radius:999px;padding:0 7px;color:var(--ink);white-space:nowrap}
+.cmbnow{margin:8px 0 0}
+.cmbnow b{color:var(--ink);font-weight:600}
+/* one row per fingerprint axis: label, bar, value. Feeling axes grow left or right from a centre line. */
+.fpbars{display:grid;gap:3px 16px;font-size:12px}
+.fpbars.two{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,auto);grid-auto-flow:column}
+@media (max-width:700px){.fpbars.two{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
+.fpblock{display:flex;gap:10px;align-items:center}
+.fpblock .fpbars{flex:1 1 auto;min-width:0}
+.fpmini{flex:0 0 auto;width:92px}
+.fpmini .radarsvg{display:block;width:92px;height:92px}
+.fpblock.two .fpmini{width:112px}.fpblock.two .fpmini .radarsvg{width:112px;height:112px}
+@media (max-width:560px){.fpblock.two{flex-direction:column;align-items:stretch}.fpblock.two .fpmini{margin:0 auto}}
+.fpb{display:grid;grid-template-columns:92px minmax(36px,1fr) 64px;gap:8px;align-items:center}
+.fpb .fl{color:var(--ink-2);white-space:nowrap}
+.fpb .fv{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.fpbar{position:relative;height:7px;background:var(--chip);border-radius:4px;overflow:hidden}
+.fpbar i{position:absolute;top:0;bottom:0;left:0;background:var(--ink);border-radius:4px}
+.fpbar.bi::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink-2)}
+.fpbar.bi i{background:var(--pick);border-radius:0}
+.fphead{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:10px 0 5px}
+.ctip{position:fixed;z-index:400;width:372px;max-width:calc(100vw - 16px);pointer-events:none;background:var(--panel);color:var(--ink);border:1px solid var(--ink-2);border-radius:10px;padding:9px 11px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.ctip[hidden]{display:none}
+.ctip .cihead{margin-bottom:7px}
+.ctip .note{margin-top:7px;font-size:11.5px;line-height:1.35}
+/* the wheel button: a hue ring around the current color, large enough to hit easily */
+.wheelbtn{display:inline-flex;align-items:center;gap:9px;min-height:46px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);padding:3px 16px 3px 4px;font-weight:600;font-size:13.5px}
+.wheelbtn:hover{border-color:var(--ink-2)}
+.wheelbtn[aria-expanded="true"]{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
+.wring{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.wring i{width:20px;height:20px;border-radius:50%;border:2px solid var(--panel)}
+.wheelpanel{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:12px 14px}
+.wheeltop{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-start}
+.wheelwrap{position:relative;width:200px;height:200px;flex:0 0 auto;touch-action:none}
+.wheelcv{width:200px;height:200px;display:block;border-radius:50%;cursor:crosshair;touch-action:none}
+.wheelcv:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.wmark{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:none}
+.wheelside{flex:1 1 220px;min-width:0;display:grid;gap:10px;align-content:start}
+.wheelside label{display:grid;gap:4px;font-size:12.5px;color:var(--ink-2)}
+.wheelside input[type=range]{width:100%}
+.wread{display:flex;align-items:center;gap:10px;font-size:13px}
+.wread .wsw{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);flex:0 0 auto}
+.wread .wwho{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.wread .wline span{color:var(--ink-2)}
+.wheelpanel .bhead{margin:12px 0 6px}
+/* Media page: the post's four colors */
+.pcols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pcol{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:5px 3px 4px;background:var(--panel);min-width:0}
+.pcol i{display:block;width:100%;height:28px;border-radius:5px;border:1px solid var(--line)}
+.pcol code{font-size:10px;color:var(--ink-2);font-family:ui-monospace,Menlo,monospace}
+.pcol:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.opt .meta .cmb{margin-right:2px}
+.wbri{accent-color:var(--sel)}
+.wdim{margin:0;color:var(--ink)}
+.wdim[hidden]{display:none}
+#mPostCols{margin-top:6px}
+#mPostCols .h{margin-top:16px}
+
 </style>
 </head>
 <body>
@@ -779,6 +841,7 @@ label.inl select{width:auto;max-width:150px}
         <div class="rowbtns" style="justify-content:space-between"><div class="h" id="mLookH" style="margin:0">Brand look</div><button type="button" class="link" id="btnEditBrand">Edit the brand</button></div>
         <p class="note" id="mLookNote" style="margin-top:2px"></p>
         <div class="mpals" id="mPals" role="group" aria-label="Palettes saved to this brand"></div>
+        <div id="mPostCols"></div>
       </section>
       <section class="mp adv" data-p="adjust" id="accAdv" aria-label="Text size, photo and brand mark" hidden>
         <div class="h">Text size, photo and brand mark</div>
@@ -938,7 +1001,7 @@ label.inl select{width:auto;max-width:150px}
       <button type="button" data-v="simple" class="tcard"><b>Simple</b><small>A guided set of controls for getting a good draft quickly.</small>
         <span class="tlist">You get keyword search and the fingerprint, premade palettes and build-your-own, ready-made type pairings, graphics in several styles each, every platform template, your text, photo and logo, the three color arrangements, saving to folders, and PNG export. Numbered steps show the order to work in.</span></button>
       <button type="button" data-v="advanced" class="tcard"><b>Advanced</b><small>Everything in Simple, plus:</small>
-        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all five hex values at once; graphic strength; rearrange the graphic</span><span>Let Shuffle try another style of the post’s graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
+        <span class="tlist"><span>Build a type pairing face by face, with your own weights</span><span>Edit all four hex values at once; graphic strength; rearrange the graphic</span><span>Let Shuffle try another style of the post’s graphic</span><span>Headline and body text size, and headline capitals</span><span>Photo framing, tint strength and the shade behind text</span><span>Show or hide the brand mark and handle</span><span>Edit a template post as layers</span><span>Export JPG, and every size of a platform as one ZIP</span><span>Choose what Shuffle changes</span></span></button>
     </div>
   </section>
   <section class="setsec" aria-labelledby="hpH">
@@ -997,12 +1060,15 @@ const SRC = {
   WCAG:{t:'S',short:'WCAG 2.2',cite:'W3C (2023). Web Content Accessibility Guidelines 2.2, Success Criterion 1.4.3 Contrast (Minimum).',url:'https://www.w3.org/TR/WCAG22/#contrast-minimum',use:'Contrast checks: 4.5:1 for body text, 3:1 for large text.'},
   SPEC:{t:'S',short:'Platform size guides 2026',cite:'Buffer, Social media image sizes in 2026 (May 2026); Sked Social, Social media image sizes for brands and agencies: the 2026 guide.',url:'https://buffer.com/resources/social-media-image-sizes/',use:'Canvas sizes for each format. Platforms change these often; re-check before production.'},
   SAFE:{t:'S',short:'Safe-zone guides 2026',cite:'Hopper HQ, Instagram Reel size in 2026: dimensions, aspect ratio, and safe zones; AdaptlyPost, Social media safe zones 2026.',url:'https://www.hopperhq.com/blog/instagram-reel-size/',use:'Areas the apps cover with their own buttons and captions. Third-party measurements that differ between guides; treated as approximate.'},
+  CANVA:{t:'C',short:'Canva design guides',cite:'Canva (n.d.). 100 color combinations and how to apply them to your designs; Color wheel: color theory and calculator. Canva Design School and Canva Colors.',url:'https://www.canva.com/learn/100-color-combinations/',use:'A design guide, not a study. Used for three things: the four-color combinations listed under Premade palettes as Canva nos. 1 to 100, with the theme Canva gives each; the names of the combination types (monochromatic, analogous, complementary, triadic), read on the RGB wheel as Canva does; and a few color meanings that the studies above did not test, such as brown for wholesome and honest. All carry the Convention label.'},
   CONV:{t:'C',short:'Convention',cite:'Practitioner convention: widely repeated in design and marketing practice, without a controlled study behind it in this index.',url:'',use:'Topic links such as green for nature, a cross for health, or monospace for tech.'}
 };
 const TIER = {R:{label:'Research',long:'Peer-reviewed research'},S:{label:'Standard',long:'Industry standard'},C:{label:'Convention',long:'Practitioner convention'}};
 
-/* ---------- Palettes: five roles each. Tags are DERIVED from the colors by
-   rules in engine.js; `conv` adds topic links that rest on convention only. */
+/* ---------- Palettes: four colors each (ground, primary, accent, text). Tags are DERIVED from the
+   colors by rules in engine.js; `conv` adds topic links that rest on convention only.
+   `surface` is the panel tint. It is not a fifth choice: where a palette does not list one,
+   engine.js works it out from the ground (autoPanel). */
 const PALETTES = [
  {id:'clinic-blue',name:'Clinic Blue',bg:'#FFFFFF',surface:'#EAF2FB',primary:'#1F5FA8',accent:'#2BB3A3',text:'#12243A',conv:{health:.8}},
  {id:'deep-trust',name:'Deep Trust',bg:'#F5F7FA',surface:'#E1E7EF',primary:'#0F2A4A',accent:'#3D7DD8',text:'#0B1B30',conv:{finance:.8,traditional:.3}},
@@ -1047,7 +1113,122 @@ const PALETTES = [
  {id:'peat',name:'Peat',bg:'#3B2F25',surface:'#4C4037',primary:'#4E5B59',accent:'#A5AAB6',text:'#FCF9F6',conv:{natural:.3}},                          // ruggedness, low pleasure, low arousal
  {id:'marigold',name:'Marigold Market',bg:'#FBE6C9',surface:'#EDD5B5',primary:'#D46938',accent:'#8F4F01',text:'#271F14',conv:{food:.5}},             // excitement, high pleasure, high arousal
  {id:'fiesta',name:'Fiesta',bg:'#F9E5CE',surface:'#EBD3B8',primary:'#BA0A16',accent:'#6E0A8A',text:'#1E1912',conv:{celebration:.6}},                 // excitement, high arousal
- {id:'tangerine-violet',name:'Tangerine Violet',bg:'#EFD6C4',surface:'#E1C6B2',primary:'#FF5F24',accent:'#3D0D76',text:'#191410',conv:{playful:.3}}  // excitement, high pleasure, high arousal
+ {id:'tangerine-violet',name:'Tangerine Violet',bg:'#EFD6C4',surface:'#E1C6B2',primary:'#FF5F24',accent:'#3D0D76',text:'#191410',conv:{playful:.3}},  // excitement, high pleasure, high arousal
+ /* Triadic set: three hues about 120 degrees apart on the RGB wheel, on a near-neutral ground. None of the palettes
+    above, and none of Canva's that pass the text-contrast check, is triadic, so the Triadic filter would be empty
+    without them. Tagged by the same rules as the rest. */
+ {id:'triad-primary',name:'Triad Primary',bg:'#F7F6F2',primary:'#1D4FB8',accent:'#D8262B',text:'#1F4D1B',conv:{}},
+ {id:'triad-carnival',name:'Triad Carnival',bg:'#FFF8EA',primary:'#5B2FA8',accent:'#F08A1C',text:'#0F4A2E',conv:{celebration:.4}},
+ {id:'triad-orchard',name:'Triad Orchard',bg:'#F3F6EC',primary:'#0E8A5F',accent:'#E5701E',text:'#43207A',conv:{}},
+ {id:'triad-arcade',name:'Triad Arcade',bg:'#14161C',primary:'#25C4D8',accent:'#F2D21B',text:'#F7B8E6',conv:{playful:.3}}
+];
+
+/* ---------- Canva's combinations ----------
+   From Canva's "100 color combinations" (SRC.CANVA). Each row: Canva's number and name, its four colors in Canva's
+   order, the theme Canva gives it (as convention links), and a short note in our words. The colors were read from
+   Canva's swatch images, so a value can differ by a step from the code printed on the swatch.
+   Roles are NOT assigned here. engine.js gives each color a role by rule (canvaPalettes), and keeps only the
+   combinations where one of the four colors can be read as text on another at 4.5:1 or better. Nos. 49 and 91
+   are missing because their swatch images do not load on Canva's page. */
+const CANVA_COMBOS = [
+ [1,"Fresh & Bright",'#FA8866','#FF420E','#80BD9E','#89DA59',{playful:.4,energy:.4},"Fresh and youthful; spring and summer events"],
+ [2,"Subdued & Professional",'#90AFC5','#336B87','#2A3132','#763626',{competence:.5,calm:.3},"Muted and businesslike, with a confident red"],
+ [3,"Dark & Earthy",'#46211A','#693D3D','#BA5536','#A43820',{natural:.5,ruggedness:.4},"Desert tones, toned down"],
+ [4,"Crisp & Dramatic",'#505160','#68829E','#AEBD38','#598234',{natural:.5},"Cool landscape greens against warm grays"],
+ [5,"Cool Blues",'#003B46','#06575B','#66A5AD','#C4DFE6',{water:.5,calm:.4},"Versatile blues, close to one hue"],
+ [6,"Outdoorsy & Natural",'#2E4600','#486B00','#A2C523','#7D4427',{natural:.7,ruggedness:.4},"Outdoor and eco-friendly brands"],
+ [7,"Shady Foliage in Blue-Greens",'#021C1E','#004445','#2C7873','#6FB98F',{natural:.5,mystery:.3,sophistication:.3},"Moody greens; quietly refined, eco-minded"],
+ [8,"Primary Colors with a Vibrant Twist",'#375E97','#FB6542','#FFBB00','#3F681C',{playful:.4,energy:.4},"Bright primaries with a sunset cast"],
+ [9,"Refreshing & Pretty",'#98DBC6','#5BC8AC','#E6D72A','#F18D9E',{playful:.5,delicate:.3},"Candy-bright and clean"],
+ [10,"Playful Greens & Blues",'#324851','#86AC41','#34675C','#7DA3A1',{playful:.4,natural:.3},"Lively greens on gray-blue"],
+ [11,"Fresh & Energetic",'#4CB5F5','#B7B8B6','#34675C','#B3C100',{fitness:.6,energy:.5},"Energetic; suggested for fitness brands"],
+ [12,"Surf & Turf",'#F4CC70','#DE7A22','#20948B','#6AB187',{water:.5,calm:.4},"Beach holiday; relaxed"],
+ [13,"Autumn in Vermont",'#8D230F','#1E434C','#9B4F0F','#C99E10',{ruggedness:.4,natural:.4,sincerity:.3},"Rustic, woodsy, down-to-earth"],
+ [14,"Icy Blues & Grays",'#F1F1F2','#BCBABE','#A1D6E2','#1895AD',{modern:.4,competence:.3},"A livelier take on navy and gray"],
+ [15,"Birds & Berries",'#9A9EAB','#5D535E','#EC96A4','#DFE166',{natural:.3,delicate:.3},"Early spring"],
+ [16,"Day & Night",'#001A27','#063852','#F0810F','#E6DF44',{power:.5,energy:.3},"Strong contrast; graphic and forceful"],
+ [17,"Stylish & Retro",'#75B1A9','#D9B44A','#4F6457','#ACD0C0',{retro:.7},"Vintage, mid-century"],
+ [18,"Shades of Citrus",'#EB8A44','#F9DC24','#4B7447','#8EBA43',{food:.5,energy:.4},"Lively, fresh citrus"],
+ [19,"Sunset to Dusk",'#363237','#2D4262','#73605B','#D09683',{sophistication:.5,calm:.3},"Soft and refined"],
+ [20,"Bright & Tropical",'#F52549','#FB6775','#FFD64D','#9BC01C',{playful:.5,celebration:.3},"Warm, youthful, tropical"],
+ [21,"Warm Naturals",'#2E2300','#6E6702','#C05805','#DB9501',{natural:.4,warmth:.4},"Autumn; cozy"],
+ [22,"Bold Berries",'#50312F','#CB0000','#E4EA8C','#3F6C45',{food:.4},"Bright but soothing; fruit tones"],
+ [23,"Summer Sunflower",'#4D85BD','#7CAA2D','#FCD302','#CB6318',{natural:.4,joy:.3},"Outdoor summer"],
+ [24,"Modern & Crisp",'#0F1B07','#FFFFFF','#5C821A','#C6D166',{modern:.6,natural:.3},"Modern and refined without being stiff"],
+ [25,"Timeless & Nautical",'#00293C','#1E656D','#F1F3CE','#F62A00',{traditional:.5,water:.4},"Classic nautical"],
+ [26,"Neutral & Versatile",'#626D71','#CDCDC0','#DDBC95','#B38867',{sophistication:.3,food:.3},"Upscale led by gray, cafe-cozy led by brown"],
+ [27,"Cheerful Brights",'#258039','#F5BE41','#31A9B8','#CF3721',{joy:.4,playful:.3},"Cheery, with some polish"],
+ [28,"Garden Fresh",'#EE693F','#F69454','#FCFDFE','#739F3D',{food:.4,energy:.3,natural:.3},"Energetic and fresh; produce tones"],
+ [29,"Summer Barbeque",'#5C8F22','#752A07','#FBCB7B','#EB5E30',{food:.6,retro:.3},"Nostalgic summer cookout"],
+ [30,"Berry Blues",'#1E1F26','#273655','#4D648D','#D0E2F9',{competence:.5},"Dependable blues"],
+ [31,"Lemonade Stand",'#F70025','#F7EFE2','#F25C00','#F9A603',{food:.6,joy:.4},"Cheerful and juicy; suggested for food ads"],
+ [32,"Serene & Spa-Like",'#A1BE95','#E2DFA2','#92AAC7','#ED5752',{calm:.6,health:.5},"Calm, with one lively accent"],
+ [33,"Fun & Tropical",'#4897D8','#FFDB5C','#FA6E59','#F8A055',{playful:.7},"Playful; summer ads and children's designs"],
+ [34,"Spicy Neutrals",'#AF4425','#662E1C','#EBDCB2','#C9A66B',{food:.4,warmth:.3},"Spice tones from light to dark"],
+ [35,"Pastels",'#C1E1DC','#FFCCAC','#FFEB94','#FDD475',{delicate:.6,playful:.3},"Pretty and delicate; spring, babies, sweets"],
+ [36,"Bold & Cultured",'#4C3F54','#D13525','#F2C057','#486824',{sophistication:.4},"Bright colors, slightly shaded"],
+ [37,"Sunny Citrus",'#FAAF08','#FA812F','#FA4032','#FEF3E2',{food:.6,joy:.3},"Juicy and appetizing"],
+ [38,"Crisp Complementary Colors",'#F5EC6B','#BBCF4A','#E63F0B','#A21F0D',{food:.4,energy:.3},"Red against green, toned down"],
+ [39,"Warm & Rustic",'#FEF2E4','#FD974F','#C60000','#805A3B',{food:.4,human:.3},"Eye-catching reds on warm neutrals"],
+ [40,"Neon Night",'#F77604','#B8D20B','#F56C57','#231B12',{energy:.5,excitement:.4},"Neons on a dark ground"],
+ [41,"Warm Jewel Tones",'#7F152E','#D61800','#EDAE01','#E94F08',{sophistication:.4,food:.3},"Refined jewel tones"],
+ [42,"Polished & Inviting",'#EAE2D6','#D5C3AA','#867666','#E1B80D',{sophistication:.5,calm:.4},"Warm grays with yellow; refined and calming"],
+ [43,"Fresh Greens",'#265C00','#68A225','#B3DE81','#FEFFFF',{natural:.6,health:.4},"One green, with crisp white"],
+ [44,"Wintery Reds",'#A10115','#D72C16','#F0EFEA','#C0B2B5',{celebration:.6,sophistication:.3},"Festive but refined; a holiday alternative"],
+ [45,"Summer Fiesta",'#C7DB00','#7AA802','#F78B2D','#E4B600',{food:.5,retro:.4},"Appetizing and retro"],
+ [46,"Chocolaty Browns",'#301B28','#523634','#B6452C','#DDC5A2',{food:.5,pleasure:.5},"Rich and decadent"],
+ [47,"Naturally Elegant",'#EBDF00','#7E7B15','#563E20','#B38540',{natural:.4,sophistication:.4},"Muted, with a green-tinted yellow"],
+ [48,"Cozy & Warm",'#662225','#B51D0A','#EAD39C','#7D5E3C',{warmth:.6},"Muted red with soft neutrals"],
+ [50,"Strawberries & Cream",'#D84130','#FE7B47','#FCFDFF','#F4CA98',{food:.5,warmth:.3},"Red softened by warm neutrals"],
+ [51,"Grecian Holiday",'#2989BC','#2F496E','#F4EADE','#EE8C73',{water:.5,calm:.4},"Relaxing seaside holiday"],
+ [52,"Bold & Basic",'#000B29','#D70127','#F9F5F2','#EEB83E',{energy:.5,power:.4},"Saturated, bold, eye-catching"],
+ [53,"Vineyard Neutrals",'#1E0000','#4F0804','#9D321E','#BC6D4F',{sophistication:.5,food:.3},"Earthy, warm and refined"],
+ [54,"Modern & Urban",'#F9B931','#426F86','#F8F2E6','#2F3130',{modern:.6},"Softer than black and white, with clear accents"],
+ [55,"Misty Mountain Greens",'#04202C','#304040','#5A7064','#CAD1C9',{natural:.6,ruggedness:.3},"Fog-like greens; soft but strong"],
+ [56,"Sunkissed Village",'#D14136','#EB893E','#EAB581','#795A46',{warmth:.4,joy:.3},"Warm Mediterranean tones; carefree"],
+ [57,"Sun & Sky",'#207CA3','#E29930','#32384E','#221F30',{interest:.3},"Mustard set against cool tones"],
+ [58,"Aqua Blues",'#004D47','#128276','#52968B','#B9C4C8',{water:.6},"Blue-greens, close to one hue"],
+ [59,"Urban Oasis",'#506C2F','#2A2A22','#F3EBDE','#7C5641',{natural:.4,modern:.4},"Neutrals with a touch of green"],
+ [60,"Candy-Coated Brights",'#F57D49','#E1305A','#FEEC5C','#008DCB',{playful:.6,excitement:.4},"Loud and youthful; street-art brights"],
+ [61,"Muted & Antique",'#A4CABB','#EAB363','#B2473D','#ACBD77',{retro:.6},"Faded, antique tints"],
+ [62,"Classy & Timeless",'#16243E','#002C53','#EFB509','#CC7212',{sophistication:.6,traditional:.4},"Classy; pairs with gold foil"],
+ [63,"Cosmopolitan",'#8593AE','#594E4C','#7E675F','#DEA288',{sophistication:.4,beauty:.3},"Soft gray-purples"],
+ [64,"Cheerful & Friendly",'#2B616D','#B2DBD5','#FFFFFF','#FA8D62',{warmth:.4,joy:.4},"Bright and friendly"],
+ [65,"Nightlife Neons",'#00CFF9','#FF0038','#FFCE39','#02050A',{excitement:.5,celebration:.4},"City nightlife; print-ink brights"],
+ [66,"Coastal Sky",'#A5C3CE','#F2D3B7','#E49D5B','#A99F3D',{water:.4,calm:.4},"Powdery coast tones"],
+ [67,"Maritime Brights",'#257984','#5EA8A7','#FFFFFF','#FE4447',{water:.6},"Crisp and fresh; sea air"],
+ [68,"Vintage Charm",'#FCC875','#B9A896','#E6CCB5','#E38B75',{retro:.6,delicate:.3},"Sun-faded vintage"],
+ [69,"Understated & Versatile",'#335352','#D4DDE2','#A94B41','#2C3033',{competence:.5,sophistication:.3},"Classy and serious without being dull"],
+ [70,"Arctic Sunrise",'#FFCCBB','#6FB5BF','#006C83','#E2E8E4',{water:.3,delicate:.3},"Coral against blue-grays"],
+ [71,"Mediterranean Afternoon",'#8C0003','#C8000A','#E8A635','#E1C498',{food:.6,warmth:.3},"Italian afternoon; warm and flavorful"],
+ [72,"Hazy Grays",'#2C4A52','#537173','#8F9B97','#F4EBDA',{calm:.5},"Relaxing and understated"],
+ [73,"City Sights",'#C5001B','#E3E3DB','#113742','#C6BEBB',{modern:.4,energy:.3},"Urban and bold"],
+ [74,"Retro & Relaxing",'#D35B36','#BE9A76','#D6C6B9','#97B7C2',{retro:.5,calm:.4},"Soft, warm and comfortable"],
+ [75,"Green Fields",'#919737','#524B3B','#FFFBE2','#5A5F37',{natural:.6},"Fresh field greens"],
+ [76,"Distinctive & Unexpected",'#B0D7D2','#E4E2C9','#432E33','#E7472F',{interest:.4,excitement:.3},"Attention-getting turquoise and orange-red"],
+ [77,"Sleek & Modern",'#2F2E33','#D5D6D1','#FFFFFF','#3A5099',{modern:.6,competence:.4,tech:.3},"Modern; corporate through trendy"],
+ [78,"Orange Accent",'#766867','#D5D6D1','#343C3F','#FE8D3F',{modern:.3},"A soft base with one orange highlight"],
+ [79,"Beyond Black & White",'#31A1AC','#AE1C1C','#F0EFFD','#2F2F27',{modern:.4},"A twist on black and white"],
+ [80,"Shabby Chic Neutrals",'#6C5E5B','#CCAB80','#DAC3B3','#4F4A46',{retro:.5,human:.3},"Industrial or steampunk neutrals"],
+ [81,"Warm & Cool",'#444B5B','#CD5A57','#78A4A3','#E1B169',{},"Warm and cool tones softened with white"],
+ [82,"Industrial & In-Control",'#20232A','#ACBEBE','#F3F4EE','#A01D25',{competence:.5,ruggedness:.3},"Serious and industrial"],
+ [83,"Autumn Oranges",'#D45447','#FFA578','#FAF9FF','#8A6E6A',{warmth:.6},"Warm, cozy, muted oranges"],
+ [84,"Pool Party",'#344D90','#5BC5EF','#FFB846','#E7552C',{playful:.6,water:.4,celebration:.3},"Fun, playful, energetic"],
+ [85,"Classic Metallics",'#080705','#EFEFEF','#D2B281','#5A4D45',{traditional:.6,sophistication:.5},"Tradition, trust and class"],
+ [86,"Subtle & Versatile",'#5F978E','#C0DCCE','#E05858','#D5C9B1',{retro:.4,water:.3},"Nautical and sun-faded"],
+ [87,"Professional & Traditional",'#962714','#FFFFFF','#1E1E20','#BBC3C6',{competence:.5,traditional:.5},"Warm but professional"],
+ [88,"Light & Natural",'#688A89','#58C8B2','#FAEED4','#A57C66',{natural:.5,calm:.4},"Gentle and fresh"],
+ [89,"Shadowy & Dramatic",'#262F34','#F34B4A','#F1D3BB','#615049',{mystery:.4,energy:.3},"Muted earth tones with a neon red"],
+ [90,"Golden Afternoon",'#882426','#CDBEA7','#323031','#C29544',{sophistication:.6},"Calm luxury in jewel tones"],
+ [92,"Technology Meets Nature",'#FCCD4B','#A3A598','#272622','#88A650',{tech:.5,natural:.4},"Soft natural tones with one bold dark"],
+ [93,"Cheerful Blues + Pink",'#FFBDBE','#FCFCFA','#337AAE','#19405F',{modern:.4,playful:.3},"Hip and modern"],
+ [94,"Wild & High-Impact",'#0F1F38','#8D7970','#F55549','#1B4A5A',{energy:.5,excitement:.3},"High impact, with an orange pop"],
+ [95,"Back to School",'#82715F','#FAAE3E','#E48533','#E5535E',{playful:.5},"Child-friendly and soft"],
+ [96,"Bright & Painterly",'#061184','#FD3D3C','#FFB74B','#138D90',{playful:.4,human:.3},"Quirky and artsy"],
+ [97,"Urban Living",'#DDDFDE','#232122','#A5BF5A','#7BA4A8',{modern:.5},"Fresh and modern grays"],
+ [98,"Retro Kitchen",'#B3DBC0','#FE0000','#FCF6F6','#67BACA',{retro:.6,playful:.3},"Bright, fun retro"],
+ [99,"Smoky Purples",'#A49592','#717076','#EED8CA','#E99887',{sophistication:.3,delicate:.3},"Warm and cool smoky tones"],
+ [100,"Trendy & Metropolitan",'#488A9A','#DBAF58','#4D585A','#B4B4B4',{modern:.5,competence:.3},"Serious but inviting, with gold"]
 ];
 
 /* ---------- Graphics: procedural, drawn in the active palette.
@@ -1598,18 +1779,18 @@ const HUE_LABEL={black:'Black',white:'White',gray:'Gray',brown:'Brown',pink:'Pin
 
 /* Hue rules: [concept, strength, reason, source]. Partly supported findings get lower strengths. */
 const HUE_RULES={
- white:[['sincerity',.9,'White marks were rated more sincere','LM'],['relief',.8,'White pairs with relief across 30 nations','J20'],['calm',.35,'White pairs with relief, a quiet positive emotion','J20'],['modern',.5,'Open white space reads as clean and minimal','CONV']],
- pink:[['sophistication',.7,'Pink marks were rated more sophisticated','LM'],['sincerity',.45,'Pink was linked to sincerity (partly supported)','LM'],['love',.85,'Pink pairs with love across 30 nations','J20'],['joy',.5,'Pink pairs with joy','J20'],['pleasure',.7,'Pink pairs with pleasure across 30 nations','J20'],['delicate',.6,'Pink is used for delicate, feminine-coded brands','CONV'],['beauty',.5,'Common in beauty and skincare','CONV']],
+ white:[['sincerity',.9,'White marks were rated more sincere','LM'],['relief',.8,'White pairs with relief across 30 nations','J20'],['calm',.35,'White pairs with relief, a quiet positive emotion','J20'],['modern',.5,'Open white space reads as clean and minimal','CONV'],['delicate',.3,'Design guides link white with purity and innocence','CANVA']],
+ pink:[['sophistication',.7,'Pink marks were rated more sophisticated','LM'],['sincerity',.45,'Pink was linked to sincerity (partly supported)','LM'],['love',.85,'Pink pairs with love across 30 nations','J20'],['joy',.5,'Pink pairs with joy','J20'],['pleasure',.7,'Pink pairs with pleasure across 30 nations','J20'],['delicate',.6,'Pink is used for delicate, feminine-coded brands','CONV'],['beauty',.5,'Common in beauty and skincare','CONV'],['excitement',.25,'Design guides describe pink as exciting as well as romantic','CANVA']],
  red:[['excitement',1,'Red marks were rated more exciting','LM'],['love',.7,'Red pairs with love across 30 nations','J20'],['anger',.75,'Red pairs with anger across 30 nations','J20'],['energy',.5,'Red is used to signal urgency','CONV'],['fear',.3,'Red is the standard danger and warning color','CONV'],['food',.3,'Common in food and quick-service brands','CONV']],
  darkred:[['traditional',.6,'Burgundy and oxblood read as established','CONV'],['sophistication',.35,'Deep reds are used for formal, premium brands','CONV'],['mystery',.4,'Blood red is a gothic convention','CONV'],['anger',.35,'Dark red keeps red’s link to anger, by convention','CONV']],
- orange:[['joy',.8,'Orange pairs with joy across 30 nations','J20'],['amusement',.8,'Orange pairs with amusement across 30 nations','J20'],['playful',.5,'Orange pairs with amusement','J20'],['excitement',.45,'Orange was expected to raise excitement (partly supported)','LM'],['food',.4,'Common in food brands','CONV']],
- yellow:[['joy',.9,'Yellow pairs with joy across 30 nations','J20'],['sincerity',.4,'Yellow was linked to sincerity (partly supported)','LM'],['energy',.3,'High-visibility yellow is used for attention','CONV'],['fear',.25,'Yellow and black is the hazard convention','CONV'],['interest',.3,'Highlighter yellow is used to draw the eye','CONV']],
- green:[['natural',.9,'Green is the default signal for nature','CONV'],['health',.6,'Common in health and wellness brands','CONV'],['ruggedness',.3,'Green was expected to raise ruggedness (partly supported)','LM'],['finance',.3,'Used for money and growth','CONV'],['relief',.3,'Green is the go and all-clear convention','CONV']],
+ orange:[['joy',.8,'Orange pairs with joy across 30 nations','J20'],['amusement',.8,'Orange pairs with amusement across 30 nations','J20'],['playful',.5,'Orange pairs with amusement','J20'],['excitement',.45,'Orange was expected to raise excitement (partly supported)','LM'],['food',.4,'Common in food brands','CONV'],['energy',.3,'Design guides describe orange as fresh, youthful and adventurous','CANVA'],['warmth',.35,'Warm colors are described as cozy','CANVA']],
+ yellow:[['joy',.9,'Yellow pairs with joy across 30 nations','J20'],['sincerity',.4,'Yellow was linked to sincerity (partly supported)','LM'],['energy',.3,'High-visibility yellow is used for attention','CONV'],['fear',.25,'Yellow and black is the hazard convention','CONV'],['interest',.3,'Highlighter yellow is used to draw the eye','CONV'],['playful',.4,'Design guides describe yellow as cheerful and playful','CANVA'],['warmth',.25,'Warm colors are described as cozy','CANVA']],
+ green:[['natural',.9,'Green is the default signal for nature','CONV'],['health',.6,'Common in health and wellness brands','CONV'],['ruggedness',.3,'Green was expected to raise ruggedness (partly supported)','LM'],['finance',.3,'Used for money and growth','CONV'],['relief',.3,'Green is the go and all-clear convention','CONV'],['admiration',.25,'Design guides link green with prestige and wealth','CANVA'],['calm',.25,'Cool colors are described as serene','CANVA']],
  turquoise:[['water',.8,'Turquoise reads as water','CONV'],['calm',.45,'Aqua tones are a spa and wellness convention','CONV'],['health',.45,'Common in clinics and wellness brands','CONV']],
- blue:[['competence',1,'Blue marks were rated more competent','LM'],['calm',.4,'Blue was among the most pleasant hues, purple-blue among the least arousing','VM'],['water',.5,'Blue reads as water and sky','CONV'],['finance',.4,'Common in banking and insurance','CONV'],['tech',.35,'Common in software brands','CONV'],['admiration',.25,'Royal and navy blues are used for honors and institutions','CONV']],
+ blue:[['competence',1,'Blue marks were rated more competent','LM'],['calm',.4,'Blue was among the most pleasant hues, purple-blue among the least arousing','VM'],['water',.5,'Blue reads as water and sky','CONV'],['finance',.4,'Common in banking and insurance','CONV'],['tech',.35,'Common in software brands','CONV'],['admiration',.25,'Royal and navy blues are used for honors and institutions','CONV'],['sincerity',.25,'Design guides describe blue as trustworthy and communicative','CANVA']],
  purple:[['sophistication',.9,'Purple marks were rated more sophisticated','LM'],['beauty',.3,'Used in beauty and wellness','CONV'],['mystery',.5,'Purple is a magic and occult convention','CONV'],['awe',.35,'Purple is used for the cosmic and magical','CONV'],['admiration',.3,'Purple is a royalty convention','CONV']],
- brown:[['ruggedness',1,'Brown marks were rated more rugged','LM'],['natural',.6,'Earth tones read as natural','CONV'],['human',.45,'Kraft and leather tones read as handmade','CONV'],['traditional',.4,'Brown reads as heritage','CONV'],['retro',.4,'Browns and ochres are a 1970s convention','CONV'],['food',.3,'Common for coffee, bakery and chocolate','CONV']],
- black:[['sophistication',1,'Black marks were rated more sophisticated','LM'],['sadness',.7,'Black pairs with sadness across 30 nations','J20'],['fear',.7,'Black pairs with fear across 30 nations','J20'],['anger',.55,'Black pairs with hate across 30 nations','J20'],['mystery',.8,'Black is the gothic and noir convention','CONV'],['modern',.3,'Black and white reads as minimal','CONV']],
+ brown:[['ruggedness',1,'Brown marks were rated more rugged','LM'],['natural',.6,'Earth tones read as natural','CONV'],['human',.45,'Kraft and leather tones read as handmade','CONV'],['traditional',.4,'Brown reads as heritage','CONV'],['retro',.4,'Browns and ochres are a 1970s convention','CONV'],['food',.3,'Common for coffee, bakery and chocolate','CONV'],['sincerity',.35,'Design guides describe brown as wholesome, simple and honest','CANVA'],['warmth',.3,'Warm earth tones are described as cozy','CANVA']],
+ black:[['sophistication',1,'Black marks were rated more sophisticated','LM'],['sadness',.7,'Black pairs with sadness across 30 nations','J20'],['fear',.7,'Black pairs with fear across 30 nations','J20'],['anger',.55,'Black pairs with hate across 30 nations','J20'],['mystery',.8,'Black is the gothic and noir convention','CONV'],['modern',.3,'Black and white reads as minimal','CONV'],['traditional',.3,'Design guides describe black as formal','CANVA']],
  gray:[['sadness',.7,'Gray pairs with sadness and disappointment across 30 nations','J20'],['modern',.35,'Neutral gray reads as understated','CONV'],['tech',.25,'Common in hardware and software brands','CONV']]
 };
 const HUE_CAUTION={
@@ -1619,7 +1800,8 @@ const HUE_CAUTION={
  yellow:['Yellow was among the least pleasant hues in controlled tests, and Egypt did not link it with joy.','VM'],
  purple:['Purple had the least consistent meaning across nations; Greece linked it with sadness.','J20'],
  brown:['Brown lowered sophistication ratings and was the least emotional color across nations.','LM'],
- white:['China linked white with sadness as well as relief.','J20']
+ white:['China linked white with sadness as well as relief.','J20'],
+ blue:['Design guides also link blue with low mood (“feeling blue”). That link is a convention and is not scored here.','CANVA']
 };
 
 function newTags(){return{};}
@@ -1646,20 +1828,76 @@ function tagPalette(p){const T=newTags();const roles=[['primary',.5],['bg',.3],[
   if(pad.B<.5)addTag(T,'ruggedness',(.55-pad.B)*.9,'Darker marks were rated more rugged','LM');
   if(pad.B>.82&&pad.S<.3)addTag(T,'delicate',.4,'Pale tints read as light and airy','CONV');
   if(pad.B<.4&&hueFamily(p.bg)==='black')addTag(T,'sophistication',.3,'Dark grounds are a luxury convention','CONV');
-  for(const c in(p.conv||{}))addTag(T,c,p.conv[c],'Palette built for this use','CONV');
+  for(const c in(p.conv||{}))addTag(T,c,p.conv[c],p.convWhy||'Palette built for this use',p.convSrc||'CONV');
   finishTags(T);const cautions=[];const seen={};
   for(const role of['primary','bg']){const f=fams[role];if(HUE_CAUTION[f]&&!seen[f]){seen[f]=1;cautions.push({text:HUE_CAUTION[f][0],src:HUE_CAUTION[f][1]});}}
   return{tags:T,cautions,pad,fams};}
 
 /* One color on its own: same hue rules, and its own brightness and saturation. */
 const colorTagCache={};
-function tagColor(hex){hex=hex.toUpperCase();if(colorTagCache[hex])return colorTagCache[hex];const T=newTags(),fam=hueFamily(hex),q=hexToHsv(hex);
+/* transient: do not keep the result (the color wheel asks about thousands of colors while it is dragged). */
+function tagColor(hex,transient){hex=hex.toUpperCase();if(colorTagCache[hex])return colorTagCache[hex];const T=newTags(),fam=hueFamily(hex),q=hexToHsv(hex);
   for(const[c,s,why,src]of(HUE_RULES[fam]||[]))addTag(T,c,s,why,src);
   const pad=padFrom(q.v,q.s);tagPad(T,pad,.9);
   if(q.s*q.v>.62)addTag(T,'excitement',(q.s*q.v-.5)*1.2,'High saturation raised excitement ratings','LM');
   if(q.v<.42&&fam!=='black')addTag(T,'ruggedness',.4,'Darker marks were rated more rugged','LM');
   if(q.v>.9&&q.s<.3&&fam!=='white')addTag(T,'delicate',.4,'Pale tints read as light and airy','CONV');
-  finishTags(T);return colorTagCache[hex]={tags:T,fam,pad,cautions:HUE_CAUTION[fam]?[{text:HUE_CAUTION[fam][0],src:HUE_CAUTION[fam][1]}]:[]};}
+  finishTags(T);const out={tags:T,fam,pad,cautions:HUE_CAUTION[fam]?[{text:HUE_CAUTION[fam][0],src:HUE_CAUTION[fam][1]}]:[]};if(!transient)colorTagCache[hex]=out;return out;}
+
+/* ---------- four colors, and the panel tint ----------
+   A palette is four choices: ground, primary, accent, text. The panel tint (the quiet block behind a card or a
+   photo placeholder) is worked out from them: the ground moved a little toward the primary, or toward the text
+   when the primary is too close to the ground to show. */
+function autoPanel(bg,primary,text){let s=mix(bg,primary,.12);if(contrast(s,bg)<1.06)s=mix(bg,text,.1);return s;}
+
+/* ---------- combination types ----------
+   Monochromatic, analogous, complementary and triadic are the color-wheel combinations design guides teach
+   (SRC.CANVA). They are conventions for building a palette, not findings: the pair studies behind harmonyOf()
+   found that near hues are rated more harmonious and opposite hues less, though an opposite hue stands out more.
+   The type is read from the hue angles of a palette's colors on the RGB wheel (the screen wheel Canva uses):
+   - a color counts as a hue only if it is not a near-neutral (saturation and chroma floors below);
+   - all hues within 24 degrees: monochromatic; within 72: analogous (up to three neighbors on a 12-step wheel);
+   - otherwise hues are grouped (a gap over 40 degrees starts a new group): two groups at least 150 degrees apart
+     are complementary, three groups each 90 to 150 degrees from the next are triadic;
+   - anything else is 'other' (four hues, split complements, uneven spacing), and no hue at all is 'neutral'. */
+const COMBOS=[{k:'mono',l:'Monochromatic',d:'One hue in lighter and darker versions. Design guides call it subtle and unified; it can lack contrast.'},
+ {k:'analogous',l:'Analogous',d:'Neighboring hues on the color wheel. Design guides call it smooth and calming; let one color lead.'},
+ {k:'complementary',l:'Complementary',d:'Hues from opposite sides of the color wheel. Design guides use it for contrast and impact.'},
+ {k:'triadic',l:'Triadic',d:'Three hues evenly spaced around the color wheel. Design guides call it bold and vibrant; let one color lead.'},
+ {k:'other',l:'Other',d:'Neutral palettes with no clear hue, and mixed palettes: four hues, split complements or uneven spacing.'}];
+const COMBO_LABEL={mono:'Monochromatic',analogous:'Analogous',complementary:'Complementary',triadic:'Triadic',other:'Mixed hues',neutral:'Neutral'};
+function isHue(hex){const q=hexToHsv(hex);return q.s>=.15&&q.v>=.2&&hexToLch(hex).C>=12;}
+function comboOf(p){const hs=[p.bg,p.primary,p.accent,p.text].filter(isHue).map(h=>hexToHsv(h).h).sort((a,b)=>a-b),n=hs.length;if(!n)return'neutral';
+  let gi=0,gm=-1;for(let i=0;i<n;i++){const g=n===1?360:(hs[(i+1)%n]-hs[i]+360)%360;if(g>gm){gm=g;gi=i;}}
+  const span=n===1?0:360-gm;if(span<=24)return'mono';if(span<=72)return'analogous';
+  const groups=[];for(let i=1;i<=n;i++){const h=hs[(gi+i)%n],g=groups[groups.length-1];if(g&&(h-g[g.length-1]+360)%360<=40)g.push(h);else groups.push([h]);}
+  const mean=g=>{let x=0,y=0;g.forEach(h=>{x+=Math.cos(h*Math.PI/180);y+=Math.sin(h*Math.PI/180);});return(Math.atan2(y,x)*180/Math.PI+360)%360;};
+  const m=groups.map(mean),dist=(a,b)=>{const d=Math.abs(a-b)%360;return d>180?360-d:d;};
+  if(m.length===2&&dist(m[0],m[1])>=150)return'complementary';
+  if(m.length===3&&[dist(m[0],m[1]),dist(m[1],m[2]),dist(m[2],m[0])].every(x=>x>=90&&x<=150))return'triadic';
+  return'other';}
+const comboKey=p=>{const t=comboOf(p);return t==='neutral'?'other':t;};
+/* How a partner color relates to its anchor, in the same terms: its hue offset as generated by companions(). */
+function comboOfOffset(off){if(off==null||off===0)return'mono';const a=Math.abs(off);return a<=45?'analogous':a===120?'triadic':a===180?'complementary':'other';}
+
+/* ---------- roles for a four-color combination ----------
+   A published combination lists four colors without saying which is the ground or the text. The roles are given
+   by rule, so nothing is hand-picked:
+   - the two colors with the highest contrast are the ground-and-text candidates; the ground is the less
+     colorful of the two (the lighter one when they are about equally colorful);
+   - the text is the least colorful of the remaining colors that reaches 4.5:1 on that ground (WCAG);
+   - of the two left, the primary is the one that shows better against the ground; the other is the accent.
+   Returns null when no color can be read as text on another: such a combination cannot make a post legible
+   without a fifth color. */
+function assignRoles(cols){let pair=null,best=0;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){const k=contrast(cols[i],cols[j]);if(k>best){best=k;pair=[i,j];}}
+  if(best<4.5)return null;const A=hexToLch(cols[pair[0]]),B=hexToLch(cols[pair[1]]);const g=(Math.abs(A.C-B.C)<8?B.L>A.L:B.C<A.C)?pair[1]:pair[0],bg=cols[g];
+  const others=[0,1,2,3].filter(i=>i!==g),t=others.filter(i=>contrast(cols[i],bg)>=4.5).sort((x,y)=>hexToLch(cols[x]).C-hexToLch(cols[y]).C)[0];
+  const rest=others.filter(i=>i!==t).sort((x,y)=>contrast(cols[y],bg)-contrast(cols[x],bg));
+  return{bg,text:cols[t],primary:cols[rest[0]],accent:cols[rest[1]]};}
+function canvaPalettes(){const out=[];CANVA_COMBOS.forEach(([n,name,a,b,c,d,conv,note])=>{const r=assignRoles([a,b,c,d]);if(!r)return;
+  out.push(Object.assign({id:'canva-'+n,name,canva:n,note:'Canva no. '+n+'. '+note+'.',conv,convWhy:'Canva’s theme for this combination: '+note.charAt(0).toLowerCase()+note.slice(1),convSrc:'CANVA'},r));});return out;}
+PALETTES.push(...canvaPalettes());
+PALETTES.forEach(p=>{if(!p.surface)p.surface=autoPanel(p.bg,p.primary,p.text);});
 
 /* ---------- single-color library: 15 hues x 7 tones, plus neutrals ---------- */
 const HUES=[['red',356],['vermilion',14],['orange',27],['amber',41],['yellow',53],['lime',82],['green',135],['teal',172],['cyan',189],['sky',205],['blue',222],['indigo',245],['violet',270],['magenta',312],['rose',336]];
@@ -1686,7 +1924,7 @@ function harmonyOf(a,b){const A=hexToLch(a),B=hexToLch(b);const neutral=A.C<10||
 
 /* Candidate partners for an anchor color, for a given role. */
 function companions(anchor,role,ground,cw){const q=hexToHsv(anchor),out=[],seen={};const cs=Object.keys(cw||{});
-  const push=(hex,label)=>{hex=hex.toUpperCase();if(seen[hex]||hex===anchor.toUpperCase())return;seen[hex]=1;const L=hexToLch(hex).L;
+  const push=(hex,label,off)=>{hex=hex.toUpperCase();if(seen[hex]||hex===anchor.toUpperCase())return;seen[hex]=1;const L=hexToLch(hex).L;
     if(role==='text'&&contrast(hex,ground)<4.5)return;if(role==='bg'&&!(L>80||L<28))return;
     if(role==='surface'){const k=contrast(hex,ground);if(k<1.04||k>1.7)return;}
     const hm=harmonyOf(anchor,hex),tg=tagColor(hex).tags;let kw=0;const matched=[];for(const c of cs){if(tg[c]&&tg[c].w>=.25){kw+=Math.min(1,tg[c].w)*cw[c];matched.push(c);}}
@@ -1694,11 +1932,11 @@ function companions(anchor,role,ground,cw){const q=hexToHsv(anchor),out=[],seen=
     /* A partner that cannot be told apart from its neighbors is not usable, however harmonious. */
     if(role==='accent'){if(pop<1.5)score*=.3;else if(pop<3)score*=.8;if(sep<1.25)score*=.4;}
     if(role==='bg'&&sep<2.2)score*=sep<1.6?.3:.8;
-    out.push({hex,label,hm,tags:tg,matched,kw,pop,sep,score});};
+    out.push({hex,label,off:off==null?null:off,hm,tags:tg,matched,kw,pop,sep,score});};
   const sat=Math.max(q.s,.25);
   for(const off of[0,25,-25,45,-45,180,150,-150,120,-120]){const h=q.h+off;
-    push(hsvToHex(h,sat*.22,.98),'pale tint');push(hsvToHex(h,sat*.5,.95),'light');push(hsvToHex(h,Math.min(1,sat*1.05),Math.max(.55,Math.min(.95,q.v+.25))),'bright');
-    push(hsvToHex(h,sat,q.v),'same strength');push(hsvToHex(h,sat*.45,.72),'muted');push(hsvToHex(h,Math.min(1,sat*1.05),.5),'deep');push(hsvToHex(h,sat*.8,.22),'dark shade');}
+    push(hsvToHex(h,sat*.22,.98),'pale tint',off);push(hsvToHex(h,sat*.5,.95),'light',off);push(hsvToHex(h,Math.min(1,sat*1.05),Math.max(.55,Math.min(.95,q.v+.25))),'bright',off);
+    push(hsvToHex(h,sat,q.v),'same strength',off);push(hsvToHex(h,sat*.45,.72),'muted',off);push(hsvToHex(h,Math.min(1,sat*1.05),.5),'deep',off);push(hsvToHex(h,sat*.8,.22),'dark shade',off);}
   [[.03,1,'tinted white'],[.06,.96,'tinted off-white'],[.08,.86,'tinted light gray'],[.1,.55,'tinted gray'],[.14,.24,'tinted charcoal'],[.18,.1,'tinted near-black']].forEach(([s,v,l])=>push(hsvToHex(q.h,s,v),l));
   push('#FFFFFF','white');push('#111111','near-black');
   out.sort((x,y)=>y.score-x.score);return out;}
@@ -2330,9 +2568,16 @@ const $=s=>document.querySelector(s);
 function el(tag,attrs){const n=document.createElement(tag);if(attrs)for(const k in attrs){const v=attrs[k];if(v==null||v===false)continue;if(k==='class')n.className=v;else if(k==='text')n.textContent=v;else if(k.startsWith('on'))n.addEventListener(k.slice(2),v);else if(k==='style')n.style.cssText=v;else n.setAttribute(k,v===true?'':v);}
   for(let i=2;i<arguments.length;i++){const c=arguments[i];if(c==null||c===false)continue;if(Array.isArray(c))c.forEach(x=>x!=null&&x!==false&&n.append(x));else n.append(c);}return n;}
 const store={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
-const ROLES=[['bg','Ground'],['surface','Panel'],['primary','Primary'],['accent','Accent'],['text','Text']];
-const ROLE_NAME={bg:'ground',surface:'panel',primary:'primary',accent:'accent',text:'text'};
-const palColors=p=>({bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text});
+/* A palette is four colors. `surface`, the panel tint, still travels with them so saved brands and posts draw as
+   they did, but it is worked out, not chosen: palColors fills it in when it is missing, and putColor re-derives it
+   when the ground, primary or text changes. */
+const ROLES=[['bg','Ground'],['primary','Primary'],['accent','Accent'],['text','Text']];
+const ROLE_NAME={bg:'ground',primary:'primary',accent:'accent',text:'text'};
+const palColors=p=>({bg:p.bg,surface:validHex(String(p.surface||''))?p.surface:autoPanel(p.bg,p.primary,p.text),primary:p.primary,accent:p.accent,text:p.text});
+function putColor(role,hex){state.colors[role]=hex.toUpperCase();if(role!=='accent')state.colors.surface=autoPanel(state.colors.bg,state.colors.primary,state.colors.text);}
+/* A palette drawn as a bar of its four colors. Each segment carries its hex, so pointing at it shows that color's fingerprint. */
+const SW_W={bg:34,primary:30,accent:20,text:16};
+function swBar(cols,even){return el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{'data-hex':String(cols[r]).toUpperCase(),'data-role':ROLE_NAME[r],style:`width:${even?25:SW_W[r]}%;background:${cols[r]}`})));}
 const FMT={};FORMATS.forEach(f=>FMT[f.id]=f);const PAL={};const TYP={};TYPESETS.forEach(t=>TYP[t.id]=t);const GRA={};GRAPHICS.forEach(g=>GRA[g.id]=g);
 /* Palettes the viewer saved from the builder are listed ahead of the preloaded ones. */
 let myPalettes=[];
@@ -2367,12 +2612,12 @@ const advActive=s=>Object.keys(ADV_DEFAULTS).some(k=>s[k]!==ADV_DEFAULTS[k]);
 function setMode(m,quiet){uiMode=m==='advanced'?'advanced':'simple';store.set('brandlab.mode.v1',uiMode);document.body.classList.toggle('mode-simple',uiMode==='simple');document.body.classList.toggle('mode-advanced',uiMode==='advanced');
   document.querySelectorAll('#modeSeg button,#welMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===uiMode)));setPanel(state.mpanel);if(quiet)return;buildResults();syncAdv();requestPaint(false);}
 
-function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true,graphic:false},mpanel:'layouts',gLean:'',fpTarget:[],
+function defaults(brandId){const b=BRANDS[brandId];return{brandId,brandName:b.name,handle:b.handle,platform:'facebook',format:'fb-feed',layout:'announce',paletteId:b.palette,colors:palColors(PAL[b.palette]),arrangement:'base',typeId:b.type,graphicId:b.graphic,gStrength:.55,seed:11,tint:false,content:Object.assign({},b.content),guides:true,query:b.query,tab:'colors',showAll:false,colorMode:'palettes',buildRole:'primary',showLoose:false,typeClass:'all',typeMode:'sets',shuffle:{layout:true,arrangement:true,colors:true,graphic:false},mpanel:'layouts',gLean:'',fpTarget:[],combo:'all',ground:'any',
   headScale:1,bodyScale:1,caps:'auto',fx:.5,fy:.5,tintAmt:.7,dim:1,showMark:true,showHandle:true,pvFmt:'square',bstep:'describe'};}
 function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s)return d;const o=Object.assign(d,s);o.content=Object.assign({},d.content,s.content||{});o.shuffle=Object.assign({},d.shuffle,s.shuffle||{});
   if(!FMT[o.format])o.format='fb-feed';o.platform=FMT[o.format].p;if(!FMT[o.format].layouts.includes(o.layout))o.layout=FMT[o.format].layouts[0];if(!TYP[o.typeId])o.typeId='clear';if(!GRA[o.graphicId])o.graphicId='none';
   const okColors=o.colors&&ROLES.every(([r])=>validHex(String(o.colors[r]||'')));if(!PAL[o.paletteId]){o.paletteId=DEFAULT_PAL;if(!okColors)o.colors=palColors(PAL[o.paletteId]);}else if(!okColors)o.colors=palColors(PAL[o.paletteId]);
-  if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
+  o.colors=palColors(o.colors);if(!ROLES.some(([r])=>r===o.buildRole))o.buildRole='primary';if(o.combo!=='all'&&!COMBOS.some(c=>c.k===o.combo))o.combo='all';if(!['any','light','dark'].includes(o.ground))o.ground='any';if(!TYPE_CLASSES.some(c=>c[0]===o.typeClass))o.typeClass='all';
   const nm=(k,lo,hi)=>{const v=+o[k];o[k]=isFinite(v)?Math.min(hi,Math.max(lo,v)):ADV_DEFAULTS[k];};nm('headScale',.6,1.5);nm('bodyScale',.8,1.3);nm('fx',0,1);nm('fy',0,1);nm('tintAmt',.1,1);nm('dim',.4,1.3);
   if(!['auto','upper','normal'].includes(o.caps))o.caps='auto';o.showMark=o.showMark!==false;o.showHandle=o.showHandle!==false;if(o.typeMode!=='build')o.typeMode='sets';if(!['colors','type','graphic','identity'].includes(o.tab))o.tab='colors';if(!['square','story','banner'].includes(o.pvFmt))o.pvFmt='square';if(o.bstep!=='build')o.bstep='describe';o.shuffle={layout:o.shuffle.layout!==false,arrangement:o.shuffle.arrangement!==false,colors:o.shuffle.colors!==false,graphic:o.shuffle.graphic===true};if(!['layouts','text','photo','graphic','brand','adjust','posts'].includes(o.mpanel))o.mpanel='layouts';
   if(!LEANS.some(L=>L.k===o.gLean))o.gLean='';
@@ -2386,7 +2631,7 @@ function typeFor(s){const t=TYP[s.typeId]||TYP.clear,hs=s.headScale||1,bs=s.body
   const d=Object.assign({},t.display,{scale:(t.display.scale||1)*hs}),b=Object.assign({},t.body,{scale:(t.body.scale||1)*bs});if(cp==='upper')d.upper=true;else if(cp==='normal')d.upper=false;return Object.assign({},t,{display:d,body:b});}
 function snap(s){s=s||state;const lay=LAYOUTS[s.layout];return{fmt:FMT[s.format],layout:s.layout,p:s.colors,arrangement:s.arrangement,type:typeFor(s),graphic:s.graphicId,gStrength:s.gStrength,seed:s.seed,content:s.content,brand:{name:s.brandName,handle:s.handle},photo:lay.photo?photoImg:null,logo:logoImg,tint:s.tint,
   fx:s.fx,fy:s.fy,tintAmt:s.tintAmt,dim:s.dim,noMark:s.showMark===false,noHandle:s.showHandle===false};}
-function curPaletteTags(){const base=PAL[state.paletteId];return tagPalette(Object.assign({},state.colors,{conv:isCustom()?{}:base.conv}));}
+function curPaletteTags(){const base=PAL[state.paletteId];return tagPalette(Object.assign({},state.colors,isCustom()?{conv:{}}:{conv:base.conv,convWhy:base.convWhy,convSrc:base.convSrc}));}
 function isCustom(){const b=PAL[state.paletteId];return ROLES.some(([r])=>b[r].toUpperCase()!==state.colors[r].toUpperCase());}
 
 /* Fonts load on demand: only the faces a draft uses are fetched. */
@@ -2416,6 +2661,8 @@ function buildFormats(){const box=$('#formats');box.textContent='';FORMATS.filte
   box.append(el('button',{type:'button','aria-pressed':String(state.format===f.id),onclick:()=>setFormat(f.id)},el('span',{class:'ratio'},el('i',{style:`width:${w}px;height:${h}px`})),el('span',{class:'nm',text:f.name}),el('span',{class:'mt',text:`${f.w} \u00D7 ${f.h} \u00B7 ${MEDIA[f.media]}`})));});}
 function buildLayouts(){const box=$('#layouts');box.textContent='';FMT[state.format].layouts.forEach(id=>{const cv=el('canvas',{'data-l':id});box.append(el('button',{type:'button','aria-pressed':String(state.layout===id),onclick:()=>{state.layout=id;buildLayouts();buildFields();requestPaint(true);}},el('span',{class:'th'},cv),el('span',{text:LAYOUTS[id].name})));});paintLayoutThumbs();}
 function paintLayoutThumbs(){document.querySelectorAll('#layouts canvas').forEach(cv=>{const s=Object.assign({},state,{layout:cv.dataset.l});renderTo(cv,s,104,92,{preview:true});});}
+/* The ← Layout and Layout → buttons under the canvas: the next or previous layout this format offers. */
+function stepLayout(d){const ls=FMT[state.format].layouts;state.layout=ls[(ls.indexOf(state.layout)+d+ls.length)%ls.length];buildLayouts();buildFields();requestPaint(true);}
 function setFormat(id){state.format=id;state.platform=FMT[id].p;if(!FMT[id].layouts.includes(state.layout))state.layout=FMT[id].layouts[0];buildPlatforms();buildFormats();buildLayouts();buildFields();const f=FMT[id];$('#fmtTitle').textContent=PLATFORMS.find(p=>p.id===f.p).name+' \u00B7 '+f.name;$('#fmtDim').textContent=`${f.w} \u00D7 ${f.h} px`;requestPaint(true);}
 
 /* ---------- keywords ---------- */
@@ -2445,9 +2692,24 @@ function buildSubbar(){const bar=$('#subbar');bar.textContent='';
     if(!build)bar.append(el('div',{class:'sugg'},TYPE_CLASSES.map(([v,t])=>el('button',{type:'button',class:state.typeClass===v?'on':'','aria-pressed':String(state.typeClass===v),text:t+' '+(v==='all'?ts.length:ts.filter(x=>x.cls===v).length),onclick:()=>{state.typeClass=v;buildResults();}}))));
     if(!build)bar.append(tgtBar(buildResults,'pairings'));}
   else if(state.tab==='graphic')bar.append(tgtBar(buildResults,'graphics'));
-  if(state.tab==='colors')bar.append(tgtBar(buildResults,state.colorMode==='build'?'colors':'palettes'));}
-function buildResults(){const res=results(),has=parsed.concepts.length>0;const count=k=>{const rs=has?res[k].filter(r=>r.score>0):res[k];return tgtOn()?rs.filter(r=>tgtFit(itemLean(k,r.it)).ok).length:rs.length;};
-  $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');$('#nGraphic').textContent=has?graphicRows().filter(r=>r.score>0).length:GFAMILIES.length;
+  if(state.tab==='colors')bar.append(comboBar(),tgtBar(buildResults,state.colorMode==='build'?'colors':'palettes'));}
+/* ---------- combination filter (Colors tab) ----------
+   Premade palettes: show only palettes of one combination type, and optionally only light or dark grounds.
+   Build your own: show only partner colors that stand in that relationship to the primary. */
+const comboOn=()=>state.combo!=='all';
+const groundOf=p=>hexToLch(p.bg).L>=55?'light':'dark';
+function palRows(rows){return rows.filter(r=>(state.combo==='all'||comboKey(r.it)===state.combo)&&(state.ground==='any'||groundOf(r.it)===state.ground));}
+function comboBar(){const build=state.colorMode==='build';if(build&&state.combo==='other')state.combo='all';const cur=COMBOS.find(c=>c.k===state.combo),cnt={};if(!build)PALETTES.forEach(p=>{const k=comboKey(p);cnt[k]=(cnt[k]||0)+1;});
+  const chip=(k,l,d)=>el('button',{type:'button','aria-pressed':String(state.combo===k),title:d,text:build||k==='all'?l:l+' '+(cnt[k]||0),onclick:()=>{state.combo=k;buildResults();}});
+  const gchip=(k,l)=>el('button',{type:'button','aria-pressed':String(state.ground===k),text:l,onclick:()=>{state.ground=k;buildResults();}});
+  return el('div',{class:'tgtbar cmbbar',role:'group','aria-label':build?'Combination: limit partner colors by how they relate to the primary':'Combination: show palettes of one combination type'},
+    el('span',{class:'tgtl',text:'Combination'}),
+    el('div',{class:'tgtchips'},el('span',{class:'tgrp sugg'},chip('all','All','Every combination type'),COMBOS.filter(c=>!build||c.k!=='other').map(c=>chip(c.k,c.l,c.d))),
+      build?null:el('span',{class:'tgrp'},el('span',{class:'tpair',role:'group','aria-label':'Ground'},el('span',{class:'tpl',text:'Ground'}),gchip('any','Any'),gchip('light','Light'),gchip('dark','Dark')))),
+    el('div',{class:'tgtrow'},cur?el('span',null,tierEl('CANVA'),' '+cur.d+(build?(state.buildRole==='primary'?' Applies to the partners suggested for Ground, Accent and Text.':' Partners and single colors are limited to that relationship with your primary.'):'')):el('span',{class:'simple-only',text:build?'Pick a type to see only partner colors with that relationship to your primary.':'Pick a type to see only palettes built that way.'}),
+      comboOn()||state.ground!=='any'?el('button',{type:'button',class:'link',text:'Clear',onclick:()=>{state.combo='all';state.ground='any';buildResults();}}):null));}
+function buildResults(){const res=results(),has=parsed.concepts.length>0;res.colors=palRows(res.colors);const count=k=>{const rs=has?res[k].filter(r=>r.score>0):res[k];return tgtOn()?rs.filter(r=>tgtFit(itemLean(k,r.it)).ok).length:rs.length;};
+  $('#nColors').textContent=count('colors');$('#nType').textContent=count('type');{const gr=graphicRows();$('#nGraphic').textContent=has?gr.filter(r=>r.score>0).length:gr.length;}
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===state.tab)));renderSavedPals();
   const idt=state.tab==='identity';$('#bIdentity').hidden=!idt;$('#results').hidden=idt;$('#subbar').hidden=idt;if(idt){$('#rhead').hidden=true;syncIdentity();return;}buildSubbar();
   const kind=state.tab,rbox=$('#results');rbox.classList.remove('flow');
@@ -2457,17 +2719,19 @@ function buildResults(){const res=results(),has=parsed.concepts.length>0;const c
   let rows=res[kind];if(kind==='type'&&state.typeClass!=='all')rows=rows.filter(r=>r.it.cls===state.typeClass);
   const matches=rows.filter(r=>r.score>0);let show=has&&!state.showAll?matches:rows;const tgt=tgtOn();
   if(tgt)show=show.map(r=>Object.assign({},r,{fit:tgtFit(itemLean(kind,r.it))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
-  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} match your keywords`:'None match your keywords'):`${rows.length} ${kind==='colors'?'palettes':'pairings'}`)+(tgt?` \u00B7 ${show.length} fit your aim`:has?'':'. Add keywords to rank them.');
+  const narrowed=kind==='colors'&&(comboOn()||state.ground!=='any'),what=kind==='colors'?[state.ground!=='any'?state.ground+'-ground':'',comboOn()?COMBOS.find(c=>c.k===state.combo).l.toLowerCase():'',rows.length===1?'palette':'palettes'].filter(Boolean).join(' '):'pairings';
+  $('#rSummary').textContent=(has?(matches.length?`${matches.length} of ${rows.length} ${narrowed?what+' ':''}match your keywords`:`None of the ${rows.length} ${narrowed?what+' ':''}match your keywords`):`${rows.length} ${what}`)+(tgt?` \u00B7 ${show.length} fit your aim`:has?'':'. Add keywords to rank them.');
   const ba=$('#btnAll');ba.hidden=!has||matches.length===rows.length;ba.textContent=state.showAll?'Matches only':`Show all ${rows.length}`;
   const box=$('#results');box.textContent='';const tagKind=kind==='colors'?'palette':kind;
   show.forEach(r=>{const it=r.it;const tg=TAGS[tagKind][it.id].tags;const ids=(r.matched.length?r.matched.filter(c=>tg[c]):topTags(tg,2)).slice(0,3);
     const inUse=kind==='colors'?(state.paletteId===it.id&&!isCustom()):kind==='type'?state.typeId===it.id:state.graphicId===it.id;let vis,meta=null;
-    if(kind==='colors'){const widths={bg:30,surface:14,primary:26,accent:16,text:14};vis=el('span',{class:'vis sw'},ROLES.map(([role])=>el('i',{style:`width:${widths[role]}%;background:${it[role]}`})));if(it.mine)meta=el('div',{class:'meta',text:'Your palette'});else if(it.note)meta=el('div',{class:'meta',text:it.note});}
+    if(kind==='colors'){vis=swBar(it);const ck=comboOf(it);meta=el('div',{class:'meta'},el('span',{class:'cmb',title:(COMBOS.find(c=>c.k===(ck==='neutral'?'other':ck))||{}).d,text:COMBO_LABEL[ck]}),it.mine?' Your palette':it.note?' '+it.note:'');}
     else if(kind==='type'){const d=it.display;vis=el('span',{class:'vis aa',style:`font-family:"${d.family}",${d.fb};font-weight:${d.weight}`,text:d.upper?'AA':'Aa'});meta=el('div',{class:'meta',text:(it.mine?'Your pairing: ':'')+d.family+(it.body.family!==d.family?' with '+it.body.family:'')});}
     else{vis=el('span',{class:'vis'},el('canvas',{'data-g':it.id,width:176,height:120}));}
     box.append(el('button',{type:'button',class:'opt','aria-pressed':String(inUse),onclick:()=>apply(kind,it.id)},vis,el('span',null,el('span',{class:'nm'},it.name,inUse?el('span',{class:'inuse',text:'In use'}):null),meta,r.fit?tgtChips(r.fit.s):null,whyCompact(tg,ids))));});
-  if(!show.length&&tgt)box.append(tgtEmpty(kind==='colors'?'palette':'pairing',has&&!state.showAll&&rows.length>matches.length,kind==='colors'));
-  else if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
+  if(!show.length&&narrowed&&!rows.length)box.append(el('p',{class:'empty'},'There are no '+what+'. ',el('button',{type:'button',class:'link',text:'Clear the combination filter',onclick:()=>{state.combo='all';state.ground='any';buildResults();}}),'.'));
+  else if(!show.length&&tgt)box.append(tgtEmpty(kind==='colors'?(narrowed?what.replace(/s$/,''):'palette'):'pairing',has&&!state.showAll&&rows.length>matches.length,kind==='colors'));
+  else if(!show.length)box.append(el('p',{class:'empty',text:kind==='type'&&state.typeClass!=='all'?'No face in this group is linked to those keywords. Try another group or \u201CShow all\u201D.':narrowed?'No palette of this kind is linked to those keywords. Choose \u201CShow all\u201D, or clear the combination filter.':'Try the other tabs, or choose \u201CShow all\u201D.'}));
   if(kind==='graphic')paintGraphicThumbs();}
 function paintGraphicThumbs(){const c=makeScheme(state.colors,'base');document.querySelectorAll('#results canvas[data-g],#mgPanel canvas[data-g]').forEach(cv=>{const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=c.bg;ctx.fillRect(0,0,cv.width,cv.height);drawGraphic(ctx,cv.dataset.g,{x:0,y:0,w:cv.width,h:cv.height},c,.85,state.seed);});}
 function runSearch(){parsed=parseQuery(liveQuery());buildTerms();buildResults();updateReadout.k='';requestPaint(false);}
@@ -2569,53 +2833,137 @@ function buildMediaGraphic(){const cur=$('#mgCur');if(!cur||$('#mgPanel').hidden
   const grid=$('#mgGrid');grid.textContent='';const rows=graphicRows();grid.append(...rows.map(r=>gCard(r,pick,true)));if(!rows.length)grid.append(tgtEmpty('graphic style',false,false));
   $('#mgStrength').value=Math.round(state.gStrength*100);paintGraphicThumbs();gRefocusNow();}
 
+/* ---------- fingerprint as percentages ----------
+   The numbers behind the radar shape, for one option: each personality axis from 0 to 100%, and each feeling axis as
+   High or Low with how far it sits from neutral. They come from the same fingerprint() the chart draws and the same
+   scale the Aim for filter uses, so 100% is the option's own strongest signal, not an absolute amount. */
+function fpPct(tags){const w={};for(const c in tags)w[c]=Math.min(1,tags[c].w);const fp=fingerprint(w);
+  return FP_AXES.map((a,i)=>{const x=fp?fp[i]:null;if(a.pad==null)return{l:a.label,pct:Math.round((x?x.v:0)*100),dir:0,bi:false};
+    const d=x&&x.set?(x.v-.5)*2:0,pct=Math.round(Math.abs(d)*100);return{l:a.label,pct,dir:pct?Math.sign(d):0,bi:true};});}
+const fpVal=a=>a.bi?(a.dir>0?'High '+a.pct+'%':a.dir<0?'Low '+a.pct+'%':'Neutral'):a.pct+'%';
+function fpBars(tags,cls){return el('div',{class:'fpbars'+(cls?' '+cls:''),role:'list','aria-label':'Fingerprint as percentages'},fpPct(tags).map(a=>el('div',{class:'fpb',role:'listitem'},el('span',{class:'fl',text:a.l}),
+  el('span',{class:'fpbar'+(a.bi?' bi':''),'aria-hidden':'true'},el('i',{style:a.bi?(a.dir<0?`right:50%;width:${a.pct/2}%`:`left:50%;width:${a.pct/2}%`):`width:${a.pct}%`})),el('span',{class:'fv',text:fpVal(a)}))));}
+const FP_NOTE='100% is this color’s own strongest signal. Feeling axes show how far it sits from neutral.';
+/* The small fingerprint shape with its percentages beside it. */
+function fpBlock(tags,cls){const w={};for(const c in tags)w[c]=Math.min(1,tags[c].w);const txt=fpPct(tags).map(a=>a.l+' '+fpVal(a)).join(', ');
+  return el('div',{class:'fpblock'+(cls?' '+cls:'')},el('div',{class:'fpmini'},radarSVG([{fp:fingerprint(w),cls:'rc'}],104,'Fingerprint shape: '+txt,true)),fpBars(tags,cls));}
+
+/* ---------- color tip: point at any color to see its fingerprint ----------
+   Every swatch in the app carries data-hex. Pointing at one (or moving keyboard focus to one) shows a small card
+   with the color, its hue family and its fingerprint percentages. One listener serves the Brand page, the Media
+   page and the Library. */
+let ctipFor=null;
+function ctipHide(){const t=$('#ctip');if(t)t.hidden=true;if(ctipFor){ctipFor.removeAttribute('aria-describedby');ctipFor=null;}}
+function ctipShow(node){const hex=String(node.dataset.hex||'');if(!validHex(hex)){ctipHide();return;}let t=$('#ctip');if(!t){t=el('div',{id:'ctip',class:'ctip',role:'tooltip'});document.body.append(t);}
+  if(ctipFor&&ctipFor!==node)ctipFor.removeAttribute('aria-describedby');ctipFor=node;const H=hex[0]==='#'?hex.toUpperCase():'#'+hex.toUpperCase(),tc=tagColor(H),nm=node.dataset.name,role=node.dataset.role;
+  t.textContent='';t.append(el('div',{class:'cihead'},el('i',{class:'dot',style:'background:'+H}),el('b',{text:H}),el('span',{text:[nm,HUE_LABEL[tc.fam]+' family',role?'used as '+role:''].filter(Boolean).join(' · ')})),fpBlock(tc.tags),el('p',{class:'note',text:FP_NOTE}));
+  t.hidden=false;if(node.matches('button,[tabindex]'))node.setAttribute('aria-describedby','ctip');
+  const r=node.getBoundingClientRect(),w=t.offsetWidth,h=t.offsetHeight,vw=document.documentElement.clientWidth,vh=window.innerHeight;
+  let x=clamp(r.left+r.width/2-w/2,8,Math.max(8,vw-w-8)),y=r.bottom+8;if(y+h>vh-8)y=r.top-h-8>=8?r.top-h-8:Math.max(8,vh-h-8);t.style.left=Math.round(x)+'px';t.style.top=Math.round(y)+'px';}
+function bootColorTip(){const find=e=>e.target&&e.target.closest?e.target.closest('[data-hex]'):null;
+  document.addEventListener('mouseover',e=>{const n=find(e);if(n){if(n!==ctipFor||$('#ctip').hidden)ctipShow(n);}else if(ctipFor)ctipHide();});
+  document.addEventListener('focusin',e=>{const n=find(e);if(n)ctipShow(n);else if(ctipFor)ctipHide();});
+  /* Scrolling hides the card, unless it belongs to the focused color: tabbing to a swatch scrolls it into view, and the card should follow it there. */
+  let st=0;document.addEventListener('scroll',()=>{if(!ctipFor)return;if(document.activeElement!==ctipFor){ctipHide();return;}cancelAnimationFrame(st);st=requestAnimationFrame(()=>{if(ctipFor&&ctipFor.isConnected)ctipShow(ctipFor);else ctipHide();});},true);
+  document.addEventListener('mouseleave',ctipHide);document.addEventListener('pointerdown',ctipHide,true);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')ctipHide();});}
+
+/* ---------- color wheel ----------
+   An in-page wheel in place of the browser's own picker, so the fingerprint percentages can sit under it and follow
+   the pointer. Hue runs around the circle (red at the top, as on Canva's RGB wheel), saturation from the centre to
+   the edge, and brightness is the slider. Pointing at the wheel previews the color under the pointer in the
+   percentages; pressing or dragging chooses it, and letting go applies it to the role. */
+const wheel={open:false,h:0,s:0,v:1,hex:'',focus:''};
+function hsvRgb(h,s,v){const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;let r=0,g=0,b=0;if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}return[(r+m)*255,(g+m)*255,(b+m)*255];}
+function wheelBtn(role,open){const rn=ROLE_NAME[role];return el('button',{type:'button',class:'wheelbtn',id:'bWheel','aria-expanded':String(!!open),'aria-controls':'wheelPanel',title:open?'Close the color wheel':'Choose any '+rn+' color on the color wheel',
+  onclick:()=>{wheel.open=!wheel.open;wheel.focus=wheel.open?'cv':'btn';buildResults();}},el('span',{class:'wring','aria-hidden':'true'},el('i',{style:'background:'+state.colors[role]})),el('span',{text:open?'Close color wheel':'Color wheel'}));}
+function openWheel(role){state.tab='colors';state.colorMode='build';state.buildRole=role;wheel.open=true;wheel.focus='cv';buildResults();const w=$('#wheelPanel');if(w&&w.scrollIntoView)w.scrollIntoView({block:'center'});}
+function wheelPanel(role){const rn=ROLE_NAME[role],cur=state.colors[role].toUpperCase(),N=200,D=N*2;
+  /* Black, white and gray have no hue or saturation of their own: keep the ones the wheel was on. */
+  if(wheel.hex!==cur){const q=hexToHsv(cur);wheel.v=q.v;if(q.v>0){wheel.s=q.s;if(q.s>0)wheel.h=q.h;}wheel.hex=cur;}
+  const cv=el('canvas',{class:'wheelcv',id:'wheelCv',width:D,height:D,tabindex:0,role:'img','aria-label':'Color wheel for the '+rn+' color. Hue runs around the circle and saturation from the centre to the edge. Left and right arrow keys change the hue, up and down the saturation; hold Shift for larger steps.'});
+  const mark=el('i',{class:'wmark','aria-hidden':'true'}),wrap=el('div',{class:'wheelwrap'},cv,mark);
+  const bri=el('input',{type:'range',id:'wheelV',class:'wbri',min:0,max:100,step:1});bri.value=Math.round(wheel.v*100);const briL=el('span'),dim=el('p',{class:'note wdim',text:'Brightness is low, so a color comes out darker than the wheel shows. Raise Brightness for brighter colors.'});
+  const dot=el('i',{class:'wsw'}),hexEl=el('b',{id:'wheelHex'}),famEl=el('span'),whoEl=el('span',{class:'wwho'}),metrics=el('div',{id:'wheelFp'}),sig=el('div',{class:'tchips',id:'wheelSig'});
+  const sel=()=>hsvToHex(wheel.h,wheel.s,wheel.v);
+  /* The wheel is never drawn darker than 40% brightness, or a dark color would open an unreadable black disc. */
+  const draw=()=>{const ctx=cv.getContext('2d'),img=ctx.createImageData(D,D),d=img.data,R=D/2,v=Math.max(wheel.v,.4);for(let y=0;y<D;y++)for(let x=0;x<D;x++){const dx=x+.5-R,dy=y+.5-R,r=Math.hypot(dx,dy);if(r>R)continue;
+      const c=hsvRgb((Math.atan2(dy,dx)*180/Math.PI+450)%360,Math.min(1,r/(R-1)),v),o=(y*D+x)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255*Math.min(1,R-r);}ctx.putImageData(img,0,0);};
+  /* show(hex, hovering): the readout and the percentages for a color, without changing the palette */
+  const show=(hex,hover)=>{const t=tagColor(hex,true);dot.style.background=hex;hexEl.textContent=hex;famEl.textContent=HUE_LABEL[t.fam]+' family';whoEl.textContent=hover?'Under the pointer':'Selected';
+    metrics.textContent='';metrics.append(fpBlock(t.tags,'two'));sig.textContent='';const m=scoreTags(t.tags,parsed.cw).matched,ids=(m.length?m:topTags(t.tags,3)).slice(0,3);sig.append(...ids.map(c=>tagChip(t.tags,c)));};
+  const place=()=>{const a=(wheel.h-90)*Math.PI/180;mark.style.left=(50+50*wheel.s*Math.cos(a))+'%';mark.style.top=(50+50*wheel.s*Math.sin(a))+'%';const hex=sel();mark.style.background=hex;mark.style.borderColor=lum(hex)>.4?'#111':'#fff';};
+  const live=()=>{place();show(sel(),false);briL.textContent='Brightness '+Math.round(wheel.v*100)+'%';dim.hidden=wheel.v>=.4;};
+  const commit=f=>{const hex=sel();wheel.hex=hex;wheel.focus=f;if(hex!==state.colors[role].toUpperCase())setRole(role,hex);else{wheel.focus='';}};
+  const at=e=>{const b=cv.getBoundingClientRect(),dx=e.clientX-b.left-b.width/2,dy=e.clientY-b.top-b.height/2;return{h:(Math.atan2(dy,dx)*180/Math.PI+450)%360,s:Math.hypot(dx,dy)/(b.width/2)};};
+  let drag=false,kt=0;
+  cv.addEventListener('pointerdown',e=>{e.preventDefault();drag=true;try{cv.setPointerCapture(e.pointerId);}catch(x){}cv.focus();const q=at(e);wheel.h=q.h;wheel.s=clamp(q.s,0,1);live();});
+  cv.addEventListener('pointermove',e=>{const q=at(e);if(drag){wheel.h=q.h;wheel.s=clamp(q.s,0,1);live();}else if(e.pointerType==='mouse'){if(q.s<=1)show(hsvToHex(q.h,q.s,wheel.v),true);else show(sel(),false);}});
+  const end=()=>{if(!drag)return;drag=false;commit('cv');};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);cv.addEventListener('pointerleave',()=>{if(!drag)show(sel(),false);});
+  cv.addEventListener('keydown',e=>{const big=e.shiftKey,k=e.key;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(k))return;e.preventDefault();
+    if(k==='ArrowLeft')wheel.h=(wheel.h-(big?15:3)+360)%360;else if(k==='ArrowRight')wheel.h=(wheel.h+(big?15:3))%360;else wheel.s=clamp(wheel.s+(k==='ArrowUp'?1:-1)*(big?.1:.02),0,1);live();clearTimeout(kt);kt=setTimeout(()=>commit('cv'),450);});
+  bri.addEventListener('input',()=>{wheel.v=bri.value/100;draw();live();});bri.addEventListener('change',()=>commit('v'));
+  draw();live();
+  return el('div',{class:'wheelpanel',id:'wheelPanel',role:'group','aria-label':'Color wheel for the '+rn+' color'},
+    el('div',{class:'wheeltop'},wrap,el('div',{class:'wheelside'},el('div',{class:'wread','aria-live':'polite'},dot,el('span',null,whoEl,el('span',{class:'wline'},hexEl,' ',famEl))),
+      el('label',{for:'wheelV'},briL,bri),dim,sig,el('p',{class:'note',text:'Point at the wheel to preview a color below. Click or drag to choose it; it becomes the '+rn+' when you let go.'}))),
+    el('div',{class:'bhead'},el('h3',{text:'Fingerprint of this color'}),el('span',{class:'meta',text:'Updates as you move'})),metrics,el('p',{class:'note',text:FP_NOTE}));}
+function wheelRefocus(){const f=wheel.focus;wheel.focus='';if(!f)return;const n=f==='cv'?$('#wheelCv'):f==='v'?$('#wheelV'):$('#bWheel');if(n)n.focus({preventScroll:true});}
+
 /* ---------- build color by color ---------- */
-function setRole(role,hex){state.colors[role]=hex.toUpperCase();buildColors();buildResults();requestPaint(true);}
-function colorInfo(hex,forRole){const t=tagColor(hex),has=parsed.concepts.length>0;const m=scoreTags(t.tags,parsed.cw).matched;const ids=(m.length?m:topTags(t.tags,2)).slice(0,3);
+function setRole(role,hex){putColor(role,hex);buildColors();buildResults();requestPaint(true);}
+function colorInfo(hex,forRole,bars){const t=tagColor(hex),has=parsed.concepts.length>0;const m=scoreTags(t.tags,parsed.cw).matched;const ids=(m.length?m:topTags(t.tags,2)).slice(0,3);
   const head=el('div',{class:'cihead'},el('i',{class:'dot',style:'background:'+hex}),el('b',{text:hex.toUpperCase()}),el('span',{text:HUE_LABEL[t.fam]+' family'}),has?el('span',{class:m.length?'pass':'fail',text:m.length?'Matches '+m.map(cLabel).join(', '):'No link to your keywords'}):null);
   const box=el('div',{class:'cinfo'},head,ids.length?whyList(t.tags,ids):el('p',{class:'note',text:'No associations on file for this color.'}));
   if(tgtOn())box.append(tgtChips(colorLean(hex)));
-  t.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));return box;}
-function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary,tgt=tgtOn(),rn=ROLE_NAME[role];
-  box.append(el('p',{class:'note simple-only',style:'margin:0 0 8px',text:'Pick a role, then its color. Start with Primary: the other roles then suggest partners for it.'}));
-  box.append(el('div',{class:'roles',role:'group','aria-label':'Color role to change'},ROLES.map(([r,l])=>el('button',{type:'button',class:'role','aria-pressed':String(role===r),onclick:()=>{state.buildRole=r;buildResults();}},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))));
-  const pick=el('input',{type:'color',id:'bPick','aria-label':'Custom '+rn+' color'});pick.value=state.colors[role];pick.addEventListener('change',()=>setRole(role,pick.value));
+  t.cautions.forEach(c=>box.append(el('p',{class:'note',text:'Note: '+c.text+' ('+SRC[c.src].short+')'})));
+  if(bars)box.append(el('div',{class:'fphead',text:'Fingerprint of this color'}),fpBlock(t.tags,'two'));return box;}
+/* How a library color relates to the primary, in combination terms (hue angles on the RGB wheel). */
+function relToPrimary(hex){if(!isHue(hex)||!isHue(state.colors.primary))return'mono';let d=Math.abs(hexToHsv(hex).h-hexToHsv(state.colors.primary).h);if(d>180)d=360-d;return d<=15?'mono':d<=50?'analogous':d>=105&&d<=135?'triadic':d>=165?'complementary':'other';}
+function buildColorBuilder(){const box=$('#results');box.textContent='';const role=state.buildRole,has=parsed.concepts.length>0,ground=state.colors.bg,anchor=state.colors.primary,tgt=tgtOn(),rn=ROLE_NAME[role],cmb=comboOn()&&role!=='primary'?state.combo:'',cmbL=cmb?COMBOS.find(c=>c.k===cmb).l.toLowerCase():'';
+  box.append(el('p',{class:'note simple-only',style:'margin:0 0 8px',text:'A palette is four colors. Pick a role, then its color. Start with Primary: the other roles then suggest partners for it.'}));
+  box.append(el('div',{class:'roles',role:'group','aria-label':'Color role to change'},ROLES.map(([r,l])=>el('button',{type:'button',class:'role','aria-pressed':String(role===r),'data-hex':state.colors[r].toUpperCase(),'data-role':ROLE_NAME[r],onclick:()=>{state.buildRole=r;buildResults();}},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))));
+  {const ck=comboOf(state.colors),C=COMBOS.find(c=>c.k===(ck==='neutral'?'other':ck));box.append(el('p',{class:'note cmbnow',id:'cmbNow',title:C.d},tierEl('CANVA'),' These four colors make a ',el('b',{text:COMBO_LABEL[ck].toLowerCase()}),' combination. The panel tint behind cards is worked out from the ground.'));}
   const hx=el('input',{type:'text',id:'bHex',maxlength:7,placeholder:'#1A2B3C','aria-label':'Hex code for the '+rn+' color',style:'width:92px'});hx.value=state.colors[role].toUpperCase();
   const useHex=()=>{let v=hx.value.trim();if(v&&v[0]!=='#')v='#'+v;if(validHex(v))setRole(role,v);else{hx.value=state.colors[role].toUpperCase();say('That is not a hex color. Use six characters, such as #1A2B3C.');}};hx.addEventListener('change',useHex);hx.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();useHex();}});
   const sec=(title,right)=>el('div',{class:'bhead'},el('h3',null,title),right||null);
-  box.append(sec('Current '+rn,el('span',{class:'rowbtns'},hx,el('label',{class:'btn small',for:'bPick',style:'cursor:pointer'},'Any color…',pick))));
-  const info=colorInfo(state.colors[role],role);info.id='cinfo';box.append(info);
+  box.append(sec('Current '+rn,el('span',{class:'rowbtns'},hx,wheelBtn(role,wheel.open))));
+  if(wheel.open)box.append(wheelPanel(role));
+  {const info=colorInfo(state.colors[role],role,!wheel.open);info.id='cinfo';box.append(info);}
 
   if(role!=='primary'){const rows=companions(anchor,role,ground,parsed.cw);const matched=rows.filter(r=>r.matched.length);let list=has&&!state.showLoose?matched:rows;
-    /* Partners keep their order (how well they suit the primary); the target only filters them. */
+    /* Partners keep their order (how well they suit the primary); the combination and the target only filter them. */
+    if(cmb)list=list.filter(r=>comboOfOffset(r.off)===cmb);
     if(tgt)list=list.filter(r=>tgtFit(colorLean(r.hex)).ok);list=list.slice(0,10);
     const narrowed=has&&!state.showLoose;
-    box.append(sec(['Partners for ',el('i',{class:'dot',style:'background:'+anchor}),' your primary'],has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
-    box.append(el('p',{class:'note',style:'margin:0 0 8px',text:'Ranked by how well they suit the primary'+(narrowed?', among colors that match a keyword':'')+(tgt?', that lean toward '+tgtNames():'')+'.'}));
-    if(!list.length)box.append(el('p',{class:'empty',text:tgt?`None of the partners leans toward ${tgtNames()}. `+(narrowed?'Include colors with no keyword link, drop a direction, or pick from the single colors below.':'Drop a direction, or pick from the single colors below.'):has?`No ${rn} color that suits this primary matches your keywords. Include colors with no keyword link, or change the primary.`:'No suitable partners for this role.'}));
+    box.append(sec(['Partners for ',el('i',{class:'dot','data-hex':anchor.toUpperCase(),'data-role':'primary',style:'background:'+anchor}),' your primary'],has&&rows.length>matched.length?el('button',{type:'button',class:'link',text:state.showLoose?'Keyword matches only':'Include colors with no keyword link',onclick:()=>{state.showLoose=!state.showLoose;buildResults();}}):null));
+    box.append(el('p',{class:'note',style:'margin:0 0 8px',text:'Ranked by how well they suit the primary'+(cmb?', '+cmbL+' partners only':'')+(narrowed?', among colors that match a keyword':'')+(tgt?', that lean toward '+tgtNames():'')+'.'}));
+    if(!list.length)box.append(el('p',{class:'empty',text:tgt?`None of the ${cmb?cmbL+' ':''}partners leans toward ${tgtNames()}. `+(narrowed?'Include colors with no keyword link, drop a direction, or pick from the single colors below.':'Drop a direction, or pick from the single colors below.'):cmb?`No ${cmbL} partner ${narrowed?'that matches your keywords ':''}works as the ${rn}. Choose All under Combination, ${narrowed?'include colors with no keyword link, ':''}or use the color wheel.`:has?`No ${rn} color that suits this primary matches your keywords. Include colors with no keyword link, or change the primary.`:'No suitable partners for this role.'}));
     const og=el('div',{class:'optgrid'});
     list.forEach(r=>{const hm=r.hm;
       const facts=[el('span',{class:'tchip',title:hm.why+' ('+SRC[hm.src].short+')'+(hm.close?'. Lightness is close to the primary, which lowered harmony ratings.':'')},tierEl(hm.src),hm.level+' harmony')];
       if(role==='text'||role==='accent')facts.push(el('span',{class:'tchip',title:'Contrast against the ground (WCAG 2.2)'+(role==='text'?'':r.pop<1.5?': too faint to stand out':r.pop>=3?': stands out':'')},tierEl('WCAG'),r.pop.toFixed(1)+':1 on ground'));
-      og.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{style:'width:42%;background:'+anchor}),el('i',{style:'width:58%;background:'+r.hex})),
+      og.append(el('button',{type:'button',class:'opt','aria-pressed':String(state.colors[role].toUpperCase()===r.hex),onclick:()=>setRole(role,r.hex)},el('span',{class:'vis sw'},el('i',{'data-hex':anchor.toUpperCase(),'data-role':'primary',style:'width:42%;background:'+anchor}),el('i',{'data-hex':r.hex,style:'width:58%;background:'+r.hex})),
         el('span',null,el('span',{class:'nm'},r.hex),el('div',{class:'meta',text:hm.rel+', '+r.label}),tgt?tgtChips(colorLean(r.hex)):null,whyCompact(r.tags,r.matched.slice(0,2),facts))));});
     box.append(og);}
 
   let lib=rankColors(parsed.cw);if(role==='text')lib=lib.filter(r=>contrast(r.it.hex,ground)>=4.5);if(role==='bg')lib=lib.filter(r=>{const L=hexToLch(r.it.hex).L;return L>80||L<28;});
+  if(cmb)lib=lib.filter(r=>relToPrimary(r.it.hex)===cmb);
   const m=lib.filter(r=>r.score>0);let show=has?m.slice(0,35):lib;
   /* With a target, every color that fits is listed (keyword matches only, when there are keywords), closest first. */
   if(tgt)show=(has?m:lib).map(r=>Object.assign({},r,{fit:tgtFit(colorLean(r.it.hex))})).filter(r=>r.fit.ok).sort((a,b)=>b.fit.mean-a.fit.mean||b.score-a.score);
-  box.append(sec('Single colors',el('span',{class:'meta',text:show.length+(tgt?(has?' match your keywords and fit your aim':' fit your aim'):has?' best matches for your keywords':' colors')})));
-  if(!show.length)box.append(el('p',{class:'empty',text:tgt?`No single color${has?' that matches your keywords':''} leans toward ${tgtNames()}. Drop a direction to widen the search.`:'No single color matches your keywords.'}));
-  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals. Select it to use it as the '+rn+'.'}));
-  const grid=el('div',{class:'swgrid'});show.forEach(r=>{const b=el('button',{type:'button',class:'swatch',style:'background:'+r.it.hex,title:r.it.name+' '+r.it.hex,'aria-label':r.it.name+' '+r.it.hex,'aria-pressed':String(state.colors[role].toUpperCase()===r.it.hex),onclick:()=>setRole(role,r.it.hex)});
+  box.append(sec('Single colors',el('span',{class:'meta',text:show.length+(cmb?' '+cmbL:'')+(tgt?(has?' match your keywords and fit your aim':' fit your aim'):has?' best matches for your keywords':' colors')})));
+  if(!show.length)box.append(el('p',{class:'empty',text:tgt?`No ${cmb?cmbL+' ':'single '}color${has?' that matches your keywords':''} leans toward ${tgtNames()}. Drop a direction to widen the search.`:cmb?`No ${cmbL} color${has?' that matches your keywords':''} works as the ${rn}. Choose All under Combination, or use the color wheel.`:'No single color matches your keywords.'}));
+  const live=el('div',{class:'cinfo live',id:'clive'},el('p',{class:'note',style:'margin:0',text:'Point at a swatch to see what it signals and its fingerprint percentages. Select it to use it as the '+rn+'.'}));
+  const grid=el('div',{class:'swgrid'});show.forEach(r=>{const b=el('button',{type:'button',class:'swatch',style:'background:'+r.it.hex,'data-hex':r.it.hex,'data-name':r.it.name,'aria-label':r.it.name+' '+r.it.hex,'aria-pressed':String(state.colors[role].toUpperCase()===r.it.hex),onclick:()=>setRole(role,r.it.hex)});
     const showInfo=()=>{live.textContent='';const ci=colorInfo(r.it.hex,role);ci.firstChild.insertBefore(el('span',{text:r.it.name}),ci.firstChild.children[2]);live.append(...ci.childNodes);};b.addEventListener('mouseenter',showInfo);b.addEventListener('focus',showInfo);grid.append(b);});
   if(show.length)box.append(el('div',{class:'swwrap'},grid,live));
   box.append(sec('Save these colors as a palette'));
   const pn=el('input',{type:'text',id:'palName',maxlength:40,placeholder:'Name this palette','aria-label':'Palette name'});pn.addEventListener('keydown',e=>{if(e.key==='Enter')Lib.savePalette(pn.value);});
   box.append(el('div',{class:'savepal'},pn,el('button',{type:'button',class:'btn small primary',text:'Save palette',onclick:()=>Lib.savePalette(pn.value)})));
   if(myPalettes.length)box.append(el('div',{class:'mine'},myPalettes.map(p=>{const i=el('input',{type:'text',maxlength:40,'aria-label':'Rename '+p.name});i.value=p.name;i.addEventListener('change',()=>Lib.renamePalette(p.id,i.value));
-    return el('span',{class:'term'},el('i',{class:'dot',style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'×',onclick:()=>Lib.deletePalette(p.id)}));})));}
+    return el('span',{class:'term'},el('i',{class:'dot','data-hex':p.primary.toUpperCase(),style:'background:'+p.primary}),i,el('button',{type:'button',class:'link',text:'Use',onclick:()=>apply('colors',p.id)}),el('button',{type:'button','aria-label':'Delete '+p.name,text:'×',onclick:()=>Lib.deletePalette(p.id)}));})));
+  wheelRefocus();}
 
 /* ---------- build a type pairing (Advanced) ---------- */
 function buildTypeBuilder(){const box=$('#results');box.textContent='';const cur=TYP[state.typeId]||TYP.clear,mine=cur.mine?myTypes.find(m=>m.id===cur.id):null,fams=Object.keys(FONT_FACES).sort();
@@ -2651,9 +2999,10 @@ function updateReadout(c){const parts=draftParts(),agg=draftAgg(parts);
 function buildFields(){const box=$('#fields');box.textContent='';const mk=(id,label,val,max,area,on)=>{const inp=area?el('textarea',{id:'f_'+id,maxlength:max,rows:2}):el('input',{id:'f_'+id,type:'text',maxlength:max});inp.value=val||'';inp.addEventListener('input',()=>{on(inp.value);requestPaint(true);});return el('label',{for:'f_'+id},label,inp);};
   LAYOUTS[state.layout].fields.forEach(f=>box.append(mk(f,FIELDS[f].label,state.content[f],FIELDS[f].max,FIELDS[f].area,v=>state.content[f]=v)));
   box.append(el('p',{class:'note',text:'Fields change with the layout. Placeholder copy avoids result claims; replace it with wording you can stand behind.'}));}
-function buildColors(){const box=$('#colors');box.textContent='';ROLES.forEach(([role,label])=>{const pick=el('input',{type:'color',id:'c_'+role,'aria-label':label+' color'}),hex=el('input',{type:'text',id:'h_'+role,maxlength:7,'aria-label':label+' hex value'});pick.value=state.colors[role];hex.value=state.colors[role].toUpperCase();
-    const set=v=>{state.colors[role]=v.toUpperCase();pick.value=v;hex.value=v.toUpperCase();palNote();buildResults();requestPaint(true);};pick.addEventListener('change',()=>set(pick.value));hex.addEventListener('change',()=>{let v=hex.value.trim();if(validHex(v))set(v[0]==='#'?v:'#'+v);else hex.value=state.colors[role];});
-    box.append(el('label',null,label,pick,hex));});palNote();$('#gStrength').value=Math.round(state.gStrength*100);$('#tint').checked=state.tint;}
+function buildColors(){const box=$('#colors');box.textContent='';ROLES.forEach(([role,label])=>{const hex=el('input',{type:'text',id:'h_'+role,maxlength:7,'aria-label':label+' hex value'});hex.value=state.colors[role].toUpperCase();
+    const pick=el('button',{type:'button',class:'cwell',id:'c_'+role,'data-hex':state.colors[role].toUpperCase(),'data-role':ROLE_NAME[role],style:'background:'+state.colors[role],'aria-label':'Open the color wheel for the '+ROLE_NAME[role]+' color',onclick:()=>openWheel(role)});
+    hex.addEventListener('change',()=>{let v=hex.value.trim();if(v&&v[0]!=='#')v='#'+v;if(validHex(v))setRole(role,v);else hex.value=state.colors[role].toUpperCase();});
+    box.append(el('div',{class:'cfield'},el('label',{for:'h_'+role,text:label}),pick,hex));});palNote();$('#gStrength').value=Math.round(state.gStrength*100);$('#tint').checked=state.tint;}
 function palNote(){const p=PAL[state.paletteId];$('#palNote').textContent=(isCustom()?'Edited from '+p.name+'. Associations are recalculated from your colors. ':p.name+'. ')+(p.note||'');}
 
 /* ---------- export ---------- */
@@ -2718,6 +3067,11 @@ function buildSources(){const box=$('#srcBody');box.textContent='';const P=t=>bo
   P('Difficult emotions are included because the spectrum is incomplete without them, and because a memorial post, a warning or a horror release needs them. Few type and graphic options are linked to them; the app says so instead of stretching.');
   H('How colors are scored');
   P('Hue links come from the logo and emotion studies. Brightness and saturation are scored separately: each emotion sits in a corner of pleasure-arousal-dominance space, and a color\u2019s position in that space is estimated from its brightness and saturation with Valdez and Mehrabian\u2019s regression weights. The same rules score a single color and a whole palette, so a color you pick yourself is read the same way as a preloaded one.');
+  H('Four colors, and how they combine');
+  P('A palette is four colors: ground, primary, accent and text. The panel tint behind cards and photo placeholders is not a fifth choice; it is worked out from the ground and the primary. Brands and posts saved before this change keep the panel tint they had.');
+  P('Monochromatic, analogous, complementary and triadic are the color-wheel combinations taught in design guides such as Canva\u2019s. The app reads a palette\u2019s type from the hue angles of its colors on the RGB wheel: all within 24 degrees is monochromatic, within 72 analogous, two groups at least 150 degrees apart complementary, three groups 90 to 150 degrees apart triadic. Near-white, near-black and gray colors have no hue and are left out. These types are conventions for building a palette, not measured effects, so they filter the list but add nothing to a palette\u2019s score.');
+  P('The palettes marked \u201CCanva no.\u201D are four-color combinations from Canva\u2019s list of 100. Canva does not say which color is the ground or the text, so the app assigns the roles by rule: the two colors with the most contrast become ground and text, the less colorful of them the ground, and of the other two the one that shows better on the ground becomes the primary. A combination is left out when none of its colors can be read as text on another at 4.5:1; 58 of the 100 qualify. The theme Canva gives each combination is recorded as a convention.');
+  P('Pointing at any color shows its fingerprint as percentages, the numbers behind the radar shape. 100% is that color\u2019s own strongest signal, so the figures compare directions within one color; they are not an absolute amount, and two colors at 100% on the same axis are not equally strong.');
   H('How graphics are scored');
   P('Each graphic comes in three or four styles, and each style is described by its shape features: curved or angular, balanced or asymmetric, fine lines or heavy masses, busy or sparse, still or implying movement. The same rules tag every style from those features, so two styles of one graphic can point to different parts of the fingerprint. Curved, angular, balanced, elaborate, asymmetric and moving shapes rest on logo studies; fine, heavy, sparse and hand-made shapes are conventions and say so. The badges on each style name where it leans furthest compared with the other styles of the same graphic.');
   H('How companion colors are chosen');
@@ -2762,7 +3116,7 @@ function boot(){
   document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-close]'))o.hidden=true;});});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlays();});
   let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>requestPaint(false),80);});
-  buildSources();initAll();
+  bootColorTip();buildSources();initAll();
   if(document.fonts&&document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',()=>{clearTimeout(boot.t);boot.t=setTimeout(()=>{updateReadout.k='';requestPaint(true);},120);});}
 
 
@@ -2795,7 +3149,8 @@ function picksWeights(){const a=draftAgg(),w={};for(const k in a)w[k]=a[k].w;ret
 const SVGNS='http://www.w3.org/2000/svg';
 function svgEl(tag,attrs){const n=document.createElementNS(SVGNS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);return n;}
 /* series: [{fp, cls}] drawn in order. */
-function radarSVG(series,size,label){const W=size+150,H=size+44,cx=W/2,cy=H/2,r=size/2-4,n=FP_AXES.length;
+/* bare: no axis labels and no margins for them, for the small shape beside a color's percentages. */
+function radarSVG(series,size,label,bare){const W=bare?size:size+150,H=bare?size:size+44,cx=W/2,cy=H/2,r=size/2-4,n=FP_AXES.length;
   const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+r*v*Math.cos(a),cy+r*v*Math.sin(a)];};const pts=vals=>vals.map((v,i)=>pt(i,v).map(x=>x.toFixed(1)).join(',')).join(' ');
   const svg=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':label,class:'radarsvg'});
   [.25,.5,.75,1].forEach(k=>svg.append(svgEl('polygon',{points:pts(Array(n).fill(k)),class:'rg'})));
@@ -2803,8 +3158,8 @@ function radarSVG(series,size,label){const W=size+150,H=size+44,cx=W/2,cy=H/2,r=
   /* the neutral line on the three bipolar axes */
   const pad=FP_AXES.map((a,i)=>a.pad!=null?i:-1).filter(i=>i>=0);svg.append(svgEl('polyline',{points:pad.map(i=>pt(i,.5).map(x=>x.toFixed(1)).join(',')).join(' '),class:'rn'}));
   series.forEach(s=>{if(!s.fp)return;svg.append(svgEl('polygon',{points:pts(s.fp.map(a=>a.v)),class:'rs '+s.cls}));
-    s.fp.forEach((a,i)=>{if(!a.set)return;const[x,y]=pt(i,a.v);svg.append(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:3,class:'rd '+s.cls}));});});
-  FP_AXES.forEach((a,i)=>{const[x,y]=pt(i,1.1);const deg=i*360/n;const t=svgEl('text',{x:x.toFixed(1),y:(y+(deg===0?-2:deg===180?10:4)).toFixed(1),'text-anchor':deg===0||deg===180?'middle':deg<180?'start':'end',class:'rl'});t.textContent=a.label;svg.append(t);});
+    s.fp.forEach((a,i)=>{if(!a.set)return;const[x,y]=pt(i,a.v);svg.append(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:bare?2:3,class:'rd '+s.cls}));});});
+  if(!bare)FP_AXES.forEach((a,i)=>{const[x,y]=pt(i,1.1);const deg=i*360/n;const t=svgEl('text',{x:x.toFixed(1),y:(y+(deg===0?-2:deg===180?10:4)).toFixed(1),'text-anchor':deg===0||deg===180?'middle':deg<180?'start':'end',class:'rl'});t.textContent=a.label;svg.append(t);});
   const title=svgEl('title',{});title.textContent=label;svg.prepend(title);return svg;}
 function fpText(fp){return FP_AXES.map((a,i)=>a.label+' '+(a.pad==null?Math.round(fp[i].v*100)+'%':fp[i].v>.6?'high':fp[i].v<.4?'low':'neutral')).join(', ');}
 
@@ -2878,7 +3233,7 @@ function renderSavedPals(){const box=$('#savedPals');box.textContent='';box.hidd
   myPalettes.forEach(p=>row.append(palChip(p.name,p,state.paletteId===p.id&&!isCustom(),()=>apply('colors',p.id))));
   if(!myPalettes.length)row.append(el('span',{class:'note',style:'margin:0',text:'None yet.'}));
   row.append(el('button',{type:'button',class:'btn small',text:'+ Save current colors',title:'Saved palettes can be switched on any post',onclick:()=>Lib.askPalette()}));box.append(row);}
-function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+cols[r]}))),el('span',{text:name}));}
+function palChip(name,cols,on,fn){return el('button',{type:'button',class:'palpick','aria-pressed':String(on),onclick:fn},swBar(cols,true),el('span',{text:name}));}
 const sameColors=(a,b)=>ROLES.every(([r])=>String(a[r]).toUpperCase()===String(b[r]).toUpperCase());
 
 /* ---------- Media page: the brand's look, and switching between its palettes ---------- */
@@ -2886,6 +3241,10 @@ function renderLook(){const box=$('#mPals');if(!box)return;const L=Lib.look(),t=
   $('#mLookNote').textContent=(state.brandName||'This brand')+': '+t.name+' type, '+(g&&g.fam!=='none'?gLabel(g).toLowerCase():'no')+' graphic. Choose which saved palette this post uses.';
   if(L)box.append(palChip('Brand colors',L.colors,sameColors(state.colors,L.colors),()=>{state.paletteId=L.paletteId;state.colors=Object.assign({},L.colors);buildColors();renderLook();requestPaint(true);}));
   myPalettes.forEach(p=>box.append(palChip(p.name,p,sameColors(state.colors,p),()=>{state.paletteId=p.id;state.colors=palColors(p);buildColors();renderLook();requestPaint(true);})));
+  /* The four colors this post is using, by role. Point at one for its fingerprint percentages. */
+  const pc=$('#mPostCols');if(pc){pc.textContent='';const ck=comboOf(state.colors);pc.append(el('div',{class:'h',text:'Colors on this post'}),
+    el('div',{class:'pcols'},ROLES.map(([r,l])=>el('span',{class:'pcol',tabindex:0,role:'group','aria-label':l+' color '+state.colors[r].toUpperCase(),'data-hex':state.colors[r].toUpperCase(),'data-role':ROLE_NAME[r]},el('i',{style:'background:'+state.colors[r]}),el('span',{text:l}),el('code',{text:state.colors[r].toUpperCase()})))),
+    el('p',{class:'note'},tierEl('CANVA'),' '+COMBO_LABEL[ck]+' combination. Point at a color to see its fingerprint percentages. Colors are chosen on the Brand page.'));}
   buildMediaGraphic();}
 
 function bootBrand(){const q=$('#q');const live=()=>{clearTimeout(kwT);kwT=setTimeout(runSearch,120);};
@@ -2982,7 +3341,7 @@ const Free=(function(){
   function field(label,input){return el('label',null,label,input);}
   function num(v,min,max,step,on){const i=el('input',{type:'number',min,max,step});i.value=Math.round(v*100)/100;i.addEventListener('input',()=>{const n=parseFloat(i.value);if(!isNaN(n)){on(clamp(n,min,max));touch();}});return i;}
   function colorRow(val,on){const wrap=el('div',{class:'crow'});const pick=el('input',{type:'color','aria-label':'Custom color'});pick.value=validHex(val||'')?val:'#000000';pick.addEventListener('input',()=>{on(pick.value.toUpperCase());touch();});
-    ROLES.forEach(([r,n])=>wrap.append(el('button',{type:'button',class:'cdot',style:'background:'+state.colors[r],title:'Brand '+n.toLowerCase()+' '+state.colors[r],'aria-label':'Use brand '+n.toLowerCase(),onclick:()=>{on(state.colors[r]);pick.value=state.colors[r];touch();buildProps();}})));wrap.append(pick);return wrap;}
+    ROLES.forEach(([r,n])=>wrap.append(el('button',{type:'button',class:'cdot',style:'background:'+state.colors[r],'data-hex':state.colors[r].toUpperCase(),'data-role':'brand '+n.toLowerCase(),'aria-label':'Use brand '+n.toLowerCase()+' '+state.colors[r],onclick:()=>{on(state.colors[r]);pick.value=state.colors[r];touch();buildProps();}})));wrap.append(pick);return wrap;}
   function buildProps(){const box=$f('fProps');if(!box)return;box.textContent='';if(!doc){box.append(el('p',{class:'empty',text:'Import a PDF or start a blank canvas to begin.'}));return;}
     const l=cur();
     if(!l){box.append(el('div',{class:'h',text:'Canvas'}));const sz=el('select',{id:'fSize','aria-label':'Canvas size'});sz.append(el('option',{value:'',text:`${doc.w} × ${doc.h} px (current)`}));
@@ -3138,8 +3497,8 @@ const Kit=(function(){
     H('Logo');let logoIm=b.logo?await Store.loadImage(b.logo):null;const lc=document.createElement('canvas');
     if(logoIm){const s=Math.min(640/logoIm.naturalWidth,240/logoIm.naturalHeight,1);lc.width=Math.round(logoIm.naturalWidth*s*2);lc.height=Math.round(logoIm.naturalHeight*s*2);lc.getContext('2d').drawImage(logoIm,0,0,lc.width,lc.height);pdf.addImage(lc.toDataURL('image/png'),'PNG',M,y,lc.width/4,lc.height/4);y+=lc.height/4+10;T('Primary logo. Keep clear space around it equal to the height of one letter.',10,false,true);}
     else{const wm=await wordmark(b,contrast(b.colors.primary,'#FFFFFF')>=3?b.colors.primary:b.colors.text);pdf.addImage(wm.toDataURL('image/png'),'PNG',M-10,y,260,68);y+=76;T('Wordmark: the brand name set in '+t.display.family+'. No logo file has been added to this brand yet.',10,false,true);}
-    y+=10;H('Brand colors');const sw=(W-2*M-4*10)/5;cols.forEach((c,i)=>{const x=M+i*(sw+10),[r,g,bb]=rgb(c.hex);pdf.setFillColor(r,g,bb);pdf.setDrawColor(190,190,195);pdf.rect(x,y,sw,58,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(10.5);pdf.setTextColor(25,25,30);pdf.text(c.role,x,y+74);pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.text(c.hex,x,y+88);pdf.setTextColor(95,95,100);pdf.setFontSize(8.5);pdf.text(`RGB ${r}, ${g}, ${bb}`,x,y+100);});y+=118;
-    T('Primary color: '+cols[2].hex+'. Accent color: '+cols[3].hex+'. Background color: '+cols[0].hex+'. Text color: '+cols[4].hex+'. Panel color: '+cols[1].hex+'.',10,false,true);
+    y+=10;H('Brand colors');const sw=(W-2*M-(cols.length-1)*10)/cols.length,hexOf=k=>cols.find(c=>c.key===k).hex;cols.forEach((c,i)=>{const x=M+i*(sw+10),[r,g,bb]=rgb(c.hex);pdf.setFillColor(r,g,bb);pdf.setDrawColor(190,190,195);pdf.rect(x,y,sw,58,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(10.5);pdf.setTextColor(25,25,30);pdf.text(c.role,x,y+74);pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.text(c.hex,x,y+88);pdf.setTextColor(95,95,100);pdf.setFontSize(8.5);pdf.text(`RGB ${r}, ${g}, ${bb}`,x,y+100);});y+=118;
+    T('Primary color: '+hexOf('primary')+'. Accent color: '+hexOf('accent')+'. Background color: '+hexOf('bg')+'. Text color: '+hexOf('text')+'.',10,false,true);
     (b.palettes||[]).slice(0,5).forEach(p=>{y+=4;pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(25,25,30);pdf.text(ascii('Palette: '+p.name),M,y+10);ROLES.forEach(([r],i)=>{const[rr2,g,bb]=rgb(p[r]);pdf.setFillColor(rr2,g,bb);pdf.setDrawColor(190,190,195);pdf.rect(M+190+i*74,y,18,14,'FD');pdf.setFont('helvetica','normal');pdf.setFontSize(8);pdf.setTextColor(60,60,66);pdf.text(p[r].toUpperCase(),M+212+i*74,y+10);});y+=20;});
     y+=14;if(y>560){pdf.addPage();y=64;}H('Typography');T('Heading font: '+t.display.family+', weight '+t.display.weight+(t.display.upper?', set in capitals':'')+'.',11,true);T('Body font: '+t.body.family+', weight '+t.body.weight+'.',11,true);T('Both are open-licensed Google Fonts. Font files are in the fonts folder of this kit.',10,false,true);y+=4;
     const sp=await specimen(b);pdf.addImage(sp.toDataURL('image/jpeg',.9),'JPEG',M,y,W-2*M,(W-2*M)*560/1500);y+=(W-2*M)*560/1500+18;
@@ -3208,7 +3567,7 @@ const Lib=(function(){
   const LOOK=['paletteId','colors','typeId','graphicId','gStrength'];
   function pick(s){return{brandName:s.brandName,handle:s.handle,query:s.query,typeId:s.typeId,graphicId:s.graphicId,gStrength:s.gStrength,paletteId:s.paletteId,colors:Object.assign({},s.colors)};}
   function live(){return view==='brand'||!draft?pick(state):draft;}
-  function brandFields(){const L=live(),old=Store.get('brand',state.bid)||{};return{name:(L.brandName||'').trim()||'Untitled brand',handle:L.handle||'',query:L.query||'',typeId:L.typeId,graphicId:L.graphicId,gStrength:L.gStrength,paletteId:L.paletteId,colors:ROLES.reduce((o,[r])=>(o[r]=L.colors[r],o),{}),palettes:myPalettes.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text})),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},old.content||state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
+  function brandFields(){const L=live(),old=Store.get('brand',state.bid)||{};return{name:(L.brandName||'').trim()||'Untitled brand',handle:L.handle||'',query:L.query||'',typeId:L.typeId,graphicId:L.graphicId,gStrength:L.gStrength,paletteId:L.paletteId,colors:palColors(L.colors),palettes:myPalettes.map(p=>Object.assign({id:p.id,name:p.name},palColors(p))),types:myTypes.map(m=>({id:m.id,name:m.name,d:m.d.slice(),b:m.b.slice()})),content:Object.assign({},old.content||state.content),logo:logoRef&&!logoRef.startsWith('mem:')?logoRef:null};}
   const fieldsSig=()=>{const f=brandFields();delete f.content;return state.bid+JSON.stringify(f);};
   function isDirty(){return !!(Store.S.ready&&state.bid&&sig&&((logoRef&&logoRef.startsWith('mem:'))||fieldsSig()!==sig));}
   function syncDirty(){const d=isDirty();$('#navDirty').hidden=!d;const st=$('#bSaveState');st.textContent=d?'Unsaved changes':'All changes saved';st.classList.toggle('on',d);$('#btnDiscard').hidden=!d;$('#btnSaveBrand').disabled=!d;}
@@ -3285,7 +3644,7 @@ const Lib=(function(){
   function buildLib(){if(view!=='lib')return;const S=Store.S;if(!libBrand||!Store.get('brand',libBrand))libBrand=state.bid;const brands=Store.all('brand'),posts=Store.all('post');
     const a=$('#libAcct');a.textContent='';a.append(el('div',{class:'who'},S.me.avatarUrl?el('img',{src:S.me.avatarUrl,alt:'',width:44,height:44}):null,el('div',null,el('h2',{text:S.me.name||'Your workspace'}),el('p',{class:'lede',style:'margin:0',text:S.mode==='cloud'?'Signed in with your Claude account. Your brands and posts are private to you and follow you to any device.':S.reason}))),
       el('div',{class:'rowbtns'},el('span',{class:'meta',text:`${brands.length} ${brands.length===1?'brand':'brands'} · ${posts.length} ${posts.length===1?'post':'posts'}`}),el('button',{type:'button',class:'btn small',title:'One file with every brand, post and image in this workspace',text:'Back up everything',onclick:async()=>{libSay('Building the backup…');await saveFile('brand-media-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(await Store.exportAll()),false);libSay('Backup saved. Keep the file somewhere safe; open it here to restore.');}}),el('label',{class:'btn small',style:'cursor:pointer',title:'Open a backup, or a brand or post file someone shared with you'},'Open a backup or shared file',el('input',{type:'file',id:'libOpen',accept:'application/json,.json',hidden:true,onchange:openFile}))));
-    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;libFolder=null;buildLib();}},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+b.colors[r]}))),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open now':''}`}))));});
+    const bl=$('#libBrands');bl.textContent='';brands.forEach(b=>{const n=posts.filter(p=>p.bid===b.id).length;bl.append(el('button',{type:'button',class:'bcard','aria-pressed':String(b.id===libBrand),onclick:()=>{libBrand=b.id;libFolder=null;buildLib();}},swBar(b.colors,true),el('span',null,el('b',{text:b.name}),el('small',{text:`${n} ${n===1?'post':'posts'}${b.id===state.bid?' · open now':''}`}))));});
     bl.append(el('button',{type:'button',class:'btn',text:'New brand',onclick:()=>guard(makeBrand)}));
     const b=Store.get('brand',libBrand),pn=$('#libPanel');pn.textContent='';if(!b)return;const ps=brandPosts(b.id),t=TYP[b.typeId]||TYP.clear;
     const nm=el('input',{type:'text',id:'libName',maxlength:40,'aria-label':'Brand name'});nm.value=b.name;nm.addEventListener('change',async()=>{const v=nm.value.trim()||b.name;await Store.put('brand',Object.assign({},b,{name:v}));if(b.id===state.bid){state.brandName=v;if(draft)draft.brandName=v;const f=JSON.parse(sig.slice(state.bid.length));f.name=v;sig=state.bid+JSON.stringify(f);syncIdentity();renderLook();requestPaint(true);}fillBrandSelect();buildLib();});
@@ -3296,7 +3655,7 @@ const Lib=(function(){
     pn.append(el('p',{class:'note',id:'libMsg','aria-live':'polite',text:'Brand kit: a ZIP with a guidelines PDF, logo, palette files and fonts. In Canva, give the PDF to Brand Kit Builder, or add the pieces by hand.'}));
     const pals=[{name:'Current colors',cols:b.colors}].concat((b.palettes||[]).map(p=>({name:p.name,cols:p})));
     pn.append(el('div',{class:'h',text:'Identity'}),el('div',{class:'ident'},el('div',null,el('small',{text:'Typefaces'}),el('b',{text:t.display.family+(t.body.family!==t.display.family?' with '+t.body.family:'')})),el('div',null,el('small',{text:'Keywords'}),el('b',{text:b.query||'None yet'})),el('div',null,el('small',{text:'Logo'}),el('b',{text:b.logo?'Uploaded':'Text wordmark'}))),
-      el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([r])=>el('i',{style:'width:20%;background:'+p.cols[r]}))),el('span',{text:p.name})))));
+      el('div',{class:'pals'},pals.map(p=>el('span',{class:'palchip'},swBar(p.cols,true),el('span',{text:p.name})))));
     const fl=folders(b.id),inF=f=>ps.filter(p=>(p.folder||'')===f).length;if(libFolder!=null&&libFolder!==''&&!fl.includes(libFolder))libFolder=null;
     const newPost=()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);state.postId=null;$('#postName').value='';fillFolderSel(libFolder||'');buildDrafts();setView('design');});
     pn.append(el('div',{class:'phead',style:'margin-top:18px'},el('div',{class:'h',style:'margin:0',text:`Posts (${ps.length})`}),el('div',{class:'rowbtns'},el('button',{type:'button',class:'btn small',text:'New template post',onclick:newPost}),el('button',{type:'button',class:'btn small',text:'New layer layout or PDF import',onclick:()=>guardIf(b.id,()=>{if(b.id!==state.bid)activate(b.id);setView('free');})}))));
@@ -3357,7 +3716,7 @@ const Lib=(function(){
     const isB=r.kind==='brand',b=(r.data&&r.data.brand)||{},p=r.data&&r.data.post;if(isB?!(b.colors&&Array.isArray(r.data.posts)):!(p&&(p.s||p.doc))){$('#inH').textContent='This file cannot be opened';$('#inAdd').hidden=true;box.append(el('p',{text:'It does not contain a complete brand or post.'}));return;}
     incoming=r;registerTypes(b.types||[]);$('#inH').textContent=isB?'Shared brand: '+(b.name||'Untitled'):'Shared post: '+(p.name||'Untitled');
     box.append(el('p',{text:(r.mine?'You shared this.':r.by?'Shared by '+r.by+'.':r.file?'From a shared file.':'Shared by another account.')+' '+(isB?`It includes the brand, ${(b.palettes||[]).length} saved ${(b.palettes||[]).length===1?'palette':'palettes'} and ${r.data.posts.length} ${r.data.posts.length===1?'post':'posts'}.`:`It belongs to the brand “${b.name||'Untitled'}”, which is copied with it.`)}));
-    if(b.colors)box.append(el('div',{class:'pals'},el('span',{class:'palchip'},el('span',{class:'vis sw'},ROLES.map(([x])=>el('i',{style:'width:20%;background:'+b.colors[x]}))),el('span',{text:b.name||'Brand colors'}))));
+    if(b.colors)box.append(el('div',{class:'pals'},el('span',{class:'palchip'},swBar(b.colors,true),el('span',{text:b.name||'Brand colors'}))));
     const prev=el('div',{class:'cmp'});(isB?r.data.posts.slice(0,4):[p]).forEach(q=>{const cv=el('canvas');prev.append(el('figure',null,cv,el('figcaption',{text:q.name})));thumb(cv,q,220,240);});box.append(prev);$('#inAdd').hidden=false;$('#inAdd').textContent=isB?'Add to my brands':'Add to my posts';}
   async function acceptIncoming(){const r=incoming;if(!r)return;if(isDirty()){guard(acceptIncoming);return;}const src=r.data.brand||{};let b=r.kind==='post'&&src.id?Store.all('brand').find(x=>x.from===src.id):null;
     if(!b){const d=defaults('sample');b=src.colors?clone(src):{handle:'',query:'',typeId:d.typeId,graphicId:d.graphicId,gStrength:.55,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:d.content,logo:null};delete b.kind;b.id=uidGen();b.from=src.id||null;b.name=(src.name||'Shared brand').slice(0,40);await Store.put('brand',b);}
@@ -3382,7 +3741,7 @@ const Lib=(function(){
     await Store.init();
     /* first visit: make a brand from the designer's current state, carrying over anything kept by earlier versions */
     if(!Store.all('brand').length){const legacyP=(store.get('brandlab.mypalettes.v1')||[]).filter(p=>p&&p.id&&ROLES.every(([r])=>validHex(String(p[r]||''))));const legacyD=(store.get('brandlab.drafts.v1')||[]).filter(d=>d&&d.s);
-      const id=uidGen();myPalettes=legacyP.map(p=>({id:p.id,name:p.name,bg:p.bg,surface:p.surface,primary:p.primary,accent:p.accent,text:p.text}));registerPalettes();state.bid=id;await Store.put('brand',Object.assign(brandFields(),{id}));
+      const id=uidGen();myPalettes=legacyP.map(p=>Object.assign({id:p.id,name:p.name},palColors(p)));registerPalettes();state.bid=id;await Store.put('brand',Object.assign(brandFields(),{id}));
       let n=0;for(const d of legacyD.slice(0,40)){await Store.put('post',{id:uidGen(),bid:id,name:'Draft '+(++n),type:'template',s:sane(d.s),photo:null});}}
     const want=Store.get('brand',state.bid)?state.bid:Store.all('brand')[0].id;activate(want,true);acct();buildDrafts();{const v=store.get('brandlab.view.v1');setView(['brand','design','free','lib'].includes(v)?v:'brand');}
     {const S=Store.S;$('#welBody').textContent=S.mode==='cloud'?'Your account here is your Claude sign-in'+(S.me.name?' ('+S.me.name+')':'')+'. There is nothing to register. Brands, palettes and posts you save are private to your account and open on any device where you are signed in.':S.reason;}
