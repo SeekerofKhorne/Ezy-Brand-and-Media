@@ -759,3 +759,29 @@ test('hosted with accounts (simulated): work saves per account and a share link 
   assert.deepEqual(one.errors.concat(two.errors), []);
   await ctx.close();
 });
+
+test('switching brands empties the photo and logo pickers, and a late image load does not land in the new brand', async () => {
+  const page = await openApp(browser, url);
+  await page.evaluate(async () => { const d = defaults('sample'); await Store.put('brand', { id: 'b2', name: 'Second', handle: '', query: '', typeId: d.typeId, graphicId: d.graphicId, gStrength: .55, paletteId: d.paletteId, colors: d.colors, palettes: [], types: [], content: d.content, logo: null }); });
+  await page.reload(); await page.waitForFunction('Store.S.ready && !!state.bid');
+  if (await page.isVisible('#ovWelcome')) await page.click('#ovWelcome [data-close]');
+  await toMedia(page); await page.click('#rail button[data-p=photo]');
+  await page.setInputFiles('#inPhoto', fixture('photo.jpg'));
+  await page.waitForFunction('!!photoImg');
+  const other = await page.evaluate('Store.all("brand").find(b=>b.id!==state.bid).id');
+  await page.selectOption('#brandSel', other);
+  await page.waitForFunction(id => state.bid === id, other);
+  assert.equal(await page.evaluate('document.querySelector("#inPhoto").files.length'), 0, 'the old file is no longer shown as chosen');
+  assert.equal(await page.evaluate('photoImg'), null);
+  // the same file can be chosen again in the new brand
+  await page.setInputFiles('#inPhoto', fixture('photo.jpg'));
+  await page.waitForFunction('!!photoImg');
+  // a photo still loading when the brand changes is dropped
+  const back = await page.evaluate('Store.all("brand").find(b=>b.id!==state.bid).id');
+  await page.evaluate(() => { const i = document.querySelector('#inPhoto'); i.value = ''; });
+  await page.setInputFiles('#inPhoto', fixture('photo.jpg'));
+  await page.selectOption('#brandSel', back);
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate('photoImg'), null, 'a photo picked in one brand does not appear in another');
+  assert.deepEqual(page.errors, []);
+});

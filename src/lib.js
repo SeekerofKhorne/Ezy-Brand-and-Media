@@ -36,7 +36,7 @@ const Lib=(function(){
     myTypes=(b.types||[]).filter(validType).map(clone);state.bid=b.id;registerTypes();
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
-    logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
+    resetUploads();const g=imgGen;logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{if(g!==imgGen)return;logoImg=im;requestPaint(true);});
     draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();fillFolderSel('');if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
@@ -65,7 +65,7 @@ const Lib=(function(){
   function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');resetUploads();const g=imgGen;photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{if(g!==imgGen)return;photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
