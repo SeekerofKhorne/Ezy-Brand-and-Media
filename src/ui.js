@@ -63,6 +63,10 @@ function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s
   return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
+/* imgGen counts brand switches, post opens and removals. An image that finishes loading after one of those
+   belongs to the work that was open before, so it is dropped instead of landing in the new brand or post. */
+let imgGen=0;
+function resetUploads(){imgGen++;['#inPhoto','#inLogo'].forEach(id=>{const i=$(id);if(i)i.value='';});}
 
 function typeFor(s){const t=TYP[s.typeId]||TYP.clear,hs=s.headScale||1,bs=s.bodyScale||1,cp=s.caps||'auto';if(hs===1&&bs===1&&cp==='auto')return t;
   const d=Object.assign({},t.display,{scale:(t.display.scale||1)*hs}),b=Object.assign({},t.body,{scale:(t.body.scale||1)*bs});if(cp==='upper')d.upper=true;else if(cp==='normal')d.upper=false;return Object.assign({},t,{display:d,body:b});}
@@ -543,9 +547,9 @@ function boot(){
   document.querySelectorAll('#rail button').forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.p);store.set('brandlab.state.v1',state);}));
   $('#btnPrev').addEventListener('click',()=>stepLayout(-1));$('#btnNext').addEventListener('click',()=>stepLayout(1));$('#btnShuffle').addEventListener('click',shuffle);
   $('#btnExport').addEventListener('click',()=>exportPNG());
-  $('#inPhoto').addEventListener('change',e=>loadImage(e.target.files[0],im=>{photoImg=im;photoRef=Store.memRef(e.target.files[0]);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);}));
-  $('#inLogo').addEventListener('change',e=>loadImage(e.target.files[0],im=>{logoImg=im;logoRef=Store.memRef(e.target.files[0]);requestPaint(true);}));
-  $('#rmPhoto').addEventListener('click',()=>{photoImg=null;photoRef=null;$('#inPhoto').value='';requestPaint(true);});$('#rmLogo').addEventListener('click',()=>{logoImg=null;logoRef=null;$('#inLogo').value='';requestPaint(true);});
+  $('#inPhoto').addEventListener('change',e=>{const f=e.target.files[0],g=imgGen;loadImage(f,im=>{if(g!==imgGen)return;photoImg=im;photoRef=Store.memRef(f);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);});});
+  $('#inLogo').addEventListener('change',e=>{const f=e.target.files[0],g=imgGen;loadImage(f,im=>{if(g!==imgGen)return;logoImg=im;logoRef=Store.memRef(f);requestPaint(true);});});
+  $('#rmPhoto').addEventListener('click',()=>{imgGen++;photoImg=null;photoRef=null;$('#inPhoto').value='';requestPaint(true);});$('#rmLogo').addEventListener('click',()=>{imgGen++;logoImg=null;logoRef=null;$('#inLogo').value='';requestPaint(true);});
   $('#tint').addEventListener('change',e=>{state.tint=e.target.checked;requestPaint(true);});
   $('#gStrength').addEventListener('input',e=>{state.gStrength=e.target.value/100;requestPaint(true);});
   $('#btnSeed').addEventListener('click',()=>{state.seed=1+Math.floor(Math.random()*9999);requestPaint(true);});

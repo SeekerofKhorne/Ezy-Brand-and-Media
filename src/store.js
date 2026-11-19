@@ -60,7 +60,8 @@ const Store=(function(){
   function loadImage(ref){if(!ref)return Promise.resolve(null);if(imgCache.has(ref))return imgCache.get(ref);
     const p=(async()=>{let url;if(ref.startsWith('a:'))url='/_blob/'+ref.slice(2);else{const b=await refBlob(ref);if(!b)return null;url=URL.createObjectURL(b);}
       return await new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=url;});})();
-    imgCache.set(ref,p);return p;}
+    /* a failed read is not kept, so the next draw tries again instead of showing nothing for the rest of the session */
+    imgCache.set(ref,p);p.then(im=>{if(!im&&imgCache.get(ref)===p)imgCache.delete(ref);});return p;}
   const imagesSaved=()=>S.mode!=='cloud'||!!assets;
 
   /* --- share links: a snapshot other accounts on this page can open and copy --- */

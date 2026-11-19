@@ -2594,7 +2594,8 @@ const Store=(function(){
   function loadImage(ref){if(!ref)return Promise.resolve(null);if(imgCache.has(ref))return imgCache.get(ref);
     const p=(async()=>{let url;if(ref.startsWith('a:'))url='/_blob/'+ref.slice(2);else{const b=await refBlob(ref);if(!b)return null;url=URL.createObjectURL(b);}
       return await new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=url;});})();
-    imgCache.set(ref,p);return p;}
+    /* a failed read is not kept, so the next draw tries again instead of showing nothing for the rest of the session */
+    imgCache.set(ref,p);p.then(im=>{if(!im&&imgCache.get(ref)===p)imgCache.delete(ref);});return p;}
   const imagesSaved=()=>S.mode!=='cloud'||!!assets;
 
   /* --- share links: a snapshot other accounts on this page can open and copy --- */
@@ -2687,6 +2688,10 @@ function sane(s){const d=defaults(BRANDS[s&&s.brandId]?s.brandId:'sample');if(!s
   return o;}
 let state=sane(store.get('brandlab.state.v1'));
 let photoImg=null,logoImg=null;
+/* imgGen counts brand switches, post opens and removals. An image that finishes loading after one of those
+   belongs to the work that was open before, so it is dropped instead of landing in the new brand or post. */
+let imgGen=0;
+function resetUploads(){imgGen++;['#inPhoto','#inLogo'].forEach(id=>{const i=$(id);if(i)i.value='';});}
 
 function typeFor(s){const t=TYP[s.typeId]||TYP.clear,hs=s.headScale||1,bs=s.bodyScale||1,cp=s.caps||'auto';if(hs===1&&bs===1&&cp==='auto')return t;
   const d=Object.assign({},t.display,{scale:(t.display.scale||1)*hs}),b=Object.assign({},t.body,{scale:(t.body.scale||1)*bs});if(cp==='upper')d.upper=true;else if(cp==='normal')d.upper=false;return Object.assign({},t,{display:d,body:b});}
@@ -3167,9 +3172,9 @@ function boot(){
   document.querySelectorAll('#rail button').forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.p);store.set('brandlab.state.v1',state);}));
   $('#btnPrev').addEventListener('click',()=>stepLayout(-1));$('#btnNext').addEventListener('click',()=>stepLayout(1));$('#btnShuffle').addEventListener('click',shuffle);
   $('#btnExport').addEventListener('click',()=>exportPNG());
-  $('#inPhoto').addEventListener('change',e=>loadImage(e.target.files[0],im=>{photoImg=im;photoRef=Store.memRef(e.target.files[0]);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);}));
-  $('#inLogo').addEventListener('change',e=>loadImage(e.target.files[0],im=>{logoImg=im;logoRef=Store.memRef(e.target.files[0]);requestPaint(true);}));
-  $('#rmPhoto').addEventListener('click',()=>{photoImg=null;photoRef=null;$('#inPhoto').value='';requestPaint(true);});$('#rmLogo').addEventListener('click',()=>{logoImg=null;logoRef=null;$('#inLogo').value='';requestPaint(true);});
+  $('#inPhoto').addEventListener('change',e=>{const f=e.target.files[0],g=imgGen;loadImage(f,im=>{if(g!==imgGen)return;photoImg=im;photoRef=Store.memRef(f);if(!LAYOUTS[state.layout].photo){const l=FMT[state.format].layouts.find(x=>LAYOUTS[x].photo);if(l){state.layout=l;buildLayouts();buildFields();}else say('This format has no photo layout. The photo will show when you pick one that does.');}requestPaint(true);});});
+  $('#inLogo').addEventListener('change',e=>{const f=e.target.files[0],g=imgGen;loadImage(f,im=>{if(g!==imgGen)return;logoImg=im;logoRef=Store.memRef(f);requestPaint(true);});});
+  $('#rmPhoto').addEventListener('click',()=>{imgGen++;photoImg=null;photoRef=null;$('#inPhoto').value='';requestPaint(true);});$('#rmLogo').addEventListener('click',()=>{imgGen++;logoImg=null;logoRef=null;$('#inLogo').value='';requestPaint(true);});
   $('#tint').addEventListener('change',e=>{state.tint=e.target.checked;requestPaint(true);});
   $('#gStrength').addEventListener('input',e=>{state.gStrength=e.target.value/100;requestPaint(true);});
   $('#btnSeed').addEventListener('click',()=>{state.seed=1+Math.floor(Math.random()*9999);requestPaint(true);});
@@ -3652,7 +3657,7 @@ const Lib=(function(){
     myTypes=(b.types||[]).filter(validType).map(clone);state.bid=b.id;registerTypes();
     const pid=PAL[b.paletteId]?b.paletteId:DEFAULT_PAL;const okC=b.colors&&ROLES.every(([r])=>validHex(String(b.colors[r]||'')));
     state=sane(Object.assign(defaults('sample'),keep,{bid:b.id,postId:null,brandName:b.name,handle:b.handle||'',query:b.query||'',typeId:b.typeId,graphicId:b.graphicId,gStrength:b.gStrength==null?.55:b.gStrength,paletteId:pid,colors:okC?Object.assign({},b.colors):palColors(PAL[pid]),content:Object.assign({},defaults('sample').content,b.content||{})}));
-    logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{logoImg=im;requestPaint(true);});
+    resetUploads();const g=imgGen;logoRef=b.logo||null;logoImg=null;photoRef=null;photoImg=null;$('#postName').value='';if(logoRef)Store.loadImage(logoRef).then(im=>{if(g!==imgGen)return;logoImg=im;requestPaint(true);});
     draft=pick(state);postLook=null;sig=fieldsSig();fillBrandSelect();initAll();syncDirty();fillFolderSel('');if(Free.doc)Free.refresh();if(!quiet)say('Now working in '+b.name+'.');}
   async function newBrand(name,preset){const d=defaults(preset||'sample');const b={id:uidGen(),name:name||'New brand',handle:d.handle,query:d.query,typeId:d.typeId,graphicId:d.graphicId,gStrength:d.gStrength,paletteId:d.paletteId,colors:d.colors,palettes:[],types:[],content:Object.assign({},d.content),logo:null};await Store.put('brand',b);return b;}
 
@@ -3681,7 +3686,7 @@ const Lib=(function(){
   function openPostNow(id){const p=Store.get('post',id);if(!p)return;if(view==='brand')setView('design');if(p.bid!==state.bid&&Store.get('brand',p.bid))activate(p.bid,true);closeOverlays();
     if(p.type==='free'){const d=clone(p.doc);d.id=p.id;d.name=p.name;Free.open(d,[]);setView('free');return;}
     const keep={tab:state.tab,guides:state.guides,shuffle:state.shuffle,showAll:state.showAll,colorMode:state.colorMode,buildRole:state.buildRole,typeClass:state.typeClass};
-    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{photoImg=im;requestPaint(true);});
+    state=sane(Object.assign(clone(p.s),keep,{bid:state.bid,postId:p.id,query:draft?draft.query:state.query}));fillFolderSel(p.folder||'');resetUploads();const g=imgGen;photoRef=p.photo||null;photoImg=null;if(photoRef)Store.loadImage(photoRef).then(im=>{if(g!==imgGen)return;photoImg=im;requestPaint(true);});
     $('#postName').value=p.name;initAll();setView('design');say('Opened “'+p.name+'”.');}
   async function deletePost(id){await Store.del('post',id);if(state.postId===id)state.postId=null;buildDrafts();acct();if(view==='lib')buildLib();}
   async function dupPost(id){const p=Store.get('post',id);if(!p)return;const c=clone(p);c.id=uidGen();c.name=(p.name+' copy').slice(0,60);if(c.doc)c.doc.id=c.id;await Store.put('post',c);buildDrafts();buildLib();}
